@@ -20,23 +20,14 @@ library(tidyverse)
 library(lubridate)
 library(stringr)
 
+#Run functions script to upload all the user defined functions####
+source("05_Scripts/00_MULimnology_reservoirProfileQAQC_Functions.R")
+
 #Set year here####
 year<-2022
 
 #Read in the sensor limits file####
 sensorLimits<-read_csv("00_Level0_Data/MissouriReservoirs-YSI_EXO3_SensorLimits.csv")
-
-#Function for qaqc to create NAs based on being outside the bounds from a data table####
-qaqc_bounds<-function(variable,qaqc_table){
-  
-  qaqc_table2<-data.frame(qaqc_table) #make the sensor tibble into a data frame
-  max<-as.numeric(qaqc_table2[qaqc_table2$Param==deparse(substitute(variable)),"maxBound"]) #pull the max for the variable
-  min<-as.numeric(qaqc_table2[qaqc_table2$Param==deparse(substitute(variable)),"minBound"]) #pull the min for the variable
-  
-  variable2<-ifelse(variable>max|variable<min,NA,variable) #If the variable is outside the bounds then set it to NA
-  
-  return(variable2) #Return the variable 
-}
 
 
 #*Set the directory path here####
@@ -57,6 +48,8 @@ Level0_files_log<-tibble(Level0_profiles=Level0_files,Level0to1_done="No",Level0
                          longitude=NA,
                          altitude_m=NA,
                          barometerAirHandheld_mbars=NA,
+                         doConcentration_mgpL_bottom=NA,
+                         doConcentration_mgpL_bottom5mean=NA,
                          Level1FileName=paste0(MULakeNumber,"_",year,"_",month,"_",day,ifelse(csv=="csv","_Level1.csv",paste0("_",csv,"_Level1.csv"))) #new file name which is old file name with _Level1 ammended
                          ) 
 
@@ -179,8 +172,10 @@ for(fileIndex in 1:length(Level0_files)){
     Level0_files_log$longitude[fileIndex]<-mean(qaqcProfile$longitude,na.rm=TRUE)
     Level0_files_log$altitude_m[fileIndex]<-mean(qaqcProfile$altitude_m,na.rm=TRUE)
     Level0_files_log$barometerAirHandheld_mbars[fileIndex]<-mean(qaqcProfile$barometerAirHandheld_mbars,na.rm=TRUE)
-    
-    
+    Level0_files_log$doConcentration_mgpL_bottom[fileIndex]<-readProfile$doConcentration_mgpL[length(readProfile$doConcentration_mgpL)]
+    Level0_files_log$doConcentration_mgpL_bottom5mean[fileIndex]<-mean(readProfile$doConcentration_mgpL[(length(readProfile$doConcentration_mgpL)-5):length(readProfile$doConcentration_mgpL)],na.rm=TRUE)
+            
+              
     #Print each file to level1####
       #*level 1 directory####
       level1_dir<-paste0("01_Level1_Data/",year,"_Level1_Data/")
@@ -195,5 +190,5 @@ for(fileIndex in 1:length(Level0_files)){
     }
   
 #Export the log####
-write_csv(Level0_files_log,file=paste0("03_Outputs/",year,"_QAQC_log.csv"))
+write_csv(Level0_files_log,file=paste0("06_Outputs/",year,"_QAQC_log.csv"))
 
