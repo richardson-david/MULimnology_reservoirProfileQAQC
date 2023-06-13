@@ -1,0 +1,199 @@
+##Level0: DataInput, Decap, Base QA/QC Missouri Reservoirs####
+##Created 25Apr2023 by David Richardson (hereafter DCR)
+##Reads in level 0 data from the YSI sonde, formats the files, and does a basic QA/QC
+
+#Pseudo Code####
+  #Identify folders 
+  #create a log file within 01_RawData/2022_sonde_profiles/Level0_RawData
+  #Read in 1 week of files
+  #Decap the headers
+  #Do basic QA/QC, look for max/mins of each column (OTHER STUFF HERE)
+
+#Libraries
+if (!require(tidyverse)) {install.packages("tidyverse")}
+if (!require(lubridate)) {install.packages("lubridate")}
+if (!require(stringr)) {install.packages("stringr")}
+
+
+#Load packages
+library(tidyverse)
+library(lubridate)
+library(stringr)
+
+#Set year here####
+year<-2022
+
+#Read in the sensor limits file####
+sensorLimits<-read_csv("01_RawData/MissouriReservoirs-YSI_EXO3_SensorLimits.csv")
+
+#Function for qaqc to create NAs based on being outside the bounds from a data table####
+qaqc_bounds<-function(variable,qaqc_table){
+  
+  qaqc_table2<-data.frame(qaqc_table) #make the sensor tibble into a data frame
+  max<-as.numeric(qaqc_table2[qaqc_table2$Param==deparse(substitute(variable)),"maxBound"]) #pull the max for the variable
+  min<-as.numeric(qaqc_table2[qaqc_table2$Param==deparse(substitute(variable)),"minBound"]) #pull the min for the variable
+  
+  variable2<-ifelse(variable>max|variable<min,NA,variable) #If the variable is outside the bounds then set it to NA
+  
+  return(variable2) #Return the variable 
+}
+
+
+#*Set the directory path here####
+dirPath<-paste0("00_Level0_Data/",year,"_Level0_RawData")
+
+#Identify all the individual .csv files####
+Level0_files<-list.files(dirPath,pattern = "*.csv")
+
+#Create log of the existing files, can maybe refer back to this and amend as new files are added####
+  #columns include when they have been loaded and the date they are done####
+  #***This will not be created each time, just one initial and then loaded in####
+Level0_files_log<-tibble(Level0_profiles=Level0_files,Level0to1_done="No",Level0to1_done_date=NA)%>% #Marks that Level 0 to 1 is done and what date
+                  separate(Level0_profiles,c("MULakeNumber","year","month","day","csv"),remove=FALSE)%>% #use separate function to pull out each component of the 
+                  #HERE IS WHERE TO TRY TO FIGURE OUT WHERE THE ARMS WOULD GO####
+                   mutate(profile_date=ymd(paste(year,month,day,sep="-")),
+                         maxDepth_m=NA,
+                         latitude=NA,
+                         longitude=NA,
+                         altitude_m=NA,
+                         barometerAirHandheld_mbars=NA,
+                         Level1FileName=paste0(MULakeNumber,"_",year,"_",month,"_",day,ifelse(csv=="csv","_Level1.csv",paste0("_",csv,"_Level1.csv"))) #new file name which is old file name with _Level1 ammended
+                         ) 
+
+
+#For loop through the files####
+  #Check the log to see if the file has already been loaded
+  #If not, then read in each file, 
+  #lop of the header
+  #Do some basic QA/QC
+  #export the file to the Level1 folder as csv
+  #Update the week log folder
+  #Update the profile log folder
+  
+                # #Figure out how to debug the different file types####
+                # fileIndex<-12
+                # #find the file encoding
+                # fileEncoding_set<-guess_encoding(paste0(dirPath,"/",Level0_files_log$Level0_profiles[fileIndex]),n_max=1000)[1,1]%>%pull()
+                # firstEntry<-read.table(paste0(dirPath,"/",Level0_files_log$Level0_profiles[fileIndex]),nrows=1,header=F,skipNul=TRUE,sep=",",fileEncoding=fileEncoding_set)$V1
+                # 
+                # if(firstEntry=="sep="){
+                #   skip_rows=9
+                # }else{
+                #   skip_rows=8
+                # }
+                # 
+                # read.csv(file=paste0(dirPath,"/",Level0_files_log$Level0_profiles[fileIndex]),skip=skip_rows,fileEncoding=fileEncoding_set)
+
+
+#***This 1 can be subbed in with the new file index from the log####
+    #Debug fileIndex<-27
+for(fileIndex in 1:length(Level0_files)){
+  #Check to see if the file has been read in already####
+  #Do some basic checks of the file name, can catch errors here####
+  #Read in the file####
+    #Start by checking what the file encoding each file has####
+    fileEncoding_set<-guess_encoding(paste0(dirPath,"/",Level0_files_log$Level0_profiles[fileIndex]),n_max=1000)[1,1]%>%pull()
+    #Read in the first entry to check####
+    firstEntry<-read.table(paste0(dirPath,"/",Level0_files_log$Level0_profiles[fileIndex]),nrows=1,header=F,skipNul=TRUE,sep=",",fileEncoding=fileEncoding_set)$V1
+    #There are currently two options of file types, if it is sep= then skip 9 rows, otherwise skip 8####
+    if(firstEntry=="sep="){
+      skip_rows=9
+    }else{
+      skip_rows=8
+    }
+    
+        
+    #This also decaps the first bunch of rows to start with row skip_rows
+    #The file encoding is necessary because there are some odd characters in the file that need to be bypassed
+     readProfile<-tibble(read.csv(file=paste0(dirPath,"/",Level0_files_log$Level0_profiles[fileIndex]),skip=skip_rows,fileEncoding=fileEncoding_set))%>%
+                                mutate(date=mdy(Date..MM.DD.YYYY.),  #Convert date to date, time to time, merge to a dateTime variable####
+                                      dateTime=ymd_hms(paste(date,Time..HH.mm.ss.,sep=" ")),
+                                      MULakeNumber=strsplit(Level0_files_log$Level0_profiles[fileIndex],'_')[[1]][1], #Extract the MULakeNumber from the file name
+                                      )%>%
+                              dplyr::select(-Site.Name,-Chlorophyll.ug.L,-BGA.PC.ug.L,-pH.mV,-Battery.V,-Cable.Pwr.V,-Date..MM.DD.YYYY.,-Time..HH.mm.ss.,-Time..Fract..Sec.,-nLF.Cond.µS.cm,-Cond.µS.cm)%>% #get rid of a number of unneccessary columns
+                              #Here is where units/column names can be corrected####
+                              mutate(Pressure.bar.a=if("Pressure.bar.a" %in% names(.)){Pressure.bar.a}else{if("Pressure.psi.a" %in% names(.)){Pressure.psi.a/14.696}else{NA}}, #Check if there is pressure with different units and convert if it is in psi
+                                     Barometer.mbars=if("Barometer.mbars" %in% names(.)){Barometer.mbars}else{if("Barometer.mmHg" %in% names(.)){Barometer.mmHg/0.75}else{NA}} #Check if there is hand held pressure with different units and convert if it is in mmHg 
+                                      )%>% 
+                              dplyr::select(-any_of(c("Pressure.psi.a","Barometer.mmHg")))%>% #removes the column if it exists
+                              rename(chlorophyll_RFU=Chlorophyll.RFU, #Rename a number of variables to fit the convention with _ representing the distinction between label and units
+                                     depth_m=Depth.m,
+                                     doSaturation_percent=ODO...sat,
+                                     doConcentration_mgpL=ODO.mg.L,
+                                     orp_mV=ORP.mV,
+                                     waterPressure_barA=Pressure.bar.a, #barA is absolute pressure where absolute zero is its zero point; bar(g) is gauge pressure that uses atmopsheric pressure as its zero point
+                                     salinity_psu=Sal.psu,
+                                     specificConductivity_uSpcm=SpCond.µS.cm,
+                                     phycocyaninBGA_RFU=BGA.PC.RFU,
+                                     tds_mgpL=TDS.mg.L,
+                                     turbidity_FNU=Turbidity.FNU,
+                                     temp_degC=Temp..C,
+                                     verticalPosition_m=Vertical.Position.m,
+                                     latitude=GPS.Latitude..,
+                                     longitude=GPS.Longitude..,
+                                     altitude_m=Altitude.m,
+                                     barometerAirHandheld_mbars=Barometer.mbars 
+                                     )%>%
+                          mutate(depthDiff_m=c(diff(depth_m),0), #Create a depth difference column that represents the difference of the depths for each consecutive reading
+                                 verticalPositionDiff_m=c(diff(verticalPosition_m),0) #Create a depth difference column that represents the difference of the depths for each consecutive reading
+                                 )
+    #Graph the depth_m and depth difference####
+      #ggplot(data=readProfile,aes(x=dateTime,y=depth_m))+geom_point()
+      #ggplot(data=readProfile,aes(x=dateTime,y=depthDiff_m))+geom_point()+geom_hline(yintercept=0.03) #Look at the depth differences; find a cutoff that works. In this case, you might lose some points in the middle of the profile
+      #ggplot(data=readProfile,aes(x=dateTime,y=verticalPosition_m))+geom_point()
+      #ggplot(data=readProfile,aes(x=dateTime,y=verticalPositionDiff_m))+geom_point()+geom_hline(yintercept=0.03) #Look at the depth differences; find a cutoff that works. In this case, you might lose some points in the middle of the profile
+      
+    #Chop off the bottom and top for anomalous values - trim based on . Perhaps use the difference (diff) of the depth. If the diff is <0.03 m, then remove the next one.#### 
+    qaqcProfile<-readProfile%>%
+                filter(verticalPositionDiff_m>=0)%>% #Removes any readings from the top of the profile with negative depths
+                filter(verticalPositionDiff_m>0.03) #Remove any readings from the profile with a vertical position difference >0.03, should set this globally. This is conservative and might lose some readings from the top (bouncing boat/waves), middle (not lowering sonde fast enough), and bottom (sonde hit the bottom and is not moving)
+                
+    
+    #Basic checks for error codes and makes any NA data above or below the sensor bounds as NA####
+    qaqcProfile<-qaqcProfile%>%mutate(
+                           chlorophyll_RFU=qaqc_bounds(chlorophyll_RFU,sensorLimits),
+                           depth_m=qaqc_bounds(depth_m,sensorLimits),
+                           doSaturation_percent=qaqc_bounds(doSaturation_percent,sensorLimits),
+                           doConcentration_mgpL=qaqc_bounds(doConcentration_mgpL,sensorLimits),
+                           orp_mV=qaqc_bounds(orp_mV,sensorLimits),
+                           waterPressure_barA=qaqc_bounds(waterPressure_barA,sensorLimits),
+                           salinity_psu=qaqc_bounds(salinity_psu,sensorLimits),
+                           specificConductivity_uSpcm=qaqc_bounds(specificConductivity_uSpcm,sensorLimits),
+                           phycocyaninBGA_RFU=qaqc_bounds(phycocyaninBGA_RFU,sensorLimits),
+                           tds_mgpL=qaqc_bounds(tds_mgpL,sensorLimits),
+                           turbidity_FNU=qaqc_bounds(turbidity_FNU,sensorLimits),
+                           pH=qaqc_bounds(pH,sensorLimits),
+                           temp_degC=qaqc_bounds(temp_degC,sensorLimits),
+                           verticalPosition_m=qaqc_bounds(verticalPosition_m,sensorLimits),
+                           latitude=qaqc_bounds(latitude,sensorLimits),
+                           longitude=qaqc_bounds(longitude,sensorLimits),
+                           altitude_m=qaqc_bounds(altitude_m,sensorLimits),
+                           barometerAirHandheld_mbars=qaqc_bounds(barometerAirHandheld_mbars,sensorLimits)
+                           )
+      
+                  
+    
+    #Store any details in the log####
+    Level0_files_log$maxDepth_m[fileIndex]<-max(qaqcProfile$verticalPosition_m,na.rm=TRUE)
+    Level0_files_log$latitude[fileIndex]<-mean(qaqcProfile$latitude,na.rm=TRUE)
+    Level0_files_log$longitude[fileIndex]<-mean(qaqcProfile$longitude,na.rm=TRUE)
+    Level0_files_log$altitude_m[fileIndex]<-mean(qaqcProfile$altitude_m,na.rm=TRUE)
+    Level0_files_log$barometerAirHandheld_mbars[fileIndex]<-mean(qaqcProfile$barometerAirHandheld_mbars,na.rm=TRUE)
+    
+    
+    #Print each file to level1####
+      #*level 1 directory####
+      level1_dir<-paste0("01_Level1_Data/",year,"_Level1_Data/")
+    
+    #Write out Level1 csv in the file####
+    write_csv(qaqcProfile,file=paste0(level1_dir,Level0_files_log$Level1FileName[fileIndex]))
+    
+    #Set the log as done####
+    Level0_files_log$Level0to1_done[fileIndex]<-"Yes" #This profile has been exported
+    Level0_files_log$Level0to1_done_date[fileIndex]<-today() #Set the date run as today
+
+    }
+  
+#Export the log####
+write_csv(Level0_files_log,file=paste0("03_Outputs/",year,"_QAQC_log.csv"))
+
