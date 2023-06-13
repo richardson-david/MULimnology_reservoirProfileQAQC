@@ -162,7 +162,8 @@ for(fileIndex in 1:length(Level0_files)){
                            longitude=qaqc_bounds(longitude,sensorLimits),
                            altitude_m=qaqc_bounds(altitude_m,sensorLimits),
                            barometerAirHandheld_mbars=qaqc_bounds(barometerAirHandheld_mbars,sensorLimits)
-                           )
+                           )%>%
+                          mutate(altitude_m=ifelse(altitude_m==99.9,NA,altitude_m)) #99.9 seems to be an error code, only a little bit of the southeastern part of missouri is actually at that elevation of 99.9 m or 327.7559 feet (https://oembed-dnr.mo.gov/document-search/surface-elevation-map-mo-pub2874/pub2874)
       
                   
     
