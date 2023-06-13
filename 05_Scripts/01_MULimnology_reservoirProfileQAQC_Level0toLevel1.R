@@ -24,7 +24,7 @@ library(stringr)
 year<-2022
 
 #Read in the sensor limits file####
-sensorLimits<-read_csv("01_RawData/MissouriReservoirs-YSI_EXO3_SensorLimits.csv")
+sensorLimits<-read_csv("00_Level0_Data/MissouriReservoirs-YSI_EXO3_SensorLimits.csv")
 
 #Function for qaqc to create NAs based on being outside the bounds from a data table####
 qaqc_bounds<-function(variable,qaqc_table){
