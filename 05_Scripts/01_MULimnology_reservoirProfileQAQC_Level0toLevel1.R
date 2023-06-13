@@ -39,7 +39,7 @@ Level0_files<-list.files(dirPath,pattern = "*.csv")
 #Create log of the existing files, can maybe refer back to this and amend as new files are added####
   #columns include when they have been loaded and the date they are done####
   #***This will not be created each time, just one initial and then loaded in####
-Level0_files_log<-tibble(Level0_profiles=Level0_files,Level0to1_done="No",Level0to1_done_date=NA)%>% #Marks that Level 0 to 1 is done and what date
+Level0_files_log<-tibble(Level0_profiles=Level0_files,Level0to1_done="No",Level0to1_done_date=as_date(NA))%>% #Marks that Level 0 to 1 is done and what date
                   separate(Level0_profiles,c("MULakeNumber","year","month","day","csv"),remove=FALSE)%>% #use separate function to pull out each component of the 
                   #HERE IS WHERE TO TRY TO FIGURE OUT WHERE THE ARMS WOULD GO####
                    mutate(profile_date=ymd(paste(year,month,day,sep="-")),
@@ -79,7 +79,7 @@ Level0_files_log<-tibble(Level0_profiles=Level0_files,Level0to1_done="No",Level0
 
 
 #***This 1 can be subbed in with the new file index from the log####
-    #Debug fileIndex<-27
+    #Debug fileIndex<-1
 for(fileIndex in 1:length(Level0_files)){
   #Check to see if the file has been read in already####
   #Do some basic checks of the file name, can catch errors here####
@@ -185,10 +185,9 @@ for(fileIndex in 1:length(Level0_files)){
     
     #Set the log as done####
     Level0_files_log$Level0to1_done[fileIndex]<-"Yes" #This profile has been exported
-    Level0_files_log$Level0to1_done_date[fileIndex]<-today() #Set the date run as today
+    Level0_files_log$Level0to1_done_date[fileIndex]<-as_date(today()) #Set the date run as today
 
     }
   
 #Export the log####
 write_csv(Level0_files_log,file=paste0("06_Outputs/",year,"_QAQC_log.csv"))
-
