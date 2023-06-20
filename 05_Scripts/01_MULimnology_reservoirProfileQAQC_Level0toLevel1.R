@@ -24,7 +24,7 @@ library(stringr)
 source("05_Scripts/00_MULimnology_reservoirProfileQAQC_Functions.R")
 
 #Set year here####
-year<-2020
+year<-2019
 
 #Read in the sensor limits file####
 sensorLimits<-read_csv("00_Level0_Data/MissouriReservoirs-YSI_EXO3_SensorLimits.csv")
@@ -88,27 +88,50 @@ for(fileIndex in 1:length(Level0_files)){
     fileEncoding_set<-guess_encoding(paste0(dirPath,"/",Level0_files_log$Level0_profiles[fileIndex]),n_max=1000)[1,1]%>%pull()
     #Read in the first entry to check####
     firstEntry<-read.table(paste0(dirPath,"/",Level0_files_log$Level0_profiles[fileIndex]),nrows=1,header=F,skipNul=TRUE,sep=",",fileEncoding=fileEncoding_set)$V1
-    #There are currently two options of file types, if it is sep= then skip 9 rows, otherwise skip 8####
+    #There are currently three options of file types, if it is sep= then skip 9 rows, if it is Date, then skip 0 rows, otherwise skip 8####
     if(firstEntry=="sep="){
       skip_rows=9
     }else{
-      skip_rows=8
+        if(firstEntry=="Date"){skip_rows=0}else{
+                                skip_rows=8
+        }
     }
     
         
     #This also decaps the first bunch of rows to start with row skip_rows
     #The file encoding is necessary because there are some odd characters in the file that need to be bypassed
      readProfile<-tibble(read.csv(file=paste0(dirPath,"/",Level0_files_log$Level0_profiles[fileIndex]),skip=skip_rows,fileEncoding=fileEncoding_set))%>%
+                                mutate(Time..HH.mm.ss.=if('Time..HH.mm.ss.'%in% colnames(.)){Time..HH.mm.ss.}else{if('Time..HH.MM.SS.'%in% colnames(.)){Time..HH.MM.SS.}else{if('Time'%in% colnames(.)){Time}else{"12:00:00"}}})%>% #Create a Time variable that selects from any of the column headers... if nothing exists, then assign 12:00
+                                dplyr::select(-any_of(c("Time..HH.MM.SS.","Time")))%>%
+                                mutate(Date..MM.DD.YYYY.=if('Date..MM.DD.YYYY.'%in% colnames(.)){Date..MM.DD.YYYY.}else{if('Date'%in% colnames(.)){Date}else{paste0(Level0_files_log$month[fileIndex],"/", Level0_files_log$day[fileIndex],"/", Level0_files_log$year[fileIndex])}})%>% #Create a Time variable that selects from any of the column headers... if nothing exists, then assign 12:00
+                                dplyr::select(-any_of(c("Date")))%>%
                                 mutate(date=mdy(Date..MM.DD.YYYY.),  #Convert date to date, time to time, merge to a dateTime variable####
                                       dateTime=ymd_hms(paste(date,Time..HH.mm.ss.,sep=" ")),
                                       MULakeNumber=strsplit(Level0_files_log$Level0_profiles[fileIndex],'_')[[1]][1], #Extract the MULakeNumber from the file name
                                       )%>%
-                              dplyr::select(-Site.Name,-Chlorophyll.ug.L,-BGA.PC.ug.L,-pH.mV,-Battery.V,-Cable.Pwr.V,-Date..MM.DD.YYYY.,-Time..HH.mm.ss.,-Time..Fract..Sec.,-nLF.Cond.µS.cm,-Cond.µS.cm)%>% #get rid of a number of unneccessary columns
+                              dplyr::select(-any_of(c("Site","Unit.ID","User.ID","Site.Name","Chlorophyll.ug.L","Chl.ug.L","BGA.PC.ug.L","pH.mV","Battery.V","Cable.Pwr.V","Date..MM.DD.YYYY.","Time..HH.mm.ss.","Time..Fract..Sec.","nLF.Cond.µS.cm","Cond.µS.cm")))%>% #get rid of a number of unneccessary columns
                               #Here is where units/column names can be corrected####
                               mutate(Pressure.bar.a=if("Pressure.bar.a" %in% names(.)){Pressure.bar.a}else{if("Pressure.psi.a" %in% names(.)){Pressure.psi.a/14.696}else{NA}}, #Check if there is pressure with different units and convert if it is in psi
-                                     Barometer.mbars=if("Barometer.mbars" %in% names(.)){Barometer.mbars}else{if("Barometer.mmHg" %in% names(.)){Barometer.mmHg/0.75}else{NA}} #Check if there is hand held pressure with different units and convert if it is in mmHg 
+                                     Barometer.mbars=if("Barometer.mbars" %in% names(.)){Barometer.mbars}else{if("Barometer.mmHg" %in% names(.)){Barometer.mmHg/0.75}else{if("mmHg" %in% names(.)){mmHg/0.75}else{NA}}} #Check if there is hand held pressure with different units and convert if it is in mmHg 
                                       )%>% 
-                              dplyr::select(-any_of(c("Pressure.psi.a","Barometer.mmHg")))%>% #removes the column if it exists
+                          
+                              mutate(Temp..C=if("Temp..C" %in% names(.)){Temp..C}else{if("X.C" %in% names(.)){X.C}else{NA}}, #Check if there is temperature in different column headers
+                                     ODO...sat=if("ODO...sat" %in% names(.)){ODO...sat}else{if("DO.." %in% names(.)){DO..}else{NA}}, #Check if there is DO in different column headers
+                                     ODO.mg.L=if("ODO.mg.L" %in% names(.)){ODO.mg.L}else{if("DO.mg.L" %in% names(.)){DO.mg.L}else{NA}}, #Check if there is DO sat in different column headers
+                                     SpCond.µS.cm=if("SpCond.µS.cm" %in% names(.)){SpCond.µS.cm}else{if("C.uS.cm" %in% names(.)){C.uS.cm}else{NA}}, #Check if there is Specific conductivity in different column headers
+                                     Turbidity.FNU=if("Turbidity.FNU" %in% names(.)){Turbidity.FNU}else{if("FNU" %in% names(.)){FNU}else{NA}}, #Check if there is turbidity in different column headers
+                                     Chlorophyll.RFU=if("Chlorophyll.RFU" %in% names(.)){Chlorophyll.RFU}else{if("Chl.RFU" %in% names(.)){Chl.RFU}else{NA}}, #Check if there is chl rfu in different column headers
+                                     #BGA.PC.RFU=if("BGA.PC.RFU" %in% names(.)){BGA.PC.RFU }else{if("BGA.PC.RFU" %in% names(.)){BGA.PC.RFU}else{NA}}, #Check if there is BGA rfu in different column headers: RIGHT NOW THIS COLUMN NAME APPEARS TO BE THE SAME - COMMENTED IT OUT FOR NOW
+                                     Sal.psu=if("Sal.psu" %in% names(.)){Sal.psu}else{NA}, #checks if salinity exists, if not, puts in column of NA
+                                     TDS.mg.L=if("TDS.mg.L" %in% names(.)){TDS.mg.L}else{NA}, #checks if tds exists, if not, puts in column of NA
+                                     GPS.Latitude..=if("GPS.Latitude.." %in% names(.)){GPS.Latitude..}else{NA}, #checks if latitude exists, if not, puts in column of NA
+                                     GPS.Longitude..=if("GPS.Latitude.." %in% names(.)){GPS.Latitude..}else{NA}, #checks if longitude exists, if not, puts in column of NA
+                                     Altitude.m=if("Altitude.m" %in% names(.)){Altitude.m}else{NA}, #checks if altitude exists, if not, puts in column of NA
+                                     Depth.m=if("Depth.m" %in% names(.)){Depth.m}else{if("DEP.m" %in% names(.)){DEP.m}else{NA}} #Check if there is depth column in different column headers
+                                     )%>%
+                              dplyr::select(-any_of(c("Pressure.psi.a","Barometer.mmHg","mmHg","X.C","DO..","DO.mg.L","C.uS.cm","FNU","Chl.RFU")))%>% #removes the column if it exists
+       
+                              mutate(Vertical.Position.m=if("Vertical.Position.m" %in% names(.)){Vertical.Position.m}else{if("Depth.m" %in% names(.)){Depth.m}else{NA}})%>% #Check if there is vertical position column and if not, use the depth column that has been previously renamed
                               rename(chlorophyll_RFU=Chlorophyll.RFU, #Rename a number of variables to fit the convention with _ representing the distinction between label and units
                                      depth_m=Depth.m,
                                      doSaturation_percent=ODO...sat,
