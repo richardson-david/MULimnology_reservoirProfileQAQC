@@ -24,7 +24,7 @@ library(stringr)
 source("05_Scripts/00_MULimnology_reservoirProfileQAQC_Functions.R")
 
 #Set year here####
-year<-2019
+year<-2021
 
 #Read in the sensor limits file####
 sensorLimits<-read_csv("00_Level0_Data/MissouriReservoirs-YSI_EXO3_SensorLimits.csv")
@@ -79,7 +79,7 @@ Level0_files_log<-tibble(Level0_profiles=Level0_files,Level0to1_done="No",Level0
 
 
 #***This 1 can be subbed in with the new file index from the log####
-    #Debug fileIndex<-149
+    #Debug fileIndex<-4
 for(fileIndex in 1:length(Level0_files)){
   #Check to see if the file has been read in already####
   #Do some basic checks of the file name, can catch errors here####
@@ -125,7 +125,7 @@ for(fileIndex in 1:length(Level0_files)){
                                      Sal.psu=if("Sal.psu" %in% names(.)){Sal.psu}else{NA}, #checks if salinity exists, if not, puts in column of NA
                                      TDS.mg.L=if("TDS.mg.L" %in% names(.)){TDS.mg.L}else{NA}, #checks if tds exists, if not, puts in column of NA
                                      GPS.Latitude..=if("GPS.Latitude.." %in% names(.)){GPS.Latitude..}else{NA}, #checks if latitude exists, if not, puts in column of NA
-                                     GPS.Longitude..=if("GPS.Latitude.." %in% names(.)){GPS.Latitude..}else{NA}, #checks if longitude exists, if not, puts in column of NA
+                                     GPS.Longitude..=if("GPS.Longitude.." %in% names(.)){GPS.Longitude..}else{NA}, #checks if longitude exists, if not, puts in column of NA
                                      Altitude.m=if("Altitude.m" %in% names(.)){Altitude.m}else{NA}, #checks if altitude exists, if not, puts in column of NA
                                      Depth.m=if("Depth.m" %in% names(.)){Depth.m}else{if("DEP.m" %in% names(.)){DEP.m}else{NA}} #Check if there is depth column in different column headers
                                      )%>%
