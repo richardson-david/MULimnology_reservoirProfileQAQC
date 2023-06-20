@@ -1,0 +1,2 @@
+pH,orp_mV,phycocyaninBGA_RFU,date,dateTime,MULakeNumber,waterPressure_barA,barometerAirHandheld_mbars,temp_degC,doSaturation_percent,doConcentration_mgpL,specificConductivity_uSpcm,turbidity_FNU,chlorophyll_RFU,salinity_psu,tds_mgpL,latitude,longitude,altitude_m,depth_m,verticalPosition_m,depthDiff_m,verticalPositionDiff_m
+7.92,129.3,0,2018-07-31,2018-07-31T09:58:24Z,094,NA,983.8666666666667,26.331,53.4,4.3,208.2,7.4,0,NA,NA,NA,NA,NA,2.824,2.824,0.7190000000000003,0.7190000000000003

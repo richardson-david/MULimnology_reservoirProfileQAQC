@@ -24,7 +24,7 @@ library(stringr)
 source("05_Scripts/00_MULimnology_reservoirProfileQAQC_Functions.R")
 
 #Set year here####
-year<-2021
+year<-2018
 
 #Read in the sensor limits file####
 sensorLimits<-read_csv("00_Level0_Data/MissouriReservoirs-YSI_EXO3_SensorLimits.csv")
@@ -79,8 +79,9 @@ Level0_files_log<-tibble(Level0_profiles=Level0_files,Level0to1_done="No",Level0
 
 
 #***This 1 can be subbed in with the new file index from the log####
-    #Debug fileIndex<-4
-for(fileIndex in 1:length(Level0_files)){
+    #Debug fileIndex<-7
+    #Debug: fileIndex Level0_files_log$Level0_profiles[fileIndex]
+for(fileIndex in 106:length(Level0_files)){
   #Check to see if the file has been read in already####
   #Do some basic checks of the file name, can catch errors here####
   #Read in the file####
@@ -89,18 +90,30 @@ for(fileIndex in 1:length(Level0_files)){
     #Read in the first entry to check####
     firstEntry<-read.table(paste0(dirPath,"/",Level0_files_log$Level0_profiles[fileIndex]),nrows=1,header=F,skipNul=TRUE,sep=",",fileEncoding=fileEncoding_set)$V1
     #There are currently three options of file types, if it is sep= then skip 9 rows, if it is Date, then skip 0 rows, otherwise skip 8####
-    if(firstEntry=="sep="){
-      skip_rows=9
+    if(Level0_files_log$Level0_profiles[fileIndex]=="094_2018_09_19.csv"){skip_rows=15}else if(firstEntry=="sep="){
+      if(year==2018){ #in 2018, there is often a mising header row - this adjusts for that by checking what is in row 12 of the read.table version####
+                    if(Level0_files_log$Level0_profiles[fileIndex]=="074_2018_09_27_P.csv"){skip_rows=9 #find specific cases where the below code doesn't work
+                    }else if(read.table(paste0(dirPath,"/",Level0_files_log$Level0_profiles[fileIndex]),nrows=23,header=F,skipNul=TRUE,sep=",",fileEncoding=fileEncoding_set)$V1[12]=="CT"){skip_rows=16}else{skip_rows=15}
+                    }else{skip_rows=9}
     }else{
         if(firstEntry=="Date"){skip_rows=0}else{
                                 skip_rows=8
         }
     }
     
+    
+    #Read in files differentially for 2018 vs. other years####
+    if(year==2018 & Level0_files_log$Level0_profiles[fileIndex]!="074_2018_09_27_P.csv" & Level0_files_log$Level0_profiles[fileIndex]!="094_2018_09_19.csv"){
+      readProfile<-tibble(read.csv(file=paste0(dirPath,"/",Level0_files_log$Level0_profiles[fileIndex]),skip=skip_rows,fileEncoding=fileEncoding_set,row.names=NULL))
+            colnames(readProfile) <- colnames(readProfile)[2:ncol(readProfile)] #shift column headers over 1
+            readProfile[, ncol(readProfile)] <- NULL #Remove the last column
+      }else{
+           readProfile<-tibble(read.csv(file=paste0(dirPath,"/",Level0_files_log$Level0_profiles[fileIndex]),skip=skip_rows,fileEncoding=fileEncoding_set))
+           }
         
     #This also decaps the first bunch of rows to start with row skip_rows
     #The file encoding is necessary because there are some odd characters in the file that need to be bypassed
-     readProfile<-tibble(read.csv(file=paste0(dirPath,"/",Level0_files_log$Level0_profiles[fileIndex]),skip=skip_rows,fileEncoding=fileEncoding_set))%>%
+     readProfile<-readProfile%>%
                                 mutate(Time..HH.mm.ss.=if('Time..HH.mm.ss.'%in% colnames(.)){Time..HH.mm.ss.}else{if('Time..HH.MM.SS.'%in% colnames(.)){Time..HH.MM.SS.}else{if('Time'%in% colnames(.)){Time}else{"12:00:00"}}})%>% #Create a Time variable that selects from any of the column headers... if nothing exists, then assign 12:00
                                 dplyr::select(-any_of(c("Time..HH.MM.SS.","Time")))%>%
                                 mutate(Date..MM.DD.YYYY.=if('Date..MM.DD.YYYY.'%in% colnames(.)){Date..MM.DD.YYYY.}else{if('Date'%in% colnames(.)){Date}else{paste0(Level0_files_log$month[fileIndex],"/", Level0_files_log$day[fileIndex],"/", Level0_files_log$year[fileIndex])}})%>% #Create a Time variable that selects from any of the column headers... if nothing exists, then assign 12:00
@@ -114,22 +127,23 @@ for(fileIndex in 1:length(Level0_files)){
                               mutate(Pressure.bar.a=if("Pressure.bar.a" %in% names(.)){Pressure.bar.a}else{if("Pressure.psi.a" %in% names(.)){Pressure.psi.a/14.696}else{NA}}, #Check if there is pressure with different units and convert if it is in psi
                                      Barometer.mbars=if("Barometer.mbars" %in% names(.)){Barometer.mbars}else{if("Barometer.mmHg" %in% names(.)){Barometer.mmHg/0.75}else{if("mmHg" %in% names(.)){mmHg/0.75}else{NA}}} #Check if there is hand held pressure with different units and convert if it is in mmHg 
                                       )%>% 
-                          
-                              mutate(Temp..C=if("Temp..C" %in% names(.)){Temp..C}else{if("X.C" %in% names(.)){X.C}else{NA}}, #Check if there is temperature in different column headers
-                                     ODO...sat=if("ODO...sat" %in% names(.)){ODO...sat}else{if("DO.." %in% names(.)){DO..}else{NA}}, #Check if there is DO in different column headers
-                                     ODO.mg.L=if("ODO.mg.L" %in% names(.)){ODO.mg.L}else{if("DO.mg.L" %in% names(.)){DO.mg.L}else{NA}}, #Check if there is DO sat in different column headers
-                                     SpCond.µS.cm=if("SpCond.µS.cm" %in% names(.)){SpCond.µS.cm}else{if("C.uS.cm" %in% names(.)){C.uS.cm}else{NA}}, #Check if there is Specific conductivity in different column headers
-                                     Turbidity.FNU=if("Turbidity.FNU" %in% names(.)){Turbidity.FNU}else{if("FNU" %in% names(.)){FNU}else{NA}}, #Check if there is turbidity in different column headers
-                                     Chlorophyll.RFU=if("Chlorophyll.RFU" %in% names(.)){Chlorophyll.RFU}else{if("Chl.RFU" %in% names(.)){Chl.RFU}else{NA}}, #Check if there is chl rfu in different column headers
-                                     #BGA.PC.RFU=if("BGA.PC.RFU" %in% names(.)){BGA.PC.RFU }else{if("BGA.PC.RFU" %in% names(.)){BGA.PC.RFU}else{NA}}, #Check if there is BGA rfu in different column headers: RIGHT NOW THIS COLUMN NAME APPEARS TO BE THE SAME - COMMENTED IT OUT FOR NOW
+                              #Here is sorting out all the different column names and making sure they are captured####
+                              mutate(Temp..C=if("Temp..C" %in% names(.)){Temp..C}else{if("X.C" %in% names(.)){X.C}else{if("Temp" %in% names(.)){Temp}else{NA}}}, #Check if there is temperature in different column headers
+                                     ODO...sat=if("ODO...sat" %in% names(.)){ODO...sat}else{if("DO.." %in% names(.)){DO..}else{if("DO." %in% names(.)){DO.}else{NA}}}, #Check if there is DO in different column headers
+                                     ODO.mg.L=if("ODO.mg.L" %in% names(.)){ODO.mg.L}else{if("DO.mg.L" %in% names(.)){DO.mg.L}else{if("DO.mg" %in% names(.)){DO.mg}else{NA}}}, #Check if there is DO sat in different column headers
+                                     SpCond.µS.cm=if("SpCond.µS.cm" %in% names(.)){SpCond.µS.cm}else{if("C.uS.cm" %in% names(.)){C.uS.cm}else{if("SPC.uS.cm" %in% names(.)){SPC.uS.cm}else{if("Cond" %in% names(.)){Cond}else{NA}}}}, #Check if there is Specific conductivity in different column headers
+                                     Turbidity.FNU=if("Turbidity.FNU" %in% names(.)){Turbidity.FNU}else{if("FNU" %in% names(.)){FNU}else{if("Turb" %in% names(.)){Turb}else{NA}}}, #Check if there is turbidity in different column headers
+                                     Chlorophyll.RFU=if("Chlorophyll.RFU" %in% names(.)){Chlorophyll.RFU}else{if("Chl.RFU" %in% names(.)){Chl.RFU}else{if("CHL.rfu" %in% names(.)){CHL.rfu}else{NA}}}, #Check if there is chl rfu in different column headers
+                                     BGA.PC.RFU=if("BGA.PC.RFU" %in% names(.)){BGA.PC.RFU }else{if("BGA-PC RFU" %in% names(.)){`BGA-PC RFU`}else{if("PC.rfu" %in% names(.)){PC.rfu}else{NA}}}, #Check if there is BGA rfu in different column headers: RIGHT NOW THIS COLUMN NAME APPEARS TO BE THE SAME - COMMENTED IT OUT FOR NOW
                                      Sal.psu=if("Sal.psu" %in% names(.)){Sal.psu}else{NA}, #checks if salinity exists, if not, puts in column of NA
                                      TDS.mg.L=if("TDS.mg.L" %in% names(.)){TDS.mg.L}else{NA}, #checks if tds exists, if not, puts in column of NA
+                                     ORP.mV=if("ORP.mV" %in% names(.)){ORP.mV}else{if("ORP" %in% names(.)){ORP}else{NA}}, #checks if orp mv exists, if not, puts in column of NA
                                      GPS.Latitude..=if("GPS.Latitude.." %in% names(.)){GPS.Latitude..}else{NA}, #checks if latitude exists, if not, puts in column of NA
                                      GPS.Longitude..=if("GPS.Longitude.." %in% names(.)){GPS.Longitude..}else{NA}, #checks if longitude exists, if not, puts in column of NA
                                      Altitude.m=if("Altitude.m" %in% names(.)){Altitude.m}else{NA}, #checks if altitude exists, if not, puts in column of NA
-                                     Depth.m=if("Depth.m" %in% names(.)){Depth.m}else{if("DEP.m" %in% names(.)){DEP.m}else{NA}} #Check if there is depth column in different column headers
+                                     Depth.m=if("Depth.m" %in% names(.)){Depth.m}else{if("DEP.m" %in% names(.)){DEP.m}else{if("Depth" %in% names(.)){as.numeric(Depth)}else{NA}}} #Check if there is depth column in different column headers
                                      )%>%
-                              dplyr::select(-any_of(c("Pressure.psi.a","Barometer.mmHg","mmHg","X.C","DO..","DO.mg.L","C.uS.cm","FNU","Chl.RFU")))%>% #removes the column if it exists
+                              dplyr::select(-any_of(c("Depth","Pressure.psi.a","Barometer.mmHg","mmHg","X.C","Temp","DO..","DO.","DO.mg.L","DO.mg","C.uS.cm","SPC.uS.cm","Cond","ORP","FNU","Turb","PC.rfu","PC.ug","Chl.RFU","CHL.rfu","CHL.ug","NH4.N.mg.L","NO3.N.mg.L","Cl.mg.L","TSS.mg.L","BGA-PC RFU","phycocyaninBGA_RFU","BGA.PE.RFU","BGA.PE.ug.L","fDOM.RFU","fDOM.QSU","DEP.m")))%>% #removes the column if it exists
        
                               mutate(Vertical.Position.m=if("Vertical.Position.m" %in% names(.)){Vertical.Position.m}else{if("Depth.m" %in% names(.)){Depth.m}else{NA}})%>% #Check if there is vertical position column and if not, use the depth column that has been previously renamed
                               rename(chlorophyll_RFU=Chlorophyll.RFU, #Rename a number of variables to fit the convention with _ representing the distinction between label and units
@@ -162,7 +176,7 @@ for(fileIndex in 1:length(Level0_files)){
     #Chop off the bottom and top for anomalous values - trim based on . Perhaps use the difference (diff) of the depth. If the diff is <0.03 m, then remove the next one.#### 
     qaqcProfile<-readProfile%>%
                 filter(verticalPositionDiff_m>=0)%>% #Removes any readings from the top of the profile with negative depths
-                filter(verticalPositionDiff_m>0.03) #Remove any readings from the profile with a vertical position difference >0.03, should set this globally. This is conservative and might lose some readings from the top (bouncing boat/waves), middle (not lowering sonde fast enough), and bottom (sonde hit the bottom and is not moving)
+                filter(verticalPositionDiff_m>0.01) #Remove any readings from the profile with a vertical position difference >0.03, should set this globally. This is conservative and might lose some readings from the top (bouncing boat/waves), middle (not lowering sonde fast enough), and bottom (sonde hit the bottom and is not moving)
                 
     
     #Basic checks for error codes and makes any NA data above or below the sensor bounds as NA####
