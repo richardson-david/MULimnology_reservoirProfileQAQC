@@ -29,3 +29,8 @@ Write the add and commit command in the terminal:
     git add -A && git commit -m 'staging all files'
 
 Now you can go back to the GUI Git, and click on push button. All files that you staged in the terminal window, will be pushed up to your repository.
+
+FINAL suggestion: when adding a ton of new files, R Studio tends to hang up
+	First, Git>More>New Terminal
+	git add -A
+	Then go through commit in GUI like usual, even if it the files are selected there
