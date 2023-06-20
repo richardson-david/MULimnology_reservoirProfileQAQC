@@ -79,7 +79,7 @@ Level0_files_log<-tibble(Level0_profiles=Level0_files,Level0to1_done="No",Level0
 
 
 #***This 1 can be subbed in with the new file index from the log####
-    #Debug fileIndex<-213
+    #Debug fileIndex<-149
 for(fileIndex in 1:length(Level0_files)){
   #Check to see if the file has been read in already####
   #Do some basic checks of the file name, can catch errors here####
