@@ -24,7 +24,7 @@ library(stringr)
 source("05_Scripts/00_MULimnology_reservoirProfileQAQC_Functions.R")
 
 #Set year here####
-year<-2019
+year<-2018
 
 #Read in the sensor limits file####
 sensorLimits<-read_csv("00_Level0_Data/MissouriReservoirs-YSI_EXO3_SensorLimits.csv")
@@ -81,7 +81,7 @@ Level0_files_log<-tibble(Level0_profiles=Level0_files,Level0to1_done="No",Level0
 #***This 1 can be subbed in with the new file index from the log####
     #Debug fileIndex<-7
     #Debug: fileIndex Level0_files_log$Level0_profiles[fileIndex]
-for(fileIndex in 1:length(Level0_files)){
+for(fileIndex in 106:length(Level0_files)){
   #Check to see if the file has been read in already####
   #Do some basic checks of the file name, can catch errors here####
   #Read in the file####
@@ -90,8 +90,11 @@ for(fileIndex in 1:length(Level0_files)){
     #Read in the first entry to check####
     firstEntry<-read.table(paste0(dirPath,"/",Level0_files_log$Level0_profiles[fileIndex]),nrows=1,header=F,skipNul=TRUE,sep=",",fileEncoding=fileEncoding_set)$V1
     #There are currently three options of file types, if it is sep= then skip 9 rows, if it is Date, then skip 0 rows, otherwise skip 8####
-    if(firstEntry=="sep="){
-      skip_rows=9
+    if(Level0_files_log$Level0_profiles[fileIndex]=="094_2018_09_19.csv"){skip_rows=15}else if(firstEntry=="sep="){
+      if(year==2018){ #in 2018, there is often a mising header row - this adjusts for that by checking what is in row 12 of the read.table version####
+                    if(Level0_files_log$Level0_profiles[fileIndex]=="074_2018_09_27_P.csv"){skip_rows=9 #find specific cases where the below code doesn't work
+                    }else if(read.table(paste0(dirPath,"/",Level0_files_log$Level0_profiles[fileIndex]),nrows=23,header=F,skipNul=TRUE,sep=",",fileEncoding=fileEncoding_set)$V1[12]=="CT"){skip_rows=16}else{skip_rows=15}
+                    }else{skip_rows=9}
     }else{
         if(firstEntry=="Date"){skip_rows=0}else{
                                 skip_rows=8
@@ -99,11 +102,18 @@ for(fileIndex in 1:length(Level0_files)){
     }
     
     
- 
+    #Read in files differentially for 2018 vs. other years####
+    if(year==2018 & Level0_files_log$Level0_profiles[fileIndex]!="074_2018_09_27_P.csv" & Level0_files_log$Level0_profiles[fileIndex]!="094_2018_09_19.csv"){
+      readProfile<-tibble(read.csv(file=paste0(dirPath,"/",Level0_files_log$Level0_profiles[fileIndex]),skip=skip_rows,fileEncoding=fileEncoding_set,row.names=NULL))
+            colnames(readProfile) <- colnames(readProfile)[2:ncol(readProfile)] #shift column headers over 1
+            readProfile[, ncol(readProfile)] <- NULL #Remove the last column
+      }else{
+           readProfile<-tibble(read.csv(file=paste0(dirPath,"/",Level0_files_log$Level0_profiles[fileIndex]),skip=skip_rows,fileEncoding=fileEncoding_set))
+           }
         
     #This also decaps the first bunch of rows to start with row skip_rows
     #The file encoding is necessary because there are some odd characters in the file that need to be bypassed
-     readProfile<-tibble(read.csv(file=paste0(dirPath,"/",Level0_files_log$Level0_profiles[fileIndex]),skip=skip_rows,fileEncoding=fileEncoding_set))%>%
+     readProfile<-readProfile%>%
                                 mutate(Time..HH.mm.ss.=if('Time..HH.mm.ss.'%in% colnames(.)){Time..HH.mm.ss.}else{if('Time..HH.MM.SS.'%in% colnames(.)){Time..HH.MM.SS.}else{if('Time'%in% colnames(.)){Time}else{"12:00:00"}}})%>% #Create a Time variable that selects from any of the column headers... if nothing exists, then assign 12:00
                                 dplyr::select(-any_of(c("Time..HH.MM.SS.","Time")))%>%
                                 mutate(Date..MM.DD.YYYY.=if('Date..MM.DD.YYYY.'%in% colnames(.)){Date..MM.DD.YYYY.}else{if('Date'%in% colnames(.)){Date}else{paste0(Level0_files_log$month[fileIndex],"/", Level0_files_log$day[fileIndex],"/", Level0_files_log$year[fileIndex])}})%>% #Create a Time variable that selects from any of the column headers... if nothing exists, then assign 12:00
