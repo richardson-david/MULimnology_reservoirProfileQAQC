@@ -50,6 +50,9 @@ Level0_files_log<-tibble(Level0_profiles=Level0_files,Level0to1_done="No",Level0
                          barometerAirHandheld_mbars=NA,
                          doConcentration_mgpL_bottom=NA,
                          doConcentration_mgpL_bottom5mean=NA,
+                         nrow_original_Level0=NA, #number of rows in the read in file
+                         nrow_readProfile=NA, #number of rows in the read profile
+                         nrow_Level1=NA, #Number of Level1 profile 
                          Level1FileName=paste0(MULakeNumber,"_",year,"_",month,"_",day,ifelse(csv=="csv","_Level1.csv",paste0("_",csv,"_Level1.csv"))) #new file name which is old file name with _Level1 ammended
                          ) 
 
@@ -79,9 +82,10 @@ Level0_files_log<-tibble(Level0_profiles=Level0_files,Level0to1_done="No",Level0
 
 
 #***This 1 can be subbed in with the new file index from the log####
-    #Debug fileIndex<-7
-    #Debug: fileIndex Level0_files_log$Level0_profiles[fileIndex]
-for(fileIndex in 106:length(Level0_files)){
+    #Debug fileIndex<-143
+    #Debug: fileIndex 
+    #       Level0_files_log$Level0_profiles[fileIndex]
+for(fileIndex in 171:length(Level0_files)){
   #Check to see if the file has been read in already####
   #Do some basic checks of the file name, can catch errors here####
   #Read in the file####
@@ -96,20 +100,29 @@ for(fileIndex in 106:length(Level0_files)){
                     }else if(read.table(paste0(dirPath,"/",Level0_files_log$Level0_profiles[fileIndex]),nrows=23,header=F,skipNul=TRUE,sep=",",fileEncoding=fileEncoding_set)$V1[12]=="CT"){skip_rows=16}else{skip_rows=15}
                     }else{skip_rows=9}
     }else{
-        if(firstEntry=="Date"){skip_rows=0}else{
+        if(firstEntry=="Date"|firstEntry=="Date (MM/DD/YYYY)"){skip_rows=0}else{
                                 skip_rows=8
         }
     }
     
-    
+    #List of files that do not have commas at the end####
+    files_nocommas<-c("074_2018_09_27_P.csv","092_2018_09_13.csv","093_2018_09_13.csv","094_2018_09_19.csv","114_2018_05_30_P.csv",
+                      "118_2018_06_13_P.csv","121_2018_08_01_P.csv","143_2018_09_11.csv","149_2018_09_06.csv","149_2018_09_26.csv","179_2018_09_12.csv",
+                      "180_2018_09_12.csv","181_2018_09_12.csv","185_2018_09_11_P.csv","186_2018_09_30.csv")
     #Read in files differentially for 2018 vs. other years####
-    if(year==2018 & Level0_files_log$Level0_profiles[fileIndex]!="074_2018_09_27_P.csv" & Level0_files_log$Level0_profiles[fileIndex]!="094_2018_09_19.csv"){
+    if(!(Level0_files_log$Level0_profiles[fileIndex]%in%files_nocommas)){
       readProfile<-tibble(read.csv(file=paste0(dirPath,"/",Level0_files_log$Level0_profiles[fileIndex]),skip=skip_rows,fileEncoding=fileEncoding_set,row.names=NULL))
             colnames(readProfile) <- colnames(readProfile)[2:ncol(readProfile)] #shift column headers over 1
             readProfile[, ncol(readProfile)] <- NULL #Remove the last column
       }else{
            readProfile<-tibble(read.csv(file=paste0(dirPath,"/",Level0_files_log$Level0_profiles[fileIndex]),skip=skip_rows,fileEncoding=fileEncoding_set))
            }
+    
+    #Special modification to Time variable####
+    files_timeDecimal<-c("121_2018_08_01_P.csv")
+    if(Level0_files_log$Level0_profiles[fileIndex]%in%files_timeDecimal){
+      readProfile<-readProfile%>%mutate(Time=paste0("11:",substr(Time, start = 1, stop = 5)))
+    }else{} #Do nothing
         
     #This also decaps the first bunch of rows to start with row skip_rows
     #The file encoding is necessary because there are some odd characters in the file that need to be bypassed
@@ -143,7 +156,7 @@ for(fileIndex in 106:length(Level0_files)){
                                      Altitude.m=if("Altitude.m" %in% names(.)){Altitude.m}else{NA}, #checks if altitude exists, if not, puts in column of NA
                                      Depth.m=if("Depth.m" %in% names(.)){Depth.m}else{if("DEP.m" %in% names(.)){DEP.m}else{if("Depth" %in% names(.)){as.numeric(Depth)}else{NA}}} #Check if there is depth column in different column headers
                                      )%>%
-                              dplyr::select(-any_of(c("Depth","Pressure.psi.a","Barometer.mmHg","mmHg","X.C","Temp","DO..","DO.","DO.mg.L","DO.mg","C.uS.cm","SPC.uS.cm","Cond","ORP","FNU","Turb","PC.rfu","PC.ug","Chl.RFU","CHL.rfu","CHL.ug","NH4.N.mg.L","NO3.N.mg.L","Cl.mg.L","TSS.mg.L","BGA-PC RFU","phycocyaninBGA_RFU","BGA.PE.RFU","BGA.PE.ug.L","fDOM.RFU","fDOM.QSU","DEP.m")))%>% #removes the column if it exists
+                              dplyr::select(-any_of(c("Depth","Pressure.psi.a","Barometer.mmHg","mmHg","X.C","Temp","DO..","DO.","ODO...local","DO.mg.L","DO.mg","C.uS.cm","SPC.uS.cm","Cond","ORP","FNU","Turb","PC.rfu","PC.ug","Chl.RFU","CHL.rfu","CHL.ug","NH4.N.mg.L","NO3.N.mg.L","Cl.mg.L","TSS.mg.L","BGA-PC RFU","phycocyaninBGA_RFU","BGA.PE.RFU","BGA.PE.ug.L","fDOM.RFU","fDOM.QSU","DEP.m")))%>% #removes the column if it exists
        
                               mutate(Vertical.Position.m=if("Vertical.Position.m" %in% names(.)){Vertical.Position.m}else{if("Depth.m" %in% names(.)){Depth.m}else{NA}})%>% #Check if there is vertical position column and if not, use the depth column that has been previously renamed
                               rename(chlorophyll_RFU=Chlorophyll.RFU, #Rename a number of variables to fit the convention with _ representing the distinction between label and units
@@ -167,6 +180,28 @@ for(fileIndex in 106:length(Level0_files)){
                           mutate(depthDiff_m=c(diff(depth_m),0), #Create a depth difference column that represents the difference of the depths for each consecutive reading
                                  verticalPositionDiff_m=c(diff(verticalPosition_m),0) #Create a depth difference column that represents the difference of the depths for each consecutive reading
                                  )
+     
+     #Store the number of rows in the log####
+     Level0_files_log$nrow_original_Level0[fileIndex]<-nrow(readProfile)
+     
+     #If there are more than 400 rows - this means the profile was lowered extremely slowly and the qaqc will delete all rows
+     #If this is true, then average to the nearest 10 seconds. 
+     #Create a column that is the nearest 10 seconds, then average by that####
+     if(nrow(readProfile)>400){
+                            readProfile<-readProfile%>%
+                                         mutate(dateTime_Round=round_date(dateTime,"3 seconds"))%>%
+                                         group_by(dateTime_Round)%>%
+                                         summarise_each(funs(mean(., na.rm = TRUE)))%>%
+                                         #recalculate the depthDiff
+                                         mutate(depthDiff_m=c(diff(depth_m),0), #Create a depth difference column that represents the difference of the depths for each consecutive reading
+                                                verticalPositionDiff_m=c(diff(verticalPosition_m),0) #Create a depth difference column that represents the difference of the depths for each consecutive reading
+                                         )%>%
+                                         mutate(MULakeNumber=Level0_files_log$MULakeNumber[fileIndex]) #replace the MULakeNumber from the log
+     }else{} #do nothing
+     
+     #Store the number of rows after this averaging to see if it is reduced in size in the log####
+     Level0_files_log$nrow_readProfile[fileIndex]<-nrow(readProfile)
+     
     #Graph the depth_m and depth difference####
       #ggplot(data=readProfile,aes(x=dateTime,y=depth_m))+geom_point()
       #ggplot(data=readProfile,aes(x=dateTime,y=depthDiff_m))+geom_point()+geom_hline(yintercept=0.03) #Look at the depth differences; find a cutoff that works. In this case, you might lose some points in the middle of the profile
@@ -176,7 +211,7 @@ for(fileIndex in 106:length(Level0_files)){
     #Chop off the bottom and top for anomalous values - trim based on . Perhaps use the difference (diff) of the depth. If the diff is <0.03 m, then remove the next one.#### 
     qaqcProfile<-readProfile%>%
                 filter(verticalPositionDiff_m>=0)%>% #Removes any readings from the top of the profile with negative depths
-                filter(verticalPositionDiff_m>0.01) #Remove any readings from the profile with a vertical position difference >0.03, should set this globally. This is conservative and might lose some readings from the top (bouncing boat/waves), middle (not lowering sonde fast enough), and bottom (sonde hit the bottom and is not moving)
+                filter(verticalPositionDiff_m>0.02) #Remove any readings from the profile with a vertical position difference >0.03, should set this globally. This is conservative and might lose some readings from the top (bouncing boat/waves), middle (not lowering sonde fast enough), and bottom (sonde hit the bottom and is not moving)
                 
     
     #Basic checks for error codes and makes any NA data above or below the sensor bounds as NA####
@@ -212,7 +247,7 @@ for(fileIndex in 106:length(Level0_files)){
     Level0_files_log$barometerAirHandheld_mbars[fileIndex]<-mean(qaqcProfile$barometerAirHandheld_mbars,na.rm=TRUE)
     Level0_files_log$doConcentration_mgpL_bottom[fileIndex]<-readProfile$doConcentration_mgpL[length(readProfile$doConcentration_mgpL)]
     Level0_files_log$doConcentration_mgpL_bottom5mean[fileIndex]<-mean(readProfile$doConcentration_mgpL[(length(readProfile$doConcentration_mgpL)-5):length(readProfile$doConcentration_mgpL)],na.rm=TRUE)
-            
+    Level0_files_log$nrow_Level1[fileIndex]<-nrow(qaqcProfile)    #Store number of rows in qaqcProfile    
               
     #Print each file to level1####
       #*level 1 directory####
