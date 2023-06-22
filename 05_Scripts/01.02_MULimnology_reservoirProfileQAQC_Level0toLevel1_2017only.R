@@ -1,5 +1,5 @@
-##Level0 for 2018 only: DataInput, Decap, Base QA/QC Missouri Reservoirs####
-##Created 20Jun2023 by David Richardson (hereafter DCR)
+##Level0 for 2017 only: DataInput, Decap, Base QA/QC Missouri Reservoirs####
+##Created 22Jun2023 by David Richardson (hereafter DCR)
 ##Reads in level 0 data from the YSI sonde, formats the files, and does a basic QA/QC
 
 #Pseudo Code####
