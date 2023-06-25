@@ -177,8 +177,8 @@ for(fileIndex in 171:length(Level0_files)){
                                      altitude_m=Altitude.m,
                                      barometerAirHandheld_mbars=Barometer.mbars 
                                      )%>%
-                          mutate(depthDiff_m=c(diff(depth_m),0), #Create a depth difference column that represents the difference of the depths for each consecutive reading
-                                 verticalPositionDiff_m=c(diff(verticalPosition_m),0) #Create a depth difference column that represents the difference of the depths for each consecutive reading
+                          mutate(depthDiff_m=c(99,diff(depth_m)), #Create a depth difference column that represents the difference of the depths for each consecutive reading, set the first reading to 99, it will be kept
+                                 verticalPositionDiff_m=c(99,diff(verticalPosition_m)) #Create a depth difference column that represents the difference of the depths for each consecutive reading, set the first reading to 99, it will be kept
                                  )
      
      #Store the number of rows in the log####
@@ -252,6 +252,9 @@ for(fileIndex in 171:length(Level0_files)){
     #Print each file to level1####
       #*level 1 directory####
       level1_dir<-paste0("01_Level1_Data/",year,"_Level1_Data/")
+    
+    #Remove the differencing columns####
+    qaqcProfile<-qaqcProfile%>%dplyr::select(-depthDiff_m,-verticalPositionDiff_m)
     
     #Write out Level1 csv in the file####
     write_csv(qaqcProfile,file=paste0(level1_dir,Level0_files_log$Level1FileName[fileIndex]))

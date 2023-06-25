@@ -53,7 +53,7 @@ Level0_files_log<-tibble(Level0_profiles=Level0_files,Level0to1_done="No",Level0
                          nrow_original_Level0=NA, #number of rows in the read in file
                          nrow_readProfile=NA, #number of rows in the read profile
                          nrow_Level1=NA, #Number of Level1 profile 
-                         Level1FileName=paste0(MULakeNumber,"_",year,"_",month,"_",day,ifelse(csv=="csv","_Level1.csv",paste0("_",csv,"_Level1.csv"))) #new file name which is old file name with _Level1 ammended
+                         Level1FileName=paste0(MULakeNumber,"_",year,"_",month,"_",day,"_Level1.csv") #new file name which is old file name with _Level1 ammended
                          ) 
 
 
@@ -85,48 +85,22 @@ Level0_files_log<-tibble(Level0_profiles=Level0_files,Level0to1_done="No",Level0
     #Debug fileIndex<-143
     #Debug: fileIndex 
     #       Level0_files_log$Level0_profiles[fileIndex]
-for(fileIndex in 171:length(Level0_files)){
+for(fileIndex in 1:length(Level0_files)){
   #Check to see if the file has been read in already####
   #Do some basic checks of the file name, can catch errors here####
   #Read in the file####
     #Start by checking what the file encoding each file has####
     fileEncoding_set<-guess_encoding(paste0(dirPath,"/",Level0_files_log$Level0_profiles[fileIndex]),n_max=1000)[1,1]%>%pull()
-    #Read in the first entry to check####
-    firstEntry<-read.table(paste0(dirPath,"/",Level0_files_log$Level0_profiles[fileIndex]),nrows=1,header=F,skipNul=TRUE,sep=",",fileEncoding=fileEncoding_set)$V1
-    #There are currently three options of file types, if it is sep= then skip 9 rows, if it is Date, then skip 0 rows, otherwise skip 8####
-    if(Level0_files_log$Level0_profiles[fileIndex]=="094_2018_09_19.csv"){skip_rows=15}else if(firstEntry=="sep="){
-      if(year==2018){ #in 2018, there is often a mising header row - this adjusts for that by checking what is in row 12 of the read.table version####
-                    if(Level0_files_log$Level0_profiles[fileIndex]=="074_2018_09_27_P.csv"){skip_rows=9 #find specific cases where the below code doesn't work
-                    }else if(read.table(paste0(dirPath,"/",Level0_files_log$Level0_profiles[fileIndex]),nrows=23,header=F,skipNul=TRUE,sep=",",fileEncoding=fileEncoding_set)$V1[12]=="CT"){skip_rows=16}else{skip_rows=15}
-                    }else{skip_rows=9}
-    }else{
-        if(firstEntry=="Date"|firstEntry=="Date (MM/DD/YYYY)"){skip_rows=0}else{
-                                skip_rows=8
-        }
-    }
     
-    #List of files that do not have commas at the end####
-    files_nocommas<-c("074_2018_09_27_P.csv","092_2018_09_13.csv","093_2018_09_13.csv","094_2018_09_19.csv","114_2018_05_30_P.csv",
-                      "118_2018_06_13_P.csv","121_2018_08_01_P.csv","143_2018_09_11.csv","149_2018_09_06.csv","149_2018_09_26.csv","179_2018_09_12.csv",
-                      "180_2018_09_12.csv","181_2018_09_12.csv","185_2018_09_11_P.csv","186_2018_09_30.csv")
-    #Read in files differentially for 2018 vs. other years####
-    if(!(Level0_files_log$Level0_profiles[fileIndex]%in%files_nocommas)){
-      readProfile<-tibble(read.csv(file=paste0(dirPath,"/",Level0_files_log$Level0_profiles[fileIndex]),skip=skip_rows,fileEncoding=fileEncoding_set,row.names=NULL))
-            colnames(readProfile) <- colnames(readProfile)[2:ncol(readProfile)] #shift column headers over 1
-            readProfile[, ncol(readProfile)] <- NULL #Remove the last column
-      }else{
-           readProfile<-tibble(read.csv(file=paste0(dirPath,"/",Level0_files_log$Level0_profiles[fileIndex]),skip=skip_rows,fileEncoding=fileEncoding_set))
-           }
+    #all skip_rows are 0
+    skip_rows=0
     
-    #Special modification to Time variable####
-    files_timeDecimal<-c("121_2018_08_01_P.csv")
-    if(Level0_files_log$Level0_profiles[fileIndex]%in%files_timeDecimal){
-      readProfile<-readProfile%>%mutate(Time=paste0("11:",substr(Time, start = 1, stop = 5)))
-    }else{} #Do nothing
+    print(fileIndex)
+    
         
     #This also decaps the first bunch of rows to start with row skip_rows
     #The file encoding is necessary because there are some odd characters in the file that need to be bypassed
-     readProfile<-readProfile%>%
+     readProfile<-tibble(read.csv(file=paste0(dirPath,"/",Level0_files_log$Level0_profiles[fileIndex]),skip=skip_rows,fileEncoding=fileEncoding_set))%>%
                                 mutate(Time..HH.mm.ss.=if('Time..HH.mm.ss.'%in% colnames(.)){Time..HH.mm.ss.}else{if('Time..HH.MM.SS.'%in% colnames(.)){Time..HH.MM.SS.}else{if('Time'%in% colnames(.)){Time}else{"12:00:00"}}})%>% #Create a Time variable that selects from any of the column headers... if nothing exists, then assign 12:00
                                 dplyr::select(-any_of(c("Time..HH.MM.SS.","Time")))%>%
                                 mutate(Date..MM.DD.YYYY.=if('Date..MM.DD.YYYY.'%in% colnames(.)){Date..MM.DD.YYYY.}else{if('Date'%in% colnames(.)){Date}else{paste0(Level0_files_log$month[fileIndex],"/", Level0_files_log$day[fileIndex],"/", Level0_files_log$year[fileIndex])}})%>% #Create a Time variable that selects from any of the column headers... if nothing exists, then assign 12:00
@@ -142,18 +116,19 @@ for(fileIndex in 171:length(Level0_files)){
                                       )%>% 
                               #Here is sorting out all the different column names and making sure they are captured####
                               mutate(Temp..C=if("Temp..C" %in% names(.)){Temp..C}else{if("X.C" %in% names(.)){X.C}else{if("Temp" %in% names(.)){Temp}else{NA}}}, #Check if there is temperature in different column headers
-                                     ODO...sat=if("ODO...sat" %in% names(.)){ODO...sat}else{if("DO.." %in% names(.)){DO..}else{if("DO." %in% names(.)){DO.}else{NA}}}, #Check if there is DO in different column headers
-                                     ODO.mg.L=if("ODO.mg.L" %in% names(.)){ODO.mg.L}else{if("DO.mg.L" %in% names(.)){DO.mg.L}else{if("DO.mg" %in% names(.)){DO.mg}else{NA}}}, #Check if there is DO sat in different column headers
+                                     ODO...sat=if("ODO...sat" %in% names(.)){ODO...sat}else{if("DO.." %in% names(.)){DO..}else{if("DO." %in% names(.)){DO.}else{if("DO_percent" %in% names(.)){DO_percent}else{NA}}}}, #Check if there is DO in different column headers
+                                     ODO.mg.L=if("ODO.mg.L" %in% names(.)){ODO.mg.L}else{if("DO.mg.L" %in% names(.)){DO.mg.L}else{if("DO.mg" %in% names(.)){DO.mg}else{if("DO_mgpL" %in% names(.)){DO_mgpL}else{NA}}}}, #Check if there is DO sat in different column headers
                                      SpCond.µS.cm=if("SpCond.µS.cm" %in% names(.)){SpCond.µS.cm}else{if("C.uS.cm" %in% names(.)){C.uS.cm}else{if("SPC.uS.cm" %in% names(.)){SPC.uS.cm}else{if("Cond" %in% names(.)){Cond}else{NA}}}}, #Check if there is Specific conductivity in different column headers
                                      Turbidity.FNU=if("Turbidity.FNU" %in% names(.)){Turbidity.FNU}else{if("FNU" %in% names(.)){FNU}else{if("Turb" %in% names(.)){Turb}else{NA}}}, #Check if there is turbidity in different column headers
-                                     Chlorophyll.RFU=if("Chlorophyll.RFU" %in% names(.)){Chlorophyll.RFU}else{if("Chl.RFU" %in% names(.)){Chl.RFU}else{if("CHL.rfu" %in% names(.)){CHL.rfu}else{NA}}}, #Check if there is chl rfu in different column headers
-                                     BGA.PC.RFU=if("BGA.PC.RFU" %in% names(.)){BGA.PC.RFU }else{if("BGA-PC RFU" %in% names(.)){`BGA-PC RFU`}else{if("PC.rfu" %in% names(.)){PC.rfu}else{NA}}}, #Check if there is BGA rfu in different column headers: RIGHT NOW THIS COLUMN NAME APPEARS TO BE THE SAME - COMMENTED IT OUT FOR NOW
+                                     Chlorophyll.RFU=if("Chlorophyll.RFU" %in% names(.)){Chlorophyll.RFU}else{if("Chl.RFU" %in% names(.)){Chl.RFU}else{if("CHL.rfu" %in% names(.)){CHL.rfu}else{if("CHL" %in% names(.)){CHL}else{NA}}}}, #Check if there is chl rfu in different column headers
+                                     BGA.PC.RFU=if("BGA.PC.RFU" %in% names(.)){BGA.PC.RFU }else{if("BGA-PC RFU" %in% names(.)){`BGA-PC RFU`}else{if("PC.rfu" %in% names(.)){PC.rfu}else{if("PC" %in% names(.)){PC}else{NA}}}}, #Check if there is BGA rfu in different column headers: RIGHT NOW THIS COLUMN NAME APPEARS TO BE THE SAME - COMMENTED IT OUT FOR NOW
                                      Sal.psu=if("Sal.psu" %in% names(.)){Sal.psu}else{NA}, #checks if salinity exists, if not, puts in column of NA
                                      TDS.mg.L=if("TDS.mg.L" %in% names(.)){TDS.mg.L}else{NA}, #checks if tds exists, if not, puts in column of NA
                                      ORP.mV=if("ORP.mV" %in% names(.)){ORP.mV}else{if("ORP" %in% names(.)){ORP}else{NA}}, #checks if orp mv exists, if not, puts in column of NA
                                      GPS.Latitude..=if("GPS.Latitude.." %in% names(.)){GPS.Latitude..}else{NA}, #checks if latitude exists, if not, puts in column of NA
                                      GPS.Longitude..=if("GPS.Longitude.." %in% names(.)){GPS.Longitude..}else{NA}, #checks if longitude exists, if not, puts in column of NA
                                      Altitude.m=if("Altitude.m" %in% names(.)){Altitude.m}else{NA}, #checks if altitude exists, if not, puts in column of NA
+                                     pH=if("pH" %in% names(.)){pH}else{NA}, #checks if altitude exists, if not, puts in column of NA
                                      Depth.m=if("Depth.m" %in% names(.)){Depth.m}else{if("DEP.m" %in% names(.)){DEP.m}else{if("Depth" %in% names(.)){as.numeric(Depth)}else{NA}}} #Check if there is depth column in different column headers
                                      )%>%
                               dplyr::select(-any_of(c("Depth","Pressure.psi.a","Barometer.mmHg","mmHg","X.C","Temp","DO..","DO.","ODO...local","DO.mg.L","DO.mg","C.uS.cm","SPC.uS.cm","Cond","ORP","FNU","Turb","PC.rfu","PC.ug","Chl.RFU","CHL.rfu","CHL.ug","NH4.N.mg.L","NO3.N.mg.L","Cl.mg.L","TSS.mg.L","BGA-PC RFU","phycocyaninBGA_RFU","BGA.PE.RFU","BGA.PE.ug.L","fDOM.RFU","fDOM.QSU","DEP.m")))%>% #removes the column if it exists
@@ -177,8 +152,8 @@ for(fileIndex in 171:length(Level0_files)){
                                      altitude_m=Altitude.m,
                                      barometerAirHandheld_mbars=Barometer.mbars 
                                      )%>%
-                          mutate(depthDiff_m=c(diff(depth_m),0), #Create a depth difference column that represents the difference of the depths for each consecutive reading
-                                 verticalPositionDiff_m=c(diff(verticalPosition_m),0) #Create a depth difference column that represents the difference of the depths for each consecutive reading
+                          mutate(depthDiff_m=c(99,diff(depth_m)), #Create a depth difference column that represents the difference of the depths for each consecutive reading, set the first difference at 99 so it will be kept
+                                 verticalPositionDiff_m=c(99,diff(verticalPosition_m)) #Create a depth difference column that represents the difference of the depths for each consecutive reading, set the first difference at 99 so it will be kept
                                  )
      
      #Store the number of rows in the log####
@@ -187,7 +162,7 @@ for(fileIndex in 171:length(Level0_files)){
      #If there are more than 400 rows - this means the profile was lowered extremely slowly and the qaqc will delete all rows
      #If this is true, then average to the nearest 10 seconds. 
      #Create a column that is the nearest 10 seconds, then average by that####
-     if(nrow(readProfile)>400){
+     if(nrow(readProfile)>250){
                             readProfile<-readProfile%>%
                                          mutate(dateTime_Round=round_date(dateTime,"3 seconds"))%>%
                                          group_by(dateTime_Round)%>%
@@ -252,6 +227,9 @@ for(fileIndex in 171:length(Level0_files)){
     #Print each file to level1####
       #*level 1 directory####
       level1_dir<-paste0("01_Level1_Data/",year,"_Level1_Data/")
+    
+    #Remove the differencing columns####
+    qaqcProfile<-qaqcProfile%>%dplyr::select(-depthDiff_m,-verticalPositionDiff_m)
     
     #Write out Level1 csv in the file####
     write_csv(qaqcProfile,file=paste0(level1_dir,Level0_files_log$Level1FileName[fileIndex]))
