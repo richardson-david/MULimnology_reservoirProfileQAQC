@@ -85,7 +85,7 @@ Level0_files_log<-tibble(Level0_profiles=Level0_files,Level0to1_done="No",Level0
     #Debug fileIndex<-143
     #Debug: fileIndex 
     #       Level0_files_log$Level0_profiles[fileIndex]
-for(fileIndex in 171:length(Level0_files)){
+for(fileIndex in 1:length(Level0_files)){
   #Check to see if the file has been read in already####
   #Do some basic checks of the file name, can catch errors here####
   #Read in the file####
@@ -100,7 +100,7 @@ for(fileIndex in 171:length(Level0_files)){
                     }else if(read.table(paste0(dirPath,"/",Level0_files_log$Level0_profiles[fileIndex]),nrows=23,header=F,skipNul=TRUE,sep=",",fileEncoding=fileEncoding_set)$V1[12]=="CT"){skip_rows=16}else{skip_rows=15}
                     }else{skip_rows=9}
     }else{
-        if(firstEntry=="Date"|firstEntry=="Date (MM/DD/YYYY)"){skip_rows=0}else{
+        if(firstEntry=="Date"|firstEntry=="Date (MM/DD/YYYY)"|firstEntry=="Date..MM.DD.YYYY."){skip_rows=0}else{
                                 skip_rows=8
         }
     }
@@ -108,7 +108,7 @@ for(fileIndex in 171:length(Level0_files)){
     #List of files that do not have commas at the end####
     files_nocommas<-c("074_2018_09_27_P.csv","092_2018_09_13.csv","093_2018_09_13.csv","094_2018_09_19.csv","114_2018_05_30_P.csv",
                       "118_2018_06_13_P.csv","121_2018_08_01_P.csv","143_2018_09_11.csv","149_2018_09_06.csv","149_2018_09_26.csv","179_2018_09_12.csv",
-                      "180_2018_09_12.csv","181_2018_09_12.csv","185_2018_09_11_P.csv","186_2018_09_30.csv")
+                      "180_2018_09_12.csv","181_2018_09_12.csv","185_2018_08_08.csv","185_2018_09_11_P.csv","186_2018_09_30.csv")
     #Read in files differentially for 2018 vs. other years####
     if(!(Level0_files_log$Level0_profiles[fileIndex]%in%files_nocommas)){
       readProfile<-tibble(read.csv(file=paste0(dirPath,"/",Level0_files_log$Level0_profiles[fileIndex]),skip=skip_rows,fileEncoding=fileEncoding_set,row.names=NULL))
