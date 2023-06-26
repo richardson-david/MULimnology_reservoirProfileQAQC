@@ -82,7 +82,7 @@ Level0_files_log<-tibble(Level0_profiles=Level0_files,Level0to1_done="No",Level0
 
 
 #***This 1 can be subbed in with the new file index from the log####
-    #Debug fileIndex<-143
+    #Debug fileIndex<-237
     #Debug: fileIndex 
     #       Level0_files_log$Level0_profiles[fileIndex]
 for(fileIndex in 1:length(Level0_files)){
@@ -102,7 +102,7 @@ for(fileIndex in 1:length(Level0_files)){
     #The file encoding is necessary because there are some odd characters in the file that need to be bypassed
      readProfile<-tibble(read.csv(file=paste0(dirPath,"/",Level0_files_log$Level0_profiles[fileIndex]),skip=skip_rows,fileEncoding=fileEncoding_set))%>%
                                 mutate(Time..HH.mm.ss.=if('Time..HH.mm.ss.'%in% colnames(.)){Time..HH.mm.ss.}else{if('Time..HH.MM.SS.'%in% colnames(.)){Time..HH.MM.SS.}else{if('Time'%in% colnames(.)){Time}else{"12:00:00"}}})%>% #Create a Time variable that selects from any of the column headers... if nothing exists, then assign 12:00
-                                dplyr::select(-any_of(c("Time..HH.MM.SS.","Time")))%>%
+                                dplyr::select(-any_of(c("Time..HH.MM.SS.","Time","X")))%>% #also removes the X column which is row names
                                 mutate(Date..MM.DD.YYYY.=if('Date..MM.DD.YYYY.'%in% colnames(.)){Date..MM.DD.YYYY.}else{if('Date'%in% colnames(.)){Date}else{paste0(Level0_files_log$month[fileIndex],"/", Level0_files_log$day[fileIndex],"/", Level0_files_log$year[fileIndex])}})%>% #Create a Time variable that selects from any of the column headers... if nothing exists, then assign 12:00
                                 dplyr::select(-any_of(c("Date")))%>%
                                 mutate(date=mdy(Date..MM.DD.YYYY.),  #Convert date to date, time to time, merge to a dateTime variable####
@@ -131,9 +131,8 @@ for(fileIndex in 1:length(Level0_files)){
                                      pH=if("pH" %in% names(.)){pH}else{NA}, #checks if altitude exists, if not, puts in column of NA
                                      Depth.m=if("Depth.m" %in% names(.)){Depth.m}else{if("DEP.m" %in% names(.)){DEP.m}else{if("Depth" %in% names(.)){as.numeric(Depth)}else{NA}}} #Check if there is depth column in different column headers
                                      )%>%
-                              dplyr::select(-any_of(c("Depth","Pressure.psi.a","Barometer.mmHg","mmHg","X.C","Temp","DO..","DO.","ODO...local","DO.mg.L","DO.mg","C.uS.cm","SPC.uS.cm","Cond","ORP","FNU","Turb","PC.rfu","PC.ug","Chl.RFU","CHL.rfu","CHL.ug","NH4.N.mg.L","NO3.N.mg.L","Cl.mg.L","TSS.mg.L","BGA-PC RFU","phycocyaninBGA_RFU","BGA.PE.RFU","BGA.PE.ug.L","fDOM.RFU","fDOM.QSU","DEP.m")))%>% #removes the column if it exists
-       
-                              mutate(Vertical.Position.m=if("Vertical.Position.m" %in% names(.)){Vertical.Position.m}else{if("Depth.m" %in% names(.)){Depth.m}else{NA}})%>% #Check if there is vertical position column and if not, use the depth column that has been previously renamed
+                              mutate(Vertical.Position.m=if("Vertical.Position.m" %in% names(.)){Vertical.Position.m}else{if("VPos.m" %in% names(.)){VPos.m}else{if("Depth.m" %in% names(.)){Depth.m}else{NA}}})%>% #Check if there is vertical position column and if not, use the depth column that has been previously renamed
+                              dplyr::select(-any_of(c("Depth","VPos.m","Pressure.psi.a","Barometer.mmHg","mmHg","X.C","Temp","DO..","DO.","ODO...local","DO.mg.L","DO.mg","C.uS.cm","SPC.uS.cm","Cond","ORP","FNU","Turb","PC.rfu","PC.ug","Chl.RFU","CHL.rfu","CHL.ug","NH4.N.mg.L","NO3.N.mg.L","Cl.mg.L","TSS.mg.L","BGA-PC RFU","phycocyaninBGA_RFU","BGA.PE.RFU","BGA.PE.ug.L","fDOM.RFU","fDOM.QSU","DEP.m")))%>% #removes the column if it exists
                               rename(chlorophyll_RFU=Chlorophyll.RFU, #Rename a number of variables to fit the convention with _ representing the distinction between label and units
                                      depth_m=Depth.m,
                                      doSaturation_percent=ODO...sat,
@@ -168,8 +167,8 @@ for(fileIndex in 1:length(Level0_files)){
                                          group_by(dateTime_Round)%>%
                                          summarise_each(funs(mean(., na.rm = TRUE)))%>%
                                          #recalculate the depthDiff
-                                         mutate(depthDiff_m=c(diff(depth_m),0), #Create a depth difference column that represents the difference of the depths for each consecutive reading
-                                                verticalPositionDiff_m=c(diff(verticalPosition_m),0) #Create a depth difference column that represents the difference of the depths for each consecutive reading
+                                         mutate(depthDiff_m=c(99,diff(depth_m)), #Create a depth difference column that represents the difference of the depths for each consecutive reading
+                                                verticalPositionDiff_m=c(99,diff(verticalPosition_m)) #Create a depth difference column that represents the difference of the depths for each consecutive reading
                                          )%>%
                                          mutate(MULakeNumber=Level0_files_log$MULakeNumber[fileIndex]) #replace the MULakeNumber from the log
      }else{} #do nothing
@@ -185,7 +184,7 @@ for(fileIndex in 1:length(Level0_files)){
       
     #Chop off the bottom and top for anomalous values - trim based on . Perhaps use the difference (diff) of the depth. If the diff is <0.03 m, then remove the next one.#### 
     qaqcProfile<-readProfile%>%
-                filter(verticalPositionDiff_m>=0)%>% #Removes any readings from the top of the profile with negative depths
+                filter(verticalPosition_m>=0)%>% #Removes any readings from the top of the profile with negative depths
                 filter(verticalPositionDiff_m>0.02) #Remove any readings from the profile with a vertical position difference >0.03, should set this globally. This is conservative and might lose some readings from the top (bouncing boat/waves), middle (not lowering sonde fast enough), and bottom (sonde hit the bottom and is not moving)
                 
     
@@ -229,7 +228,7 @@ for(fileIndex in 1:length(Level0_files)){
       level1_dir<-paste0("01_Level1_Data/",year,"_Level1_Data/")
     
     #Remove the differencing columns####
-    qaqcProfile<-qaqcProfile%>%dplyr::select(-depthDiff_m,-verticalPositionDiff_m)
+    qaqcProfile<-qaqcProfile%>%dplyr::select(-depthDiff_m,-verticalPositionDiff_m)%>%mutate(dateTime=ymd_hms(dateTime))
     
     #Write out Level1 csv in the file####
     write_csv(qaqcProfile,file=paste0(level1_dir,Level0_files_log$Level1FileName[fileIndex]))
