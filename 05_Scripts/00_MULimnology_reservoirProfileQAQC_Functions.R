@@ -77,3 +77,17 @@ DOsat_function<-function(water_temp_degC,elevation_m=237){
   DOSat <- DOSat*convFactor*1000                   #mg/L
   
 }
+
+
+#Calculate water density from temperature ignoring conductivity####
+#https://hess.copernicus.org/preprints/hess-2016-36/hess-2016-36-manuscript-version3.pdf
+#https://agupubs.onlinelibrary.wiley.com/doi/pdf/10.1029/2006RG000210
+WaterDensity_function<-function(water_temp_degC){
+  density_kgpm3<-1000 * (1 - ((water_temp_degC + 288.9414) / (508929.2 * (water_temp_degC + 68.12963))) *
+            (water_temp_degC - 3.9863) ^ 2)
+  
+  return(density_kgpm3)
+}
+
+#create a vectorized version
+WaterDensity_function_vectorize<-Vectorize(WaterDensity_function)
