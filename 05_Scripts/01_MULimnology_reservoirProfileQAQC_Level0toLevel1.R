@@ -24,7 +24,7 @@ library(stringr)
 source("05_Scripts/00_MULimnology_reservoirProfileQAQC_Functions.R")
 
 #Set year here####
-year<-2022
+year<-2019
 
 #Read in the sensor limits file####
 sensorLimits<-read_csv("00_Level0_Data/MissouriReservoirs-YSI_EXO3_SensorLimits.csv")
@@ -187,13 +187,14 @@ for(fileIndex in 1:length(Level0_files)){
       #ggplot(data=readProfile,aes(x=dateTime,y=depth_m))+geom_point()
       #ggplot(data=readProfile,aes(x=dateTime,y=depthDiff_m))+geom_point()+geom_hline(yintercept=0.03) #Look at the depth differences; find a cutoff that works. In this case, you might lose some points in the middle of the profile
       #ggplot(data=readProfile,aes(x=dateTime,y=verticalPosition_m))+geom_point()
+      
       #ggplot(data=readProfile,aes(x=dateTime,y=verticalPositionDiff_m))+geom_point()+geom_hline(yintercept=0.03) #Look at the depth differences; find a cutoff that works. In this case, you might lose some points in the middle of the profile
       
     #Chop off the bottom and top for anomalous values - trim based on . Perhaps use the difference (diff) of the depth. If the diff is <0.03 m, then remove the next one.#### 
     qaqcProfile<-readProfile%>%
                 filter(verticalPosition_m>=0)%>% #Removes any readings from the top of the profile with negative depths
-                filter(verticalPositionDiff_m>0.02) #Remove any readings from the profile with a vertical position difference >0.03, should set this globally. This is conservative and might lose some readings from the top (bouncing boat/waves), middle (not lowering sonde fast enough), and bottom (sonde hit the bottom and is not moving)
-                
+                filter(verticalPositionDiff_m>0.06) #Remove any readings from the profile with a vertical position difference >0.03, should set this globally. This is conservative and might lose some readings from the top (bouncing boat/waves), middle (not lowering sonde fast enough), and bottom (sonde hit the bottom and is not moving)
+     #ggplot(data=qaqcProfile,aes(x=dateTime,y=verticalPosition_m))+geom_point()           
     
     #Basic checks for error codes and makes any NA data above or below the sensor bounds as NA####
     qaqcProfile<-qaqcProfile%>%mutate(

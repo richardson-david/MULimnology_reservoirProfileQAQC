@@ -10,7 +10,8 @@
 #Load packages####
 
 
-#Function for qaqc to create NAs based on being outside the bounds from a data table####
+#FUNCTION: qaqc_bounds####
+#for qaqc to create NAs based on being outside the bounds from a data table####
 qaqc_bounds<-function(variable,qaqc_table){
   
   qaqc_table2<-data.frame(qaqc_table) #make the sensor tibble into a data frame
@@ -22,7 +23,7 @@ qaqc_bounds<-function(variable,qaqc_table){
   return(variable2) #Return the variable 
 }
 
-#Function DOsat_function####
+#FUNCTION: DOsat_function####
 #Proof of concept test: reading from sensor 2020, water_temp_degC=29.431, DO=8.38, DO_saturation=109.8
 #From the calculation, DO saturation_mgpL=7.607389, saturation=110.2875
 #calculate DO saturation from temperature - assume 0 salinity####
@@ -89,5 +90,16 @@ WaterDensity_function<-function(water_temp_degC){
   return(density_kgpm3)
 }
 
+#FUNCTION: waterDensity_function_vectorize####
 #create a vectorized version
 WaterDensity_function_vectorize<-Vectorize(WaterDensity_function)
+
+#FUNCTION: flag_jumps####
+#Create function to check if the column has any jumps up or down####
+flag_jumps<-function(data,scalar=2){
+    #set the factor increase here (2=100% increase; 50% decrease)
+flag_column<-(data>=scalar*lag(data,1)|data<=(1/scalar)*lag(data,1)) #finds anything that increases by a scalar or decreases by 1/scalar
+flag_column[1]<-FALSE #makes the first NA value into FALSE
+flag_column[is.na(flag_column)] <- FALSE #convert any NA into FALSE 
+return(flag_column)
+}

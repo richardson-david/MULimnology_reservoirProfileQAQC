@@ -211,7 +211,7 @@ for(fileIndex in 1:length(Level0_files)){
     #Chop off the bottom and top for anomalous values - trim based on . Perhaps use the difference (diff) of the depth. If the diff is <0.03 m, then remove the next one.#### 
     qaqcProfile<-readProfile%>%
                 filter(verticalPosition_m>=0)%>% #Removes any readings from the top of the profile with negative depths
-                filter(verticalPositionDiff_m>0.02) #Remove any readings from the profile with a vertical position difference >0.03, should set this globally. This is conservative and might lose some readings from the top (bouncing boat/waves), middle (not lowering sonde fast enough), and bottom (sonde hit the bottom and is not moving)
+                filter(verticalPositionDiff_m>0.06) #Remove any readings from the profile with a vertical position difference >0.03, should set this globally. This is conservative and might lose some readings from the top (bouncing boat/waves), middle (not lowering sonde fast enough), and bottom (sonde hit the bottom and is not moving)
                 
     
     #Basic checks for error codes and makes any NA data above or below the sensor bounds as NA####
