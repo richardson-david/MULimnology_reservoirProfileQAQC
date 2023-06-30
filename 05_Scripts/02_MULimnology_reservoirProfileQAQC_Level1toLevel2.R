@@ -67,6 +67,8 @@ Level1_files<-list.files(dirPath,pattern = "*.csv")
 #Set thresholds for water density differences and temperature differences to set flags
 waterDensityDifference_threshold<- -0.02
 temperatureDifference_threshold<-0.1
+lowTemperature_threshold<-5
+lowpH_threshold<-5
 
 #Initialize storage location####
 List_qaqc1<-list()
@@ -82,7 +84,8 @@ for(fileIndex in 1:length(Level1_files)){
   #Calculate a water density column
   qaqcProfile1<-readProfile1%>%mutate(waterDensity_kgpm3=WaterDensity_function_vectorize(temp_degC))%>%
                 mutate(waterDensityDiff_kgpm3=c(0,diff(waterDensity_kgpm3)),
-                       tempDiff_degC=c(0,diff(temp_degC)))
+                       tempDiff_degC=c(0,diff(temp_degC)))%>%
+                mutate(MULakeNumber=as.character(MULakeNumber)) #make MULakeNumber a character since there are differing versions
   
   #Spits out the number of non-monotically increasing densities or non-decreasing temperatures####
   #can change the numbers here to account for some wiggle room
@@ -91,8 +94,8 @@ for(fileIndex in 1:length(Level1_files)){
   
   #Flag abnormal numbers####
   #how many values are below 5C
-  Level1_files_log$flag_lowTemps[fileIndex]<-sum(qaqcProfile1$temp_degC<5)
-  Level1_files_log$flag_lowpH[fileIndex]<-sum(qaqcProfile1$pH<5)
+  Level1_files_log$flag_lowTemps[fileIndex]<-sum(qaqcProfile1$temp_degC<lowTemperature_threshold,na.rm=TRUE)
+  Level1_files_log$flag_lowpH[fileIndex]<-sum(qaqcProfile1$pH<lowpH_threshold,na.rm=TRUE)
   
   #establish the scalar value for jumps up or down
   jump<-3
@@ -121,41 +124,70 @@ for(fileIndex in 1:length(Level1_files)){
 
 } #end of for loop
 
-#STOPPED HERE: SEARCH THROUGH THE LIST FOR ANY AND DO SOME DIAGNOSTIC FIGURES/QAQC profiles####
-#THEN MERGE THEM TOGETHER AND OUTPUT####
-#OUTPUT LOG1 too####
-
-Level1_files_log%>%filter(flag_lowpH>20)
-
-#Some plots to look at the data if it is flagged####
-ggplot(data=qaqcProfile1,aes(x=waterDensity_kgpm3,y=verticalPosition_m,color=as.factor(waterDensityDiff_kgpm3<waterDensityDifference_threshold)))+geom_point()+scale_y_reverse()+labs(col="flag")
-
-ggplot(data=qaqcProfile1,aes(x=dateTime,y=verticalPosition_m))+geom_point()
-ggplot(data=qaqcProfile1,aes(x=turbidity_FNU,y=verticalPosition_m))+geom_point()+scale_y_reverse()
-ggplot(data=qaqcProfile1,aes(x=longitude,y=verticalPosition_m))+geom_point()+scale_y_reverse()
-ggplot(data=qaqcProfile1,aes(x=phycocyaninBGA_RFU,y=verticalPosition_m))+geom_point()+scale_y_reverse()
-ggplot(data=qaqcProfile1,aes(x=pH,y=verticalPosition_m))+geom_point()+scale_y_reverse()
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#visually assess any flagged profiles or values####
+  #*export to a single file per year####
+  pdf(paste0("06_Outputs/Level1to2_QAQC_plots_",year,".pdf"), onefile = TRUE)
+  #*loop through the different profiles in the log file####
+  #*debug: fileIndex2<-145
+  for(fileIndex2 in 1:nrow(Level1_files_log)){
+  temp_df<-List_qaqc1[[fileIndex2]]  
+  #**Print out this one for sure####
+  print(ggplot(data=temp_df,aes(x=dateTime,y=verticalPosition_m))+geom_point()+ggtitle(paste0(Level1_files_log$Level1FileName[fileIndex2]," ","****Depth vs. time")))
+  #**Non-monotonic density
+  if(Level1_files_log[fileIndex2,"flag_monotonicDensity"]>0){
+      print(ggplot(data=temp_df,aes(x=waterDensity_kgpm3,y=verticalPosition_m,color=as.factor(waterDensityDiff_kgpm3<waterDensityDifference_threshold)))+geom_point()+scale_y_reverse()+labs(col="flag")+ggtitle(paste0(Level1_files_log$Level1FileName[fileIndex2]," ","****Non-monotonic densities")))
+      }
+  #**Non-monotonic density####
+  if(Level1_files_log[fileIndex2,"flag_decreasingTemp"]>0){
+    print(ggplot(data=temp_df,aes(x=temp_degC,y=verticalPosition_m,color=as.factor(tempDiff_degC<temperatureDifference_threshold)))+geom_point()+scale_y_reverse()+labs(col="flag")+ggtitle(paste0(Level1_files_log$Level1FileName[fileIndex2]," ","****Non-decreasing temps")))
+  }
+  
+  #**Low temperatures####
+  if(Level1_files_log[fileIndex2,"flag_lowTemps"]>0){
+    print(ggplot(data=temp_df,aes(x=temp_degC,y=verticalPosition_m,color=as.factor(temp_degC<lowTemperature_threshold)))+geom_point()+scale_y_reverse()+labs(col="flag")+ggtitle(paste0(Level1_files_log$Level1FileName[fileIndex2]," ","****Too low temps")))
+  }
+  
+  #**Low pH####
+  if(Level1_files_log[fileIndex2,"flag_lowpH"]>0){
+    print(ggplot(data=temp_df,aes(x=pH,y=verticalPosition_m,color=as.factor(pH<lowpH_threshold)))+geom_point()+scale_y_reverse()+labs(col="flag")+ggtitle(paste0(Level1_files_log$Level1FileName[fileIndex2]," ","****Too low pH")))
+  }
+  
+  #**Turbidity jumps####
+  if(Level1_files_log[fileIndex2,"flag_jumps_turbidity_FNU"]>0){
+    print(ggplot(data=temp_df,aes(x=turbidity_FNU,y=verticalPosition_m))+geom_point(color="brown")+scale_y_reverse()+labs(col="flag")+ggtitle(paste0(Level1_files_log$Level1FileName[fileIndex2]," ","****Turbidity jumps")))
+  }
+  
+  #**chl a jumps####
+  if(Level1_files_log[fileIndex2,"flag_jumps_chlorophyll_RFU"]>0){
+    print(ggplot(data=temp_df,aes(x=chlorophyll_RFU,y=verticalPosition_m))+geom_point(color="greenyellow")+scale_y_reverse()+labs(col="flag")+ggtitle(paste0(Level1_files_log$Level1FileName[fileIndex2]," ","****chl jumps")))
+  }
+  
+  #**bga jumps####
+  if(Level1_files_log[fileIndex2,"flag_jumps_phycocyaninBGA_RFU"]>0){
+    print(ggplot(data=temp_df,aes(x=phycocyaninBGA_RFU,y=verticalPosition_m))+geom_point(color="cyan4")+scale_y_reverse()+labs(col="flag")+ggtitle(paste0(Level1_files_log$Level1FileName[fileIndex2]," ","****bga jumps")))
+  }
+  
+  }
+  
+  dev.off()
+  
+  #Look for any row with any of the flag columns greater than 5####
+  check_df<-Level1_files_log%>%filter(if_any(flag_lowTemps:flag_jumps_barometerAirHandheld_mbars,~.>5))%>%print(n=Inf)
+  
+  ##########################################################################
+  #####HERE IS WHRE YOU WOULD PUT CODE TO MODIFY ANY INDIVIDUAL PROFILES####
+  ##########################################################################
+  
+#Bind all the rows together####
+  qaqc2<-do.call(bind_rows, List_qaqc1)%>%
+          dplyr::select(-depth_m)%>% #drop depth
+          rename(depth_m=verticalPosition_m)%>%
+          dplyr::select(MULakeNumber,date,dateTime,depth_m,chlorophyll_RFU:barometerAirHandheld_mbars)
+  
+#Export the level2 file####
+  write_csv(qaqc2,file=paste0("02_Level2_Data/",year,"_Level2.csv"))
 #Export the log####
 write_csv(Level1_files_log,file=paste0("06_Outputs/",year,"_QAQC_log.csv"))

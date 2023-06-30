@@ -98,8 +98,12 @@ WaterDensity_function_vectorize<-Vectorize(WaterDensity_function)
 #Create function to check if the column has any jumps up or down####
 flag_jumps<-function(data,scalar=2){
     #set the factor increase here (2=100% increase; 50% decrease)
-flag_column<-(data>=scalar*lag(data,1)|data<=(1/scalar)*lag(data,1)) #finds anything that increases by a scalar or decreases by 1/scalar
+  if(sum(!is.na(data))>0&sum(data<=0,na.rm=TRUE)>0){data<-data-(1.1*min(data,na.rm=TRUE))}else{} #if there are any negative numbers, make the minimum 0+10% and scale all others up based on that number
+flag_column<-(data>scalar*lag(data,1)|data<(1/scalar)*lag(data,1)) #finds anything that increases by a scalar or decreases by 1/scalar
 flag_column[1]<-FALSE #makes the first NA value into FALSE
 flag_column[is.na(flag_column)] <- FALSE #convert any NA into FALSE 
 return(flag_column)
 }
+
+
+
