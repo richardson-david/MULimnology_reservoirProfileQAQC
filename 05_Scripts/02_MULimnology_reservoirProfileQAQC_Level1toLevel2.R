@@ -58,7 +58,9 @@ Level1_files_log<-read_csv(paste0("06_Outputs/",year,"_QAQC_log.csv"))%>%
                        flag_jumps_latitude=NA,
                        flag_jumps_longitude=NA,
                        flag_jumps_altitude_m=NA,
-                       flag_jumps_barometerAirHandheld_mbars=NA
+                       flag_jumps_barometerAirHandheld_mbars=NA,
+                       Level1to2_some_depths_removed=NA, #indicates that some points were removed during the level 1 to 2 process
+                       Level1to2_profileRemoved=NA #yes/no indicating the whole profile was removed.
                        ) 
 
 #Identify all the individual .csv files####
@@ -69,12 +71,19 @@ waterDensityDifference_threshold<- -0.02
 temperatureDifference_threshold<-0.1
 lowTemperature_threshold<-5
 lowpH_threshold<-5
+#establish the scalar value for jumps up or down
+jump<-3
+#Establish the bottom number of rows to examine for big jumps in chl, bga, or turbidity
+nrow_bottom<-10
+nrow_top<-3
+#Establish the minimum number of rows to move forward
+nrow_min<-5
 
 #Initialize storage location####
 List_qaqc1<-list()
 
 #Loop through each file####
-#Debug fileIndex<-145
+#Debug fileIndex<-46
 #Debug: fileIndex 
 #       Level1_files_log$Level0_profiles[fileIndex]
 for(fileIndex in 1:length(Level1_files)){
@@ -97,8 +106,11 @@ for(fileIndex in 1:length(Level1_files)){
   Level1_files_log$flag_lowTemps[fileIndex]<-sum(qaqcProfile1$temp_degC<lowTemperature_threshold,na.rm=TRUE)
   Level1_files_log$flag_lowpH[fileIndex]<-sum(qaqcProfile1$pH<lowpH_threshold,na.rm=TRUE)
   
-  #establish the scalar value for jumps up or down
-  jump<-3
+  #If any of the pH's are below 5, remove the whole column
+  if(Level1_files_log$flag_lowpH[fileIndex]>0){qaqcProfile1$pH<-NA
+                                              Level1_files_log$Level1to2_some_depths_removed[fileIndex]<-"yes"} #indicates some numbers were removed
+  
+
   #Check all columns for large jumps (100% up or 50% down)####
   Level1_files_log$flag_jumps_chlorophyll_RFU[fileIndex]<-sum(flag_jumps(qaqcProfile1$chlorophyll_RFU,scalar=jump))
   Level1_files_log$flag_jumps_depth_m[fileIndex]<-sum(flag_jumps(qaqcProfile1$depth_m,scalar=jump))
@@ -119,8 +131,37 @@ for(fileIndex in 1:length(Level1_files)){
   Level1_files_log$flag_jumps_altitude_m[fileIndex]<-sum(flag_jumps(qaqcProfile1$altitude_m,scalar=jump))
   Level1_files_log$flag_jumps_barometerAirHandheld_mbars[fileIndex]<-sum(flag_jumps(qaqcProfile1$barometerAirHandheld_mbars,scalar=jump))
   
-  #Store them each as an entry in a list of tibbles
-  List_qaqc1[[fileIndex]]<-qaqcProfile1
+  #Find the locations of each of the turbidity, chl, and bga using flag_jumps function####
+  #If any of those are in the bottom 10 measurements, remove those rows
+  #Finds rows with jumps across the three variables
+  rows_with_jumps<-unique(c(which(flag_jumps(qaqcProfile1$turbidity_FNU,scalar=jump)==TRUE),
+  which(flag_jumps(qaqcProfile1$phycocyaninBGA_RFU,scalar=jump)==TRUE),
+  which(flag_jumps(qaqcProfile1$chlorophyll_RFU,scalar=jump)==TRUE)))
+  
+  #Check if there are rows to delete, if so, delete those rows####
+  if(!identical(rows_with_jumps, integer(0))&!identical(rows_with_jumps[rows_with_jumps>=Level1_files_log$nrow_Level1[fileIndex]-nrow_bottom],integer(0))){ #If there are no rows to delete, then this will return false because the vector will be integer(0) OR if the rows are all above the bottom
+    qaqcProfile1<-qaqcProfile1%>%
+      slice(-c(max(rows_with_jumps):Level1_files_log$nrow_Level1[fileIndex])) #Remove from the lowest point all the way to the bottom
+    Level1_files_log$Level1to2_some_depths_removed[fileIndex]<-"yes" #indicate that some rows were removed
+  }
+  
+  #Check if there are rows to delete at the top, if so, delete those rows####
+  if(!identical(rows_with_jumps, integer(0))&!identical(rows_with_jumps[rows_with_jumps<nrow_top],integer(0))){ #If there are no rows to delete, then this will return false because the vector will be integer(0) OR if the rows are all above the bottom
+    qaqcProfile1<-qaqcProfile1%>%
+      slice(-c(1:(min(rows_with_jumps)-1))) #Remove from the lowest point all the way to the bottom
+    Level1_files_log$Level1to2_some_depths_removed[fileIndex]<-"yes" #indicate that some rows were removed
+  }
+    
+  #Store them each as an entry in a list of tibbles####
+    #*check if there are less than nrow_min rows in the profile####
+    #*If there are then remov that profile
+  if(Level1_files_log$nrow_Level1[fileIndex]<nrow_min){
+    List_qaqc1[[fileIndex]]<-NULL #make sure this profile is null
+    Level1_files_log$Level1to2_profileRemoved<-"yes" #indicate the profile has been removed
+  }else{
+    List_qaqc1[[fileIndex]]<-qaqcProfile1  
+  }
+  
 
 } #end of for loop
 
@@ -131,9 +172,13 @@ for(fileIndex in 1:length(Level1_files)){
   #*export to a single file per year####
   pdf(paste0("06_Outputs/Level1to2_QAQC_plots_",year,".pdf"), onefile = TRUE)
   #*loop through the different profiles in the log file####
-  #*debug: fileIndex2<-145
+  #*debug: fileIndex2<-7
   for(fileIndex2 in 1:nrow(Level1_files_log)){
   temp_df<-List_qaqc1[[fileIndex2]]  
+  if(is.null(temp_df)){
+    #do nothing
+  }else{
+  
   #**Print out this one for sure####
   print(ggplot(data=temp_df,aes(x=dateTime,y=verticalPosition_m))+geom_point()+ggtitle(paste0(Level1_files_log$Level1FileName[fileIndex2]," ","****Depth vs. time")))
   #**Non-monotonic density
@@ -151,7 +196,8 @@ for(fileIndex in 1:length(Level1_files)){
   }
   
   #**Low pH####
-  if(Level1_files_log[fileIndex2,"flag_lowpH"]>0){
+  #*This also checks to see if all the pH's are 0
+  if(Level1_files_log[fileIndex2,"flag_lowpH"]>0&sum(!is.na(temp_df$pH))>0){
     print(ggplot(data=temp_df,aes(x=pH,y=verticalPosition_m,color=as.factor(pH<lowpH_threshold)))+geom_point()+scale_y_reverse()+labs(col="flag")+ggtitle(paste0(Level1_files_log$Level1FileName[fileIndex2]," ","****Too low pH")))
   }
   
@@ -170,7 +216,8 @@ for(fileIndex in 1:length(Level1_files)){
     print(ggplot(data=temp_df,aes(x=phycocyaninBGA_RFU,y=verticalPosition_m))+geom_point(color="cyan4")+scale_y_reverse()+labs(col="flag")+ggtitle(paste0(Level1_files_log$Level1FileName[fileIndex2]," ","****bga jumps")))
   }
   
-  }
+    } #end of check for null
+  } #end of for loop
   
   dev.off()
   
