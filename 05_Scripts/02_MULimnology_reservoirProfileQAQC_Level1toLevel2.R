@@ -28,7 +28,7 @@ library(stringr)
 source("05_Scripts/00_MULimnology_reservoirProfileQAQC_Functions.R")
 
 #Set year here####
-year<-2022
+year<-2020
 
 #*Set the directory path here####
 dirPath<-paste0("01_Level1_Data/",year,"_Level1_Data")
@@ -230,7 +230,11 @@ for(fileIndex in 1:length(Level1_files)){
   dev.off()
   
   #Look for any row with any of the flag columns greater than 5####
-  check_df<-Level1_files_log%>%filter(if_any(flag_lowTemps:flag_jumps_barometerAirHandheld_mbars,~.>5))%>%print(n=Inf)
+  #check_df<-Level1_files_log%>%filter(if_any(flag_lowTemps:flag_jumps_barometerAirHandheld_mbars,~.>5))%>%print(n=Inf)
+  
+  #Print out how many profiles were modified or removed####
+  Level1_files_log%>%filter(Level1to2_some_depths_removed=="yes")%>%nrow()
+  Level1_files_log%>%filter(Level1to2_profileRemoved=="yes")%>%nrow()
   
   ##########################################################################
   #####HERE IS WHRE YOU WOULD PUT CODE TO MODIFY ANY INDIVIDUAL PROFILES####
