@@ -72,7 +72,7 @@ temperatureDifference_threshold<-0.1
 lowTemperature_threshold<-5
 lowpH_threshold<-5
 #establish the scalar value for jumps up or down
-jump<-3
+jump<-2.5
 #Establish the bottom number of rows to examine for big jumps in chl, bga, or turbidity
 nrow_bottom<-10
 nrow_top<-3
@@ -138,17 +138,25 @@ for(fileIndex in 1:length(Level1_files)){
   which(flag_jumps(qaqcProfile1$phycocyaninBGA_RFU,scalar=jump)==TRUE),
   which(flag_jumps(qaqcProfile1$chlorophyll_RFU,scalar=jump)==TRUE)))
   
+  #chck if there is integer(0) then do nothing
+  #sort the vector biggest to smallest
+  #check the differences
+  #Stop when difference is !=1
+  #
+  
+
+  
   #Check if there are rows to delete, if so, delete those rows####
   if(!identical(rows_with_jumps, integer(0))&!identical(rows_with_jumps[rows_with_jumps>=Level1_files_log$nrow_Level1[fileIndex]-nrow_bottom],integer(0))){ #If there are no rows to delete, then this will return false because the vector will be integer(0) OR if the rows are all above the bottom
     qaqcProfile1<-qaqcProfile1%>%
-      slice(-c(max(rows_with_jumps):Level1_files_log$nrow_Level1[fileIndex])) #Remove from the lowest point all the way to the bottom
+      slice(-c(maxN(rows_with_jumps):Level1_files_log$nrow_Level1[fileIndex])) #Remove from the lowest point all the way to the bottom
     Level1_files_log$Level1to2_some_depths_removed[fileIndex]<-"yes" #indicate that some rows were removed
   }
   
   #Check if there are rows to delete at the top, if so, delete those rows####
   if(!identical(rows_with_jumps, integer(0))&!identical(rows_with_jumps[rows_with_jumps<nrow_top],integer(0))){ #If there are no rows to delete, then this will return false because the vector will be integer(0) OR if the rows are all above the bottom
     qaqcProfile1<-qaqcProfile1%>%
-      slice(-c(1:(min(rows_with_jumps)-1))) #Remove from the lowest point all the way to the bottom
+      slice(-c(1:(min(rows_with_jumps)-1))) #Remove from the lowest point all the way to the top
     Level1_files_log$Level1to2_some_depths_removed[fileIndex]<-"yes" #indicate that some rows were removed
   }
     
@@ -157,7 +165,7 @@ for(fileIndex in 1:length(Level1_files)){
     #*If there are then remov that profile
   if(Level1_files_log$nrow_Level1[fileIndex]<nrow_min){
     List_qaqc1[[fileIndex]]<-NULL #make sure this profile is null
-    Level1_files_log$Level1to2_profileRemoved<-"yes" #indicate the profile has been removed
+    Level1_files_log$Level1to2_profileRemoved[fileIndex]<-"yes" #indicate the profile has been removed
   }else{
     List_qaqc1[[fileIndex]]<-qaqcProfile1  
   }

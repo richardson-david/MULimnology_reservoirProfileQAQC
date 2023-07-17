@@ -105,5 +105,20 @@ flag_column[is.na(flag_column)] <- FALSE #convert any NA into FALSE
 return(flag_column)
 }
 
-
+#Find max sequence function####
+#This function finds the lowest number in the sequence of numbers adjacent to the max
+maxN<-function(vector){
+  #if vector has no numbers, do nothing
+  if(identical(rows_with_jumps, integer(0))){}else{
+    vector_sort<-vector[order(vector,decreasing = TRUE)] #sort vector from largest to smallest
+    vector_diff<-c(-1,diff(vector_sort))
+    vector_diff_isnegOne<-vector_diff==-1
+      index<-1
+    while(index<=length(vector_sort)){
+      if(vector_diff_isnegOne[index]==TRUE){index<-index+1}else{break}
+    }
+    return(vector_sort[index-1])
+    
+  }
+}
 
