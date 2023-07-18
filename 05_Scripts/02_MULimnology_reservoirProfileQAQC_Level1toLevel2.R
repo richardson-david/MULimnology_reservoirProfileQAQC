@@ -28,7 +28,7 @@ library(stringr)
 source("05_Scripts/00_MULimnology_reservoirProfileQAQC_Functions.R")
 
 #Set year here####
-year<-2019
+year<-2018
 
 #*Set the directory path here####
 dirPath<-paste0("01_Level1_Data/",year,"_Level1_Data")
@@ -83,7 +83,7 @@ nrow_min<-5
 List_qaqc1<-list()
 
 #Loop through each file####
-#Debug fileIndex<-46
+#Debug fileIndex<-25
 #Debug: fileIndex 
 #       Level1_files_log$Level0_profiles[fileIndex]
 for(fileIndex in 1:length(Level1_files)){
@@ -111,7 +111,7 @@ for(fileIndex in 1:length(Level1_files)){
                                               Level1_files_log$Level1to2_some_depths_removed[fileIndex]<-"yes"} #indicates some numbers were removed
   
 
-  #Check all columns for large jumps (100% up or 50% down)####
+  #Check all columns for large jumps ####
   Level1_files_log$flag_jumps_chlorophyll_RFU[fileIndex]<-sum(flag_jumps(qaqcProfile1$chlorophyll_RFU,scalar=jump))
   Level1_files_log$flag_jumps_depth_m[fileIndex]<-sum(flag_jumps(qaqcProfile1$depth_m,scalar=jump))
   Level1_files_log$flag_jumps_doSaturation_percent[fileIndex]<-sum(flag_jumps(qaqcProfile1$doSaturation_percent,scalar=jump))
@@ -170,7 +170,10 @@ for(fileIndex in 1:length(Level1_files)){
     List_qaqc1[[fileIndex]]<-qaqcProfile1  
   }
   
-
+  #Set the log as done####
+  Level1_files_log$Level1to2_done[fileIndex]<-"Yes" #This profile has been exported
+  Level1_files_log$Level1to2_done_date[fileIndex]<-as_date(today()) #Set the date run as today
+  
 } #end of for loop
 
 
