@@ -83,7 +83,7 @@ nrow_min<-5
 List_qaqc1<-list()
 
 #Loop through each file####
-#Debug fileIndex<-25
+#Debug fileIndex<-1
 #Debug: fileIndex 
 #       Level1_files_log$Level0_profiles[fileIndex]
 for(fileIndex in 1:length(Level1_files)){
@@ -160,6 +160,19 @@ for(fileIndex in 1:length(Level1_files)){
     Level1_files_log$Level1to2_some_depths_removed[fileIndex]<-"yes" #indicate that some rows were removed
   }
     
+  #2018 only####
+  #remove bottom 15 rows if >150 rows####
+  #remove bottom 7 rows if 50 to 150####
+  if(year==2018){
+    if(Level1_files_log$nrow_Level1[fileIndex]>150){
+      qaqcProfile1<-qaqcProfile1%>%
+        slice(-c((Level1_files_log$nrow_Level1[fileIndex]-15):Level1_files_log$nrow_Level1[fileIndex]))
+    }else if(Level1_files_log$nrow_Level1[fileIndex]<=150&Level1_files_log$nrow_Level1[fileIndex]>50){
+      qaqcProfile1<-qaqcProfile1%>%
+        slice(-c((Level1_files_log$nrow_Level1[fileIndex]-7):Level1_files_log$nrow_Level1[fileIndex]))
+    }else{} #else do nothing
+  }
+  
   #Store them each as an entry in a list of tibbles####
     #*check if there are less than nrow_min rows in the profile####
     #*If there are then remov that profile
@@ -169,6 +182,8 @@ for(fileIndex in 1:length(Level1_files)){
   }else{
     List_qaqc1[[fileIndex]]<-qaqcProfile1  
   }
+  
+
   
   #Set the log as done####
   Level1_files_log$Level1to2_done[fileIndex]<-"Yes" #This profile has been exported
