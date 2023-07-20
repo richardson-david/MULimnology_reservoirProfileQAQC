@@ -28,7 +28,7 @@ library(stringr)
 source("05_Scripts/00_MULimnology_reservoirProfileQAQC_Functions.R")
 
 #Set year here####
-year<-2018
+year<-2022
 
 #*Set the directory path here####
 dirPath<-paste0("01_Level1_Data/",year,"_Level1_Data")
@@ -36,7 +36,9 @@ dirPath<-paste0("01_Level1_Data/",year,"_Level1_Data")
 #Read in the log####
 #Creates slots for the level1 to 2 done and date
 Level1_files_log<-read_csv(paste0("06_Outputs/",year,"_QAQC_log.csv"))%>%
-                mutate(Level1to2_done="No",Level1to2_done_date=as_date(NA),
+                mutate(nrow_Level2=NA,
+                       Level2_maxDepth_m=NA,
+                       Level1to2_done="No",Level1to2_done_date=as_date(NA),
                        flag_monotonicDensity=NA, #Gives a column to flag all the non-monotonic profiles 
                        flag_decreasingTemp=NA, #Gives a column to flag all the non-decreasing temperatures
                        flag_lowTemps=NA, #flags the number of temperatures below 5 C
@@ -59,6 +61,7 @@ Level1_files_log<-read_csv(paste0("06_Outputs/",year,"_QAQC_log.csv"))%>%
                        flag_jumps_longitude=NA,
                        flag_jumps_altitude_m=NA,
                        flag_jumps_barometerAirHandheld_mbars=NA,
+                       
                        Level1to2_some_depths_removed=NA, #indicates that some points were removed during the level 1 to 2 process
                        Level1to2_profileRemoved=NA #yes/no indicating the whole profile was removed.
                        ) 
@@ -74,7 +77,8 @@ lowpH_threshold<-5
 #establish the scalar value for jumps up or down
 jump<-2.5
 #Establish the bottom number of rows to examine for big jumps in chl, bga, or turbidity
-nrow_bottom<-10
+#nrow_bottom<-10 #used in old method
+nrow_bottom_prop<-0.20 #checks the bottom 20% for jumps
 nrow_top<-3
 #Establish the minimum number of rows to move forward
 nrow_min<-5
@@ -83,7 +87,7 @@ nrow_min<-5
 List_qaqc1<-list()
 
 #Loop through each file####
-#Debug fileIndex<-1
+#Debug fileIndex<-45
 #Debug: fileIndex 
 #       Level1_files_log$Level0_profiles[fileIndex]
 for(fileIndex in 1:length(Level1_files)){
@@ -91,7 +95,8 @@ for(fileIndex in 1:length(Level1_files)){
   #read in file####
   readProfile1<-read_csv(file=paste0(dirPath,"/",Level1_files_log$Level1FileName[fileIndex]), col_types = cols()) #last argument suppresses the message on input about column types, helpful for mass upload
   #Calculate a water density column
-  qaqcProfile1<-readProfile1%>%mutate(waterDensity_kgpm3=WaterDensity_function_vectorize(temp_degC))%>%
+  qaqcProfile1<-readProfile1%>%arrange(verticalPosition_m)%>% #arrange by vertical position
+                mutate(waterDensity_kgpm3=WaterDensity_function_vectorize(temp_degC))%>%
                 mutate(waterDensityDiff_kgpm3=c(0,diff(waterDensity_kgpm3)),
                        tempDiff_degC=c(0,diff(temp_degC)))%>%
                 mutate(MULakeNumber=as.character(MULakeNumber)) #make MULakeNumber a character since there are differing versions
@@ -138,20 +143,30 @@ for(fileIndex in 1:length(Level1_files)){
   which(flag_jumps(qaqcProfile1$phycocyaninBGA_RFU,scalar=jump)==TRUE),
   which(flag_jumps(qaqcProfile1$chlorophyll_RFU,scalar=jump)==TRUE)))
   
+  #Alternate. check the last 10% of rows and if there are any matching, find the lowest one, delete from there to the end####
+  #*find all the jumps in the bottom 10% of the profile####
+  rows_with_jumps_bottom<-rows_with_jumps[rows_with_jumps>=round(Level1_files_log$nrow_Level1[fileIndex]*(1-nrow_bottom_prop),0)]
+  
+  #*check if there are any rows to delete, then 
+  if(!identical(rows_with_jumps_bottom, integer(0))){ #If there are no rows to delete, then this will return false because the vector will be integer(0) OR if the rows are all above the bottom
+    qaqcProfile1<-qaqcProfile1%>%
+      slice(-c(min(rows_with_jumps_bottom):Level1_files_log$nrow_Level1[fileIndex])) #Remove from the lowest point all the way to the bottom
+    Level1_files_log$Level1to2_some_depths_removed[fileIndex]<-"yes" #indicate that some rows were removed
+  }
+  
+  #OLD METHOD THAT RELIES ON nrow_bottom
   #chck if there is integer(0) then do nothing
   #sort the vector biggest to smallest
   #check the differences
   #Stop when difference is !=1
   #
-  
-
-  
-  #Check if there are rows to delete, if so, delete those rows####
-  if(!identical(rows_with_jumps, integer(0))&!identical(rows_with_jumps[rows_with_jumps>=Level1_files_log$nrow_Level1[fileIndex]-nrow_bottom],integer(0))){ #If there are no rows to delete, then this will return false because the vector will be integer(0) OR if the rows are all above the bottom
-    qaqcProfile1<-qaqcProfile1%>%
-      slice(-c(maxN(rows_with_jumps):Level1_files_log$nrow_Level1[fileIndex])) #Remove from the lowest point all the way to the bottom
-    Level1_files_log$Level1to2_some_depths_removed[fileIndex]<-"yes" #indicate that some rows were removed
-  }
+  # 
+  # #Check if there are rows to delete, if so, delete those rows####
+  # if(!identical(rows_with_jumps, integer(0))&!identical(rows_with_jumps[rows_with_jumps>=Level1_files_log$nrow_Level1[fileIndex]-nrow_bottom],integer(0))){ #If there are no rows to delete, then this will return false because the vector will be integer(0) OR if the rows are all above the bottom
+  #   qaqcProfile1<-qaqcProfile1%>%
+  #     slice(-c(maxN(rows_with_jumps):Level1_files_log$nrow_Level1[fileIndex])) #Remove from the lowest point all the way to the bottom
+  #   Level1_files_log$Level1to2_some_depths_removed[fileIndex]<-"yes" #indicate that some rows were removed
+  # }
   
   #Check if there are rows to delete at the top, if so, delete those rows####
   if(!identical(rows_with_jumps, integer(0))&!identical(rows_with_jumps[rows_with_jumps<nrow_top],integer(0))){ #If there are no rows to delete, then this will return false because the vector will be integer(0) OR if the rows are all above the bottom
@@ -160,19 +175,7 @@ for(fileIndex in 1:length(Level1_files)){
     Level1_files_log$Level1to2_some_depths_removed[fileIndex]<-"yes" #indicate that some rows were removed
   }
     
-  #2018 only####
-  #remove bottom 15 rows if >150 rows####
-  #remove bottom 7 rows if 50 to 150####
-  if(year==2018){
-    if(Level1_files_log$nrow_Level1[fileIndex]>150){
-      qaqcProfile1<-qaqcProfile1%>%
-        slice(-c((Level1_files_log$nrow_Level1[fileIndex]-15):Level1_files_log$nrow_Level1[fileIndex]))
-    }else if(Level1_files_log$nrow_Level1[fileIndex]<=150&Level1_files_log$nrow_Level1[fileIndex]>50){
-      qaqcProfile1<-qaqcProfile1%>%
-        slice(-c((Level1_files_log$nrow_Level1[fileIndex]-7):Level1_files_log$nrow_Level1[fileIndex]))
-    }else{} #else do nothing
-  }
-  
+
   #Store them each as an entry in a list of tibbles####
     #*check if there are less than nrow_min rows in the profile####
     #*If there are then remov that profile
@@ -180,7 +183,10 @@ for(fileIndex in 1:length(Level1_files)){
     List_qaqc1[[fileIndex]]<-NULL #make sure this profile is null
     Level1_files_log$Level1to2_profileRemoved[fileIndex]<-"yes" #indicate the profile has been removed
   }else{
-    List_qaqc1[[fileIndex]]<-qaqcProfile1  
+    List_qaqc1[[fileIndex]]<-qaqcProfile1 
+    Level1_files_log$Level2_maxDepth_m[fileIndex]<-max(qaqcProfile1$verticalPosition_m,na.rm=TRUE)
+    Level1_files_log$nrow_Level2[fileIndex]<-nrow(qaqcProfile1)
+    
   }
   
 
