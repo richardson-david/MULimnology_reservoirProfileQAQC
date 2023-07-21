@@ -78,6 +78,7 @@ for(fileIndex in 1:nrow(Level0_files_log)){
                           doSaturation_percent=(doConcentration_mgpL*100)/DOsat_function(temp_degC))%>%  #Add in DO saturation from calculation, only calculates where there is a DO concentration and temperature
                   mutate(chlorophyll_RFU=NA, #Add a bunch of missing columns as NA
                          orp_mV=NA,
+                         pH=NA,
                          waterPressure_barA=NA, 
                          salinity_psu=NA,
                          specificConductivity_uSpcm=NA,
