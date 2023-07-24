@@ -204,6 +204,8 @@ for(fileIndex in 1:nrow(Level1_files_log)){
 
 
 
+#Get list of the files with low temperature####
+low_temp<-Level1_files_log%>%filter(flag_lowTemps>0)%>%dplyr::select(Level0_profiles)%>%pull()
 
 #visually assess any flagged profiles or values####
   #*export to a single file per year####
@@ -212,48 +214,13 @@ for(fileIndex in 1:nrow(Level1_files_log)){
   #*debug: fileIndex2<-7
   for(fileIndex2 in 1:nrow(Level1_files_log)){
   temp_df<-List_qaqc1[[fileIndex2]]  
-  if(is.null(temp_df)){
-    #do nothing
-  }else{
-  
-  #**Print out this one for sure####
-  print(ggplot(data=temp_df,aes(x=dateTime,y=verticalPosition_m))+geom_point()+ggtitle(paste0(Level1_files_log$Level1FileName[fileIndex2]," ","****Depth vs. time")))
-  #**Non-monotonic density
-  if(Level1_files_log[fileIndex2,"flag_monotonicDensity"]>0){
-      print(ggplot(data=temp_df,aes(x=waterDensity_kgpm3,y=verticalPosition_m,color=as.factor(waterDensityDiff_kgpm3<waterDensityDifference_threshold)))+geom_point()+scale_y_reverse()+labs(col="flag")+ggtitle(paste0(Level1_files_log$Level1FileName[fileIndex2]," ","****Non-monotonic densities")))
-      }
-  #**Non-monotonic density####
-  if(Level1_files_log[fileIndex2,"flag_decreasingTemp"]>0){
-    print(ggplot(data=temp_df,aes(x=temp_degC,y=verticalPosition_m,color=as.factor(tempDiff_degC<temperatureDifference_threshold)))+geom_point()+scale_y_reverse()+labs(col="flag")+ggtitle(paste0(Level1_files_log$Level1FileName[fileIndex2]," ","****Non-decreasing temps")))
+  if(!is.null(temp_df)){
+    if(temp_df$fileName[1]%in%low_temp){
+      print(ggplot(data=temp_df,aes(x=temp_degC,y=verticalPosition_m,color=as.factor(tempDiff_degC<temperatureDifference_threshold)))+geom_point()+scale_y_reverse()+labs(col="flag")+geom_vline(xintercept=4,color="black")+geom_vline(xintercept=5,color="red")+theme_bw()+ggtitle(paste0(Level1_files_log$Level1FileName[fileIndex2]," ","****Non-decreasing temps"))) 
+    }  
   }
   
-  #**Low temperatures####
-  if(Level1_files_log[fileIndex2,"flag_lowTemps"]>0){
-    print(ggplot(data=temp_df,aes(x=temp_degC,y=verticalPosition_m,color=as.factor(temp_degC<lowTemperature_threshold)))+geom_point()+scale_y_reverse()+labs(col="flag")+ggtitle(paste0(Level1_files_log$Level1FileName[fileIndex2]," ","****Too low temps")))
-  }
-  
-  #**Low pH####
-  #*This also checks to see if all the pH's are 0
-  if(Level1_files_log[fileIndex2,"flag_lowpH"]>0&sum(!is.na(temp_df$pH))>0){
-    print(ggplot(data=temp_df,aes(x=pH,y=verticalPosition_m,color=as.factor(pH<lowpH_threshold)))+geom_point()+scale_y_reverse()+labs(col="flag")+ggtitle(paste0(Level1_files_log$Level1FileName[fileIndex2]," ","****Too low pH")))
-  }
-  
-  #**Turbidity jumps####
-  if(Level1_files_log[fileIndex2,"flag_jumps_turbidity_FNU"]>0){
-    print(ggplot(data=temp_df,aes(x=turbidity_FNU,y=verticalPosition_m))+geom_point(color="brown")+scale_y_reverse()+labs(col="flag")+ggtitle(paste0(Level1_files_log$Level1FileName[fileIndex2]," ","****Turbidity jumps")))
-  }
-  
-  #**chl a jumps####
-  if(Level1_files_log[fileIndex2,"flag_jumps_chlorophyll_RFU"]>0){
-    print(ggplot(data=temp_df,aes(x=chlorophyll_RFU,y=verticalPosition_m))+geom_point(color="greenyellow")+scale_y_reverse()+labs(col="flag")+ggtitle(paste0(Level1_files_log$Level1FileName[fileIndex2]," ","****chl jumps")))
-  }
-  
-  #**bga jumps####
-  if(Level1_files_log[fileIndex2,"flag_jumps_phycocyaninBGA_RFU"]>0){
-    print(ggplot(data=temp_df,aes(x=phycocyaninBGA_RFU,y=verticalPosition_m))+geom_point(color="cyan4")+scale_y_reverse()+labs(col="flag")+ggtitle(paste0(Level1_files_log$Level1FileName[fileIndex2]," ","****bga jumps")))
-  }
-  
-    } #end of check for null
+
   } #end of for loop
   
   dev.off()
