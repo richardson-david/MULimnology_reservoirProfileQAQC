@@ -91,7 +91,7 @@ readProfileAll<-read_csv(file=paste0(dirPath,"/",Level1_files), col_types = cols
                  
 
 #Loop through each file####
-#Debug fileIndex<-1067
+#Debug fileIndex<-1074
 #Debug: fileIndex 
 #       Level1_files_log$Level0_profiles[fileIndex]
 for(fileIndex in 1:nrow(Level1_files_log)){
@@ -264,8 +264,9 @@ for(fileIndex in 1:nrow(Level1_files_log)){
   #Print out how many profiles were modified or removed####
   Level1_files_log%>%filter(Level1to2_some_depths_removed=="yes")%>%nrow()
   Level1_files_log%>%filter(Level1to2_profileRemoved=="yes")%>%nrow()
+    Level1_files_log%>%filter(Level1to2_profileRemoved=="yes")%>%dplyr::select(Level0_profiles)%>%print(n=Inf)
   Level1_files_log%>%filter(flag_lowTemps>0)%>%nrow()
-    Level1_files_log%>%filter(flag_lowTemps>0)%>%dplyr::select(Level0_profiles)
+    Level1_files_log%>%filter(flag_lowTemps>0)%>%dplyr::select(Level0_profiles)%>%print(n=Inf)
     
     
   ##########################################################################
