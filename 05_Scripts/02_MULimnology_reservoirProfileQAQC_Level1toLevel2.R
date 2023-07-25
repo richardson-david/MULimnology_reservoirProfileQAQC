@@ -28,7 +28,7 @@ library(stringr)
 source("05_Scripts/00_MULimnology_reservoirProfileQAQC_Functions.R")
 
 #Set year here####
-year<-2022
+year<-2017
 
 #*Set the directory path here####
 dirPath<-paste0("01_Level1_Data/",year,"_Level1_Data")
@@ -270,10 +270,11 @@ for(fileIndex in 1:length(Level1_files)){
   
 #Bind all the rows together####
   qaqc2<-do.call(bind_rows, List_qaqc1)%>%
-          dplyr::select(-depth_m)%>% #drop depth
-          rename(depth_m=verticalPosition_m)%>%
-          dplyr::select(MULakeNumber,date,dateTime,depth_m,temp_degC,doConcentration_mgpL,doSaturation_percent,chlorophyll_RFU,phycocyaninBGA_RFU,turbidity_FNU,salinity_psu,specificConductivity_uSpcm,tds_mgpL,orp_mV,pH,latitude,longitude,altitude_m,barometerAirHandheld_mbars)
-  
+          dplyr::select(-depth_m)%>% #drop depth 
+          rename(depth_m=verticalPosition_m)%>% #make depth_m into vertical position just for easier understanding
+          dplyr::select(MULakeNumber,date,dateTime,depth_m,temp_degC,doConcentration_mgpL,doSaturation_percent,chlorophyll_RFU,phycocyaninBGA_RFU,turbidity_FNU,salinity_psu,specificConductivity_uSpcm,tds_mgpL,orp_mV,pH,latitude,longitude,altitude_m,barometerAirHandheld_mbars)%>%
+          mutate(dateTime=as.character(dateTime)) #convert dateTime to character to preserve the formatting
+
 #Export the level2 file####
   write_csv(qaqc2,file=paste0("02_Level2_Data/",year,"_Level2.csv"))
 #Export the log####
