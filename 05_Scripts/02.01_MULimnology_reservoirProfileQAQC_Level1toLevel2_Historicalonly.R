@@ -72,7 +72,7 @@ Level1_files<-list.files(dirPath,pattern = "*.csv")
 #Set thresholds for water density differences and temperature differences to set flags
 waterDensityDifference_threshold<- -0.02
 temperatureDifference_threshold<-0.1
-lowTemperature_threshold<-5
+lowTemperature_threshold<-4.2
 lowpH_threshold<-5
 #establish the scalar value for jumps up or down
 jump<-2.5
@@ -91,7 +91,7 @@ readProfileAll<-read_csv(file=paste0(dirPath,"/",Level1_files), col_types = cols
                  
 
 #Loop through each file####
-#Debug fileIndex<-1074
+#Debug fileIndex<-157
 #Debug: fileIndex 
 #       Level1_files_log$Level0_profiles[fileIndex]
 for(fileIndex in 1:nrow(Level1_files_log)){
@@ -113,7 +113,7 @@ for(fileIndex in 1:nrow(Level1_files_log)){
   
   #Flag abnormal numbers####
   #how many values are below 5C
-  Level1_files_log$flag_lowTemps[fileIndex]<-sum(qaqcProfile1$temp_degC<lowTemperature_threshold,na.rm=TRUE)
+  Level1_files_log$flag_lowTemps[fileIndex]<-sum(qaqcProfile1$temp_degC<=lowTemperature_threshold,na.rm=TRUE)
   Level1_files_log$flag_lowpH[fileIndex]<-sum(qaqcProfile1$pH<lowpH_threshold,na.rm=TRUE)
   
   #If any of the pH's are below 5, remove the whole column
@@ -182,12 +182,18 @@ for(fileIndex in 1:nrow(Level1_files_log)){
     
 
   #Store them each as an entry in a list of tibbles####
-    #*check if there are less than nrow_min rows in the profile####
-    #*If there are then remov that profile
+    #*check if there are less than nrow_min rows in the profile and remove that profile
+    #*also check if there are any low temperature flags and the profile is May to October then remove that profile####
+    #*If not, then export that profile to the list and generate a final row count and max depth####
   if(Level1_files_log$nrow_Level1[fileIndex]<nrow_min){
-    List_qaqc1[[fileIndex]]<-NULL #make sure this profile is null
+    List_qaqc1[fileIndex]<-list(NULL) #make sure this profile is null
     Level1_files_log$Level1to2_profileRemoved[fileIndex]<-"yes" #indicate the profile has been removed
-  }else{
+    
+  }else if(Level1_files_log$flag_lowTemps[fileIndex]>0&as.numeric(Level1_files_log$month[fileIndex])%in%c(5:10)){
+    List_qaqc1[fileIndex]<-list(NULL) #make sure this profile is null
+    Level1_files_log$Level1to2_profileRemoved[fileIndex]<-"yes" #indicate the profile has been removed
+    
+    }else{
     List_qaqc1[[fileIndex]]<-qaqcProfile1 
     Level1_files_log$Level2_maxDepth_m[fileIndex]<-max(qaqcProfile1$verticalPosition_m,na.rm=TRUE)
     Level1_files_log$nrow_Level2[fileIndex]<-nrow(qaqcProfile1)
@@ -207,23 +213,24 @@ for(fileIndex in 1:nrow(Level1_files_log)){
 #Get list of the files with low temperature####
 low_temp<-Level1_files_log%>%filter(flag_lowTemps>0)%>%dplyr::select(Level0_profiles)%>%pull()
 
-#visually assess any flagged profiles or values####
-  #*export to a single file per year####
-  pdf(paste0("06_Outputs/Level1to2_QAQC_plots_",year,".pdf"), onefile = TRUE)
-  #*loop through the different profiles in the log file####
-  #*debug: fileIndex2<-7
-  for(fileIndex2 in 1:nrow(Level1_files_log)){
-  temp_df<-List_qaqc1[[fileIndex2]]  
-  if(!is.null(temp_df)){
-    if(temp_df$fileName[1]%in%low_temp){
-      print(ggplot(data=temp_df,aes(x=temp_degC,y=verticalPosition_m,color=as.factor(tempDiff_degC<temperatureDifference_threshold)))+geom_point()+scale_y_reverse()+labs(col="flag")+geom_vline(xintercept=4,color="black")+geom_vline(xintercept=5,color="red")+theme_bw()+ggtitle(paste0(Level1_files_log$Level1FileName[fileIndex2]," ","****Non-decreasing temps"))) 
-    }  
-  }
+#This won't work because those were made null
+# #visually assess any flagged profiles or values####
+#   #*export to a single file per year####
+#   pdf(paste0("06_Outputs/Level1to2_QAQC_plots_",year,".pdf"), onefile = TRUE)
+#   #*loop through the different profiles in the log file####
+#   #*debug: fileIndex2<-7
+#   for(fileIndex2 in 1:nrow(Level1_files_log)){
+#   temp_df<-List_qaqc1[[fileIndex2]]  
+#   if(!is.null(temp_df)){
+#     if(temp_df$fileName[1]%in%low_temp){
+#       print(ggplot(data=temp_df,aes(x=temp_degC,y=verticalPosition_m,color=as.factor(tempDiff_degC<temperatureDifference_threshold)))+geom_point()+scale_y_reverse()+labs(col="flag")+geom_vline(xintercept=4,color="black")+geom_vline(xintercept=5,color="red")+theme_bw()+ggtitle(paste0(Level1_files_log$Level1FileName[fileIndex2]," ","****Non-decreasing temps"))) 
+#     }  
+#   }
   
 
-  } #end of for loop
+  #} #end of for loop
   
-  dev.off()
+  #dev.off()
   
   #Look for any row with any of the flag columns greater than 5####
   #check_df<-Level1_files_log%>%filter(if_any(flag_lowTemps:flag_jumps_barometerAirHandheld_mbars,~.>5))%>%print(n=Inf)
@@ -244,6 +251,7 @@ low_temp<-Level1_files_log%>%filter(flag_lowTemps>0)%>%dplyr::select(Level0_prof
   qaqc2<-do.call(bind_rows, List_qaqc1)%>%
           dplyr::select(-depth_m)%>% #drop depth
           rename(depth_m=verticalPosition_m)%>%
+          mutate(date=paste(year,month,day,sep="-"))%>%
           dplyr::select(MULakeNumber,date,dateTime,depth_m,chlorophyll_RFU:barometerAirHandheld_mbars)
   
 #Export the level2 file####
