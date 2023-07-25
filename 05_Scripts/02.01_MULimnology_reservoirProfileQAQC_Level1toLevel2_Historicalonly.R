@@ -252,8 +252,9 @@ low_temp<-Level1_files_log%>%filter(flag_lowTemps>0)%>%dplyr::select(Level0_prof
           dplyr::select(-depth_m)%>% #drop depth
           rename(depth_m=verticalPosition_m)%>%
           mutate(date=paste(year,month,day,sep="-"))%>%
-          dplyr::select(MULakeNumber,date,dateTime,depth_m,chlorophyll_RFU:barometerAirHandheld_mbars)
-  
+          dplyr::select(MULakeNumber,date,dateTime,depth_m,temp_degC,doConcentration_mgpL,doSaturation_percent,chlorophyll_RFU,phycocyaninBGA_RFU,turbidity_FNU,salinity_psu,specificConductivity_uSpcm,tds_mgpL,orp_mV,pH,latitude,longitude,altitude_m,barometerAirHandheld_mbars)
+    						
+    
 #Export the level2 file####
   write_csv(qaqc2,file=paste0("02_Level2_Data/",year,"_Level2.csv"))
 #Export the log####

@@ -28,7 +28,7 @@ library(stringr)
 source("05_Scripts/00_MULimnology_reservoirProfileQAQC_Functions.R")
 
 #Set year here####
-year<-2017
+year<-2022
 
 #*Set the directory path here####
 dirPath<-paste0("01_Level1_Data/",year,"_Level1_Data")
@@ -72,7 +72,7 @@ Level1_files<-list.files(dirPath,pattern = "*.csv")
 #Set thresholds for water density differences and temperature differences to set flags
 waterDensityDifference_threshold<- -0.02
 temperatureDifference_threshold<-0.1
-lowTemperature_threshold<-5
+lowTemperature_threshold<-4.2
 lowpH_threshold<-5
 #establish the scalar value for jumps up or down
 jump<-2.5
@@ -180,8 +180,12 @@ for(fileIndex in 1:length(Level1_files)){
     #*check if there are less than nrow_min rows in the profile####
     #*If there are then remov that profile
   if(Level1_files_log$nrow_Level1[fileIndex]<nrow_min){
-    List_qaqc1[[fileIndex]]<-NULL #make sure this profile is null
+    List_qaqc1[fileIndex]<-list(NULL) #make sure this profile is null
     Level1_files_log$Level1to2_profileRemoved[fileIndex]<-"yes" #indicate the profile has been removed
+  }else if(Level1_files_log$flag_lowTemps[fileIndex]>0&as.numeric(Level1_files_log$month[fileIndex])%in%c(5:10)){
+    List_qaqc1[fileIndex]<-list(NULL) #make sure this profile is null
+    Level1_files_log$Level1to2_profileRemoved[fileIndex]<-"yes" #indicate the profile has been removed
+    
   }else{
     List_qaqc1[[fileIndex]]<-qaqcProfile1 
     Level1_files_log$Level2_maxDepth_m[fileIndex]<-max(qaqcProfile1$verticalPosition_m,na.rm=TRUE)
@@ -268,7 +272,7 @@ for(fileIndex in 1:length(Level1_files)){
   qaqc2<-do.call(bind_rows, List_qaqc1)%>%
           dplyr::select(-depth_m)%>% #drop depth
           rename(depth_m=verticalPosition_m)%>%
-          dplyr::select(MULakeNumber,date,dateTime,depth_m,chlorophyll_RFU:barometerAirHandheld_mbars)
+          dplyr::select(MULakeNumber,date,dateTime,depth_m,temp_degC,doConcentration_mgpL,doSaturation_percent,chlorophyll_RFU,phycocyaninBGA_RFU,turbidity_FNU,salinity_psu,specificConductivity_uSpcm,tds_mgpL,orp_mV,pH,latitude,longitude,altitude_m,barometerAirHandheld_mbars)
   
 #Export the level2 file####
   write_csv(qaqc2,file=paste0("02_Level2_Data/",year,"_Level2.csv"))
