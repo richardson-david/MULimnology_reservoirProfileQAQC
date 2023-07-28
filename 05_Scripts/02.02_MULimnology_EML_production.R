@@ -1,13 +1,36 @@
 # Steps for setting up EML metadata ####
 if(!require(EMLassemblyline)){install.packages("EMLassemblyline")}
 if(!require(devtools)){install.packages("devtools")}
+if(!require(maps)){install.packages("maps")}
+if(!require(tidyverse)){install.packages("tidyverse")}
 
+
+#Load packages
 library(devtools)
 #install_github("EDIorg/EMLassemblyline", force=T)
-
 # Install from GitHub
 remotes::install_github("EDIorg/EMLassemblyline")
 library(EMLassemblyline)
+
+#Ggplot can work well with maps package
+library(maps)
+library(tidyverse)
+
+
+#Read in state data
+missouri_state<-map_data('state')%>%filter(region=="missouri")  
+head(missouri_state)
+
+#Plot state with state boundaries just for fun
+#ggplot()+
+#  geom_polygon(data=missouri_state,aes(x=long,y=lat,group=group),fill='white',color='black')
+
+#find the bounding box of missouri
+min(missouri_state$long) #west
+max(missouri_state$long) #east
+max(missouri_state$lat) #north
+min(missouri_state$lat) #south
+
 
 # Import templates for dataset licensed under CCBY, with 3 tables.
 template_core_metadata(path = "EDI/",

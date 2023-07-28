@@ -2,23 +2,3 @@ givenName	middleInitial	surName	organizationName	electronicMailAddress	userId	ro
 David	C.	Richardson	SUNY New Paltz	richardsond@newpaltz.edu	0000-0001-9374-9624	PI			
 David	C.	Richardson	SUNY New Paltz	richardsond@newpaltz.edu	0000-0001-9374-9624	contact			
 David	C.	Richardson	SUNY New Paltz	richardsond@newpaltz.edu	0000-0001-9374-9624	creator			
-Meredith	A.	Holgerson	Cornell University	meredith.holgerson@cornell.edu 	0000-0002-2275-9240	PI			
-Meredith	A.	Holgerson	Cornell University	meredith.holgerson@cornell.edu 	0000-0002-2275-9240	creator			
-Matthew	J.	Farragher	University of Maine	mfarragher7@gmail.com	0000-0002-4761-8436	creator			
-Kathryn	K.	Hoffman	St. Olaf College	kathrynjkhoffman@gmail.com		creator			
-Katelyn	B.S.	King	Michigan State University 	kingka21@msu.edu 	0000-0001-5471-842X	creator			
-Maria	B.	Alfonso	Universidad Nacional del Sur	mariabelenalfonso@gmail.com	0000-0003-0543-8098	creator			
-Mikkel	R.	Andersen	Dundalk Institute of Technology	ferskvand@gmail.com	0000-0003-2104-2894	creator			
-Kendra	Spence	Cheruveil	Michigan State University	ksc@msu.edu	0000-0003-1880-2880	creator			
-Kristen	A.	Coleman	York University	kcoleman@yorku.ca		creator			
-Mary	Jade	Farruggia	University of California Davis	mjfarruggia@ucdavis.edu	0000-0003-4234-6678	creator			
-Rocio	L.	Fernandez	National Scientific and Technical Research Council Argentina	rocioluz@yahoo.com	0000-0001-9996-8975	creator			
-Kelly	L.	Hondula	"Battelle, National Ecological Observatory Network"	khondula@sesync.org	0000-0002-1928-1442	creator			
-Gregorio	A.	Lopez Moreira M.	Leibniz-Institute of Freshwater Ecology and Inland Fisheries	ga.lopez@unitn.it	0000-0001-9023-5177	creator			
-Katherine	E.	Paul	SUNY New Paltz	katherine.paul028@gmail.com		creator			
-Benjamin	L.	Peierls	Lakes Environmental Association	ben@mainelakes.org	0000-0002-0166-7195	creator			
-Joseph	S.	Rabaey	University of Minnesota - Twin Cities	rabae005@umn.edu	0000-0002-9649-4855	creator			
-Steven		Sadro	University of California Davis	ssadro@ucdavis.edu	0000-0002-6416-3840	creator			
-Maria	Laura	Sanchez	"Universidad de Buenos Aires, CABA"	sanchezlaura80@gmail.com	0000-0001-5831-1811 	creator			
-Robyn	L.	Smyth	Bard College	rsmyth@bard.edu	0000-0001-8513-008X	creator			
-Jon	N.	Sweetman	Penn State University	jon.sweetman@ndsu.edu	0000-0002-9849-7355	creator			
