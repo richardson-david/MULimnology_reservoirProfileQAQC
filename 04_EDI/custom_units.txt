@@ -1,0 +1,2 @@
+id	unitType	parentSI	multiplierToSI	description
+microsiemensPerCentimeter	Conductivity	siemensPerCentimeter	0.001	Electrical conductance for lower conductivity
