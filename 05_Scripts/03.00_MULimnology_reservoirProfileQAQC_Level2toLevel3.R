@@ -56,9 +56,9 @@ profiles2<-do.call(bind_rows, List_qaqc2)
 #Stack all the logs together####
 logs2<-do.call(bind_rows, List_logs2)
 
+#Check for unqiue numbers in both the profiles and logs####
+#The profiles should be more accurate because the logs include profiles that have been removed####
 sort(unique(profiles2$MULakeNumber))
 sort(unique(logs2$MULakeNumber))
-
-sort(unique(profiles2$MULakeNumber))==sort(unique(logs2$MULakeNumber))
-
-logs2%>%filter(MULakeNumber=="cow")
+#Write out that list of MULake numbers####
+write_csv(tibble(MULakeNumber=sort(unique(profiles2$MULakeNumber))),file=paste0("06_Outputs/ListOfMULakeNumbers_through2022.csv"))
