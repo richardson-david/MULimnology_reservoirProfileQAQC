@@ -1,3 +1,8 @@
+##Level2: Publishing level2 profiles with EDI####
+##Created 28Jul2023 by David Richardson (hereafter DCR)
+##Reads in files from the 04_EDI folder and creates EML file for publication in EDI####
+##See here for additional instructions from Cayelan Carey's lab: https://github.com/CareyLabVT/Reservoirs/blob/master/Data/DataAlreadyUploadedToEDI/EDIProductionFiles/MakeEMLChemistry/2022/MakeEMLChemistry.R
+
 # Steps for setting up EML metadata ####
 if(!require(EMLassemblyline)){install.packages("EMLassemblyline")}
 if(!require(devtools)){install.packages("devtools")}
