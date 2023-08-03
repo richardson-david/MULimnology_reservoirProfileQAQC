@@ -38,6 +38,11 @@ historicalData<-read_csv(paste0(dirPath,"/HistoricalProfileData.csv"))%>%
                        MULakeNumber=sprintf("%03d", MULakeNumber),  #Make MULakeNumber have 3 digits with leading zeroes
                        fileName=paste(MULakeNumber,year,month,day,sep="_"))
 
+#Find and delete replicate rows####
+  #historicalData%>%group_by_all()%>%filter(n()>1)%>%ungroup()
+  historicalData<-historicalData%>%group_by_all()%>%slice(1)%>%ungroup()
+  
+  
 #Create log with row for each profile
 Level0_files_log<-tibble(Level0_profiles=unique(historicalData$fileName),Level0to1_done="No",Level0to1_done_date=as_date(NA))%>% #Marks that Level 0 to 1 is done and what date
                   separate(Level0_profiles,c("MULakeNumber","year","month","day","csv"),remove=FALSE)%>% #use separate function to pull out each component of the 
@@ -65,7 +70,7 @@ Level0_files_log<-tibble(Level0_profiles=unique(historicalData$fileName),Level0t
 #Initialize storage location
 List_historical<-list()
 
-#Debug fileIndex<-3
+#Debug fileIndex<-462
 for(fileIndex in 1:nrow(Level0_files_log)){
   singleProfile<-historicalData%>%filter(fileName==Level0_files_log$Level0_profiles[fileIndex])%>% #pull out the first profile with all values
                   dplyr::select(-any_of(c("waterBody","beginDateTime","parameterTypeID","projectID")))
@@ -89,8 +94,13 @@ for(fileIndex in 1:nrow(Level0_files_log)){
                          longitude=NA,
                          altitude_m=NA,
                          barometerAirHandheld_mbars=NA)
-                
- 
+  ######################################################################################################################              
+  ##################STOPPED HERE - FIGURE OUT WHAT TO DO WITH THESE DUPLICATE DEPTHS - POSSIBLE AVERAGE TEMP< DO, DO SAT####
+  #Only a few that it doesn't seem appropriate to do##################################
+  
+  #Check for duplicate rows here####
+  if(nrow(reformatted_DF%>%group_by(depth_m)%>%filter(n()>1))>0){print(reformatted_DF%>%group_by(depth_m)%>%filter(n()>1))}
+   
   #Store the number of rows in the log####
   Level0_files_log$nrow_original_Level0[fileIndex]<-nrow(reformatted_DF)
   

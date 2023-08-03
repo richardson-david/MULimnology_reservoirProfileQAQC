@@ -62,3 +62,28 @@ sort(unique(profiles2$MULakeNumber))
 sort(unique(logs2$MULakeNumber))
 #Write out that list of MULake numbers####
 write_csv(tibble(MULakeNumber=sort(unique(profiles2$MULakeNumber))),file=paste0("06_Outputs/ListOfMULakeNumbers_through2022.csv"))
+
+#Summary calculations - summarize by MULakeNumber and date, depth_m is profile depth, temp_degC is the temperature
+  #Temperature/Stratification metrics metrics####
+      # -Thermocline depth (metaTop in rLakeAnalyzer)
+      # -Top of the hypolimnion (metaBottom in rLakeAnalyzer)
+      # -Depth weight temperature - whole reservoir
+      # -Epilimnion temp (meters 1-3, above metaTop)
+      # -Hypolimnion temp (bottom 3 meters or below metaBottom)
+      # -Stratification strength (buoyancy frequency, density differences from top to bottom or epi to hypo, density gradients)
+profiles2%>%
+  group_by(MULakeNumber,dateTime)%>%
+  summarize(
+    minDepth_m=min(depth_m,na.rm=TRUE), #smallest depth
+    maxDepth_m=max(depth_m,na.rm=TRUE), #deepest depth
+    numberOfMeasurements_temperature=sum(!is.na(temp_degC)), #number of depth measurements
+    thermoclineDepth_m_thresh0.3=thermocline.Depth(depth.array=depth_m,temp.array=temp_degC,thresh = 0.3), #thermocline depth at 0.3 density threshold
+    top_metalimnion_m=meta.depths(wtr=temp_degC,depths=depth_m)[1], #Top of metalimnion using rLakeAnalyzer
+    bottom_metalimnion_m=meta.depths(wtr=temp_degC,depths=depth_m)[2], #Bottom of metalimnion using rLakeAnalyzer
+    epilimnion_temp_C=mean(parameterValue[prof_Depth<=top_metalimnion_m],na.rm=TRUE), #average temperature above metalimnion top
+    hypolimnion_temp_C=mean(parameterValue[prof_Depth>=bottom_metalimnion_m],na.rm=TRUE), #average temperature below the metalimnion bottom
+    above_thermocline_temp_C=mean(parameterValue[prof_Depth<=thermoclineDepth_m_thresh0.3],na.rm=TRUE), #average temperature above or equal to the thermocline
+    below_thermocline_temp_C=mean(parameterValue[prof_Depth>thermoclineDepth_m_thresh0.3],na.rm=TRUE), #average temperature below the thermocline
+    delta_hypo_epi_waterDensity_kgperm3=water.density(hypolimnion_temp_C)-water.density(epilimnion_temp_C), #density delta (hypo-epi)
+    buoyancyfrequency_1_s2=max(buoyancy.freq(wtr=parameterValue,depths=prof_Depth)) #generate the maximum buoyancy frequency using rLakeAnalyzer buoyancy frequency vector
+  )

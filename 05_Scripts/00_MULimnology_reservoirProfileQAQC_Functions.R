@@ -6,8 +6,14 @@
 #qaqc_bounds that cuts files based on sensor limits in the table####
 
 #Libraries####
+if (!require(rLakeAnalyzer)) {install.packages("rLakeAnalyzer")}
+if (!require(purrr)) {install.packages("purrr")}
+if (!require(insol)) {install.packages("insol")}
 
 #Load packages####
+library(rLakeAnalyzer) #for heatmaps and for water saturation
+library(purrr)
+library(insol)
 
 
 #FUNCTION: qaqc_bounds####
@@ -122,3 +128,40 @@ maxN<-function(vector){
   }
 }
 
+#####Function: ThermoclineDepth#################
+#THERMOCLINE DEPTH
+#Calculates the thermocline depth based on a threshold for density (usually 0.3), temp profile (C) and depth profile (m)
+#returns thermocline depth in m
+thermocline.Depth <- function(depth.array, temp.array, thresh) {
+  #Calculate density array
+  Density <-
+    1000 * (1 - (temp.array + 288.9414) / (508929.2 * (temp.array + 68.12963)) *
+              (temp.array - 3.9863) ^ 2)
+  
+  #drho_dz is the change in density over depth
+  numDepths = length(depth.array)
+  dDensdz = rep(NA, numDepths - 1)
+  for (i in 1:(numDepths - 1)) {
+    dDensdz[i] = (Density[i + 1] - Density[i]) / (depth.array[i + 1] - depth.array[i])
+    #end of for loop to calculating dDensitydz
+  }
+  
+  dDensdz.unlist <- unlist(dDensdz)
+  #if the maximum is NA, then return NA (all the values are NA)
+  #else if the maximum is less than the threshold, then it is not stratified and return NA
+  #Else find the maximum density difference to establish the thermocline depth
+  if (max(dDensdz.unlist, na.rm = TRUE) == -Inf) {
+    metaDepth <- NA
+  } else if (max(dDensdz.unlist, na.rm = TRUE) < thresh) {
+    metaDepth <- NA
+    #Old code returns max depth; this might be helpful to know you had reading but not stratified
+    #metaDepth<-max(depth.array,na.rm=TRUE)
+  } else{
+    maxBigChange <- which.max(dDensdz.unlist)
+    metaDepth <-
+      mean(c(depth.array[maxBigChange], depth.array[(maxBigChange + 1)]))
+  }
+  #return the max depth
+  return(metaDepth)
+}
+####End of Thermocline function#
