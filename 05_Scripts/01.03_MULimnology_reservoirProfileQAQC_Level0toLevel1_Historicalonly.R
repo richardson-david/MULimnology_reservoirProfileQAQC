@@ -70,7 +70,7 @@ Level0_files_log<-tibble(Level0_profiles=unique(historicalData$fileName),Level0t
 #Initialize storage location
 List_historical<-list()
 
-#Debug fileIndex<-462
+#Debug fileIndex<-1952
 for(fileIndex in 1:nrow(Level0_files_log)){
   singleProfile<-historicalData%>%filter(fileName==Level0_files_log$Level0_profiles[fileIndex])%>% #pull out the first profile with all values
                   dplyr::select(-any_of(c("waterBody","beginDateTime","parameterTypeID","projectID")))
@@ -94,12 +94,34 @@ for(fileIndex in 1:nrow(Level0_files_log)){
                          longitude=NA,
                          altitude_m=NA,
                          barometerAirHandheld_mbars=NA)
-  ######################################################################################################################              
-  ##################STOPPED HERE - FIGURE OUT WHAT TO DO WITH THESE DUPLICATE DEPTHS - POSSIBLE AVERAGE TEMP< DO, DO SAT####
-  #Only a few that it doesn't seem appropriate to do##################################
+
+  #Check for duplicate rows here and in most cases, just take the average of the numeric rows####
+  if(nrow(reformatted_DF%>%group_by(depth_m)%>%filter(n()>1))>0){
+    #print(reformatted_DF%>%group_by(depth_m)%>%filter(n()>1)) #Prints out the duplicated depths
+    print(fileIndex) #just to show which ones have been changed
+    #Select out some individuals for special cases
+    if(reformatted_DF$fileName[1]=="011_2001_06_11"){
+      reformatted_DF<-reformatted_DF%>%slice(-head(which(reformatted_DF$depth_m==5),1)) #Remove the first one at 5m deep
+    }else if(reformatted_DF$fileName[1]=="013_2003_06_18"){
+      reformatted_DF<-reformatted_DF%>%slice(c(2,3,4,8,10,13,15,17))
+    }else if(reformatted_DF$fileName[1]=="013_2003_07_16"){
+      reformatted_DF<-reformatted_DF%>%slice(-c(1,7))
+    }else{ #Average all duplicated columns
+      reformatted_DF<-reformatted_DF%>%group_by(depth_m)%>% #group by depth
+        summarize(across(MULakeNumber,first),  #take the first value from character columns, average from numeric
+                  across(temp_degC,mean), #take the average from temp as a numeric column
+                  across(dateTime:fileName,first), #take the first value from character columns
+                  across(doConcentration_mgpL:doSaturation_percent,mean), #take the average from temp as a numeric column
+                  across(chlorophyll_RFU:barometerAirHandheld_mbars,first) #take the first value from character columns
+        )%>% #end of summarize
+        dplyr::select(MULakeNumber,depth_m,temp_degC:barometerAirHandheld_mbars)
+        
+    }
+    
+    
+    }
   
-  #Check for duplicate rows here####
-  if(nrow(reformatted_DF%>%group_by(depth_m)%>%filter(n()>1))>0){print(reformatted_DF%>%group_by(depth_m)%>%filter(n()>1))}
+
    
   #Store the number of rows in the log####
   Level0_files_log$nrow_original_Level0[fileIndex]<-nrow(reformatted_DF)
