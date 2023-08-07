@@ -82,7 +82,7 @@ Level0_files_log<-tibble(Level0_profiles=Level0_files,Level0to1_done="No",Level0
 
 
 #***This 1 can be subbed in with the new file index from the log####
-    #Debug fileIndex<-42
+    #Debug fileIndex<-57
     #Debug: fileIndex 
     #       Level0_files_log$Level0_profiles[fileIndex]
 for(fileIndex in 1:length(Level0_files)){
@@ -95,7 +95,7 @@ for(fileIndex in 1:length(Level0_files)){
     #all skip_rows are 0
     skip_rows=0
     
-    print(fileIndex)
+    #print(fileIndex)
     
         
     #This also decaps the first bunch of rows to start with row skip_rows
@@ -157,6 +157,14 @@ for(fileIndex in 1:length(Level0_files)){
      
      #Store the number of rows in the log####
      Level0_files_log$nrow_original_Level0[fileIndex]<-nrow(readProfile)
+     
+     #Just checking to see if there are wrong dates in here####
+        #if(readProfile[1,"date"]=="2014-11-14"){print(Level0_files_log$Level0_profiles[fileIndex])}
+     #Check to see if the dates match the file name
+        #if(readProfile[1,"date"]==ymd(paste(Level0_files_log$year[fileIndex],"_",Level0_files_log$month[fileIndex],"_",Level0_files_log$day[fileIndex],sep=""))){}else{print(Level0_files_log$Level0_profiles[fileIndex])}
+     ####################################################################
+     #replace the dates further up in the read in tibble code (line 108) 
+     
      
      #If there are more than 400 rows - this means the profile was lowered extremely slowly and the qaqc will delete all rows
      #If this is true, then average to the nearest 10 seconds. 
