@@ -24,7 +24,7 @@ library(stringr)
 source("05_Scripts/00_MULimnology_reservoirProfileQAQC_Functions.R")
 
 #Set year here####
-year<-2021
+year<-2020
 
 #Read in the sensor limits file####
 sensorLimits<-read_csv("00_Level0_Data/MissouriReservoirs-YSI_EXO3_SensorLimits.csv")
@@ -82,7 +82,7 @@ Level0_files_log<-tibble(Level0_profiles=Level0_files,Level0to1_done="No",Level0
 
 
 #***This 1 can be subbed in with the new file index from the log####
-    #Debug fileIndex<-7
+    #Debug fileIndex<-1
     #Debug: fileIndex 
     #       Level0_files_log$Level0_profiles[fileIndex]
 for(fileIndex in 1:length(Level0_files)){
@@ -165,10 +165,10 @@ for(fileIndex in 1:length(Level0_files)){
      #Store the number of rows in the log####
      Level0_files_log$nrow_original_Level0[fileIndex]<-nrow(readProfile)
      
-     #If there are more than 400 rows - this means the profile was lowered extremely slowly and the qaqc will delete all rows
+     #If there are more than 250 rows - this means the profile was lowered extremely slowly and the qaqc will delete all rows
      #If this is true, then average to the nearest 10 seconds. 
      #Create a column that is the nearest 10 seconds, then average by that####
-     if(nrow(readProfile)>400){
+     if(nrow(readProfile)>250){
        readProfile<-readProfile%>%
          mutate(dateTime_Round=round_date(dateTime,"3 seconds"))%>%
          group_by(dateTime_Round)%>%
@@ -237,7 +237,17 @@ for(fileIndex in 1:length(Level0_files)){
       level1_dir<-paste0("01_Level1_Data/",year,"_Level1_Data/")
     
     #Remove the differencing columns####
-    qaqcProfile<-qaqcProfile%>%dplyr::select(-depthDiff_m,-verticalPositionDiff_m)
+    qaqcProfile<-qaqcProfile%>%dplyr::select(-depthDiff_m,-verticalPositionDiff_m)%>%
+      dplyr::select(MULakeNumber,date,dateTime,depth_m,verticalPosition_m,temp_degC,doConcentration_mgpL,doSaturation_percent,chlorophyll_RFU,phycocyaninBGA_RFU,turbidity_FNU,pH,orp_mV,specificConductivity_uSpcm,salinity_psu,tds_mgpL,waterPressure_barA,latitude,longitude,altitude_m,barometerAirHandheld_mbars)
+    
+    #Check for duplicate depth readings here and in most cases, just take the first reading at each depth####
+    if(nrow(qaqcProfile%>%group_by(verticalPosition_m)%>%filter(n()>1))>0){
+      qaqcProfile<-qaqcProfile%>%group_by(verticalPosition_m)%>% #group by depth
+        summarize(across(MULakeNumber:barometerAirHandheld_mbars,first),  #take the first value from character columns, average from numeric
+        )%>% #end of summarize
+        dplyr::select(MULakeNumber:depth_m,verticalPosition_m,temp_degC:barometerAirHandheld_mbars) #Put the columns back in order
+    }
+      
     
     #Write out Level1 csv in the file####
     write_csv(qaqcProfile,file=paste0(level1_dir,Level0_files_log$Level1FileName[fileIndex]))
