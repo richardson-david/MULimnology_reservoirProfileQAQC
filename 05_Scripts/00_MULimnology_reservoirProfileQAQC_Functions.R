@@ -165,3 +165,76 @@ thermocline.Depth <- function(depth.array, temp.array, thresh) {
   return(metaDepth)
 }
 ####End of Thermocline function#
+
+#####Function: minDO#################
+#Gives the minimum DO - if the entire profile is NA, returns NA
+minDO<-function(do_vector){
+  if(sum(is.na(do_vector))==length(do_vector)|sum(!is.na(do_vector))<=3){return(NA)}else{
+    return(min(do_vector,na.rm=TRUE))
+  }
+}
+####End of minDO function#
+
+#####Function: maxDO#################
+#Gives the minimum DO - if the entire profile is NA, returns NA
+maxDO<-function(do_vector){
+  if(sum(is.na(do_vector))==length(do_vector)|sum(!is.na(do_vector))<=3){return(NA)}else{
+    return(max(do_vector,na.rm=TRUE))
+  }
+}
+####End of maxDO function#
+
+#####Function: depthDOmax#################
+#Gives the depth of the maximum DO if fed a DO vector and depth vector
+#returns the first one in the event of ties, or NA in the event of less than 3 do values or all NA depths
+depthDOmax<-function(depth_vector,do_vector){
+  if(sum(is.na(depth_vector))==length(depth_vector)|sum(!is.na(do_vector))<3){return(NA) #check if the depth or do vector is all NA, then return NA
+    }else{
+    temp_vectorOfDepths<-depth_vector[do_vector==max(do_vector,na.rm=TRUE)]
+    return(temp_vectorOfDepths[1])  
+  }
+}
+####End of depthDOmax function#
+
+#Thermocline depth function - max density####
+#Calculates the thermocline depth based on max density rate of change, temp profile (C) and depth profile (m)
+thermocline.Depth.max <- function(depth.array, temp.array) {
+  #Calculate density array
+  Density <-
+    1000 * (1 - (temp.array + 288.9414) / (508929.2 * (temp.array + 68.12963)) *
+              (temp.array - 3.9863) ^ 2)
+  
+  #Calculate the differences of depth
+  dz <- diff(depth.array)
+  #Calculate the differences of density
+  dDens <-
+    as.numeric(Density[(2):length(Density)] - Density[1:length(Density) - 1])
+  #First derivative of the density profile
+  dDensdz <- dDens / dz
+  
+  #Find the max rate of change
+  maxBigChange <- which.max(dDensdz)
+  metaDepth <-
+    mean(c(depth.array[maxBigChange], depth.array[(maxBigChange + 1)]))
+  
+  return(metaDepth)
+  #End of thermocline depth max density
+}
+####End of Thermocline function#
+
+#Function Oxycline_threshold####
+#Finds the first depth that is = or below a threshold
+#depth.array=c(0,0.7,1,1.5,2)
+#DO.array=c(10.3,7.7,6,3.3,0.01)
+#DO.array=c(8.5,8.2,7.8,7.6,7,2.2,2.2,2.2,2.2)
+#DO.array=c(8.5,NA,8.2,1,5,0.5)
+Oxycline_threshold<-function(depth.array,DO.array,threshold=2){
+  #Find the first depth reading that satisfied the threshold, returns NA if there are no DO values or if there is no value below that threshold####
+  if(sum(is.na(DO.array))==length(DO.array)|sum(DO.array<=threshold,na.rm=TRUE)==0){
+    Oxycline<-NA
+  }else{
+    Oxycline<-depth.array[min(which(DO.array<=threshold))]  
+  }
+  return(Oxycline)
+}
+####End of Oxycline_threshold function#

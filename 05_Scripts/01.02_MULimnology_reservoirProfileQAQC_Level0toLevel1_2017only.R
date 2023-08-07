@@ -82,7 +82,7 @@ Level0_files_log<-tibble(Level0_profiles=Level0_files,Level0to1_done="No",Level0
 
 
 #***This 1 can be subbed in with the new file index from the log####
-    #Debug fileIndex<-237
+    #Debug fileIndex<-42
     #Debug: fileIndex 
     #       Level0_files_log$Level0_profiles[fileIndex]
 for(fileIndex in 1:length(Level0_files)){
@@ -170,7 +170,8 @@ for(fileIndex in 1:length(Level0_files)){
                                          mutate(depthDiff_m=c(99,diff(depth_m)), #Create a depth difference column that represents the difference of the depths for each consecutive reading
                                                 verticalPositionDiff_m=c(99,diff(verticalPosition_m)) #Create a depth difference column that represents the difference of the depths for each consecutive reading
                                          )%>%
-                                         mutate(MULakeNumber=Level0_files_log$MULakeNumber[fileIndex]) #replace the MULakeNumber from the log
+                                         mutate(MULakeNumber=Level0_files_log$MULakeNumber[fileIndex])%>% #replace the MULakeNumber from the log
+                                         dplyr::select(-dateTime_Round)
      }else{} #do nothing
      
      #Store the number of rows after this averaging to see if it is reduced in size in the log####
@@ -227,9 +228,19 @@ for(fileIndex in 1:length(Level0_files)){
       #*level 1 directory####
       level1_dir<-paste0("01_Level1_Data/",year,"_Level1_Data/")
     
-    #Remove the differencing columns####
-    qaqcProfile<-qaqcProfile%>%dplyr::select(-depthDiff_m,-verticalPositionDiff_m)%>%mutate(dateTime=ymd_hms(dateTime))
-    
+    #Remove the differencing columns and reorg the columns####
+    qaqcProfile<-qaqcProfile%>%dplyr::select(-depthDiff_m,-verticalPositionDiff_m)%>%mutate(dateTime=ymd_hms(dateTime))%>%
+                  dplyr::select(MULakeNumber,date,dateTime,depth_m,verticalPosition_m,temp_degC,doConcentration_mgpL,doSaturation_percent,chlorophyll_RFU,phycocyaninBGA_RFU,turbidity_FNU,pH,orp_mV,specificConductivity_uSpcm,salinity_psu,tds_mgpL,waterPressure_barA,latitude,longitude,altitude_m,barometerAirHandheld_mbars)
+
+    #Check for duplicate depth readings here and in most cases, just take the first reading at each depth####
+    if(nrow(qaqcProfile%>%group_by(verticalPosition_m)%>%filter(n()>1))>0){
+      qaqcProfile<-qaqcProfile%>%group_by(verticalPosition_m)%>% #group by depth
+        summarize(across(MULakeNumber:barometerAirHandheld_mbars,first),  #take the first value from character columns, average from numeric
+        )%>% #end of summarize
+        dplyr::select(MULakeNumber:depth_m,verticalPosition_m,temp_degC:barometerAirHandheld_mbars) #Put the columns back in order
+      }
+      
+      
     #Write out Level1 csv in the file####
     write_csv(qaqcProfile,file=paste0(level1_dir,Level0_files_log$Level1FileName[fileIndex]))
     
