@@ -96,7 +96,23 @@ for(fileIndex in 1:length(Level0_files)){
     skip_rows=0
     
     #print(fileIndex)
-    
+    #For these specific ones, trigger to replace the date####
+    if(Level0_files_log$Level0_profiles[fileIndex]=="048_2017_05_18 cleaned.csv"|
+       Level0_files_log$Level0_profiles[fileIndex]=="048_2017_07_25 FNU cleaned.csv"|
+       Level0_files_log$Level0_profiles[fileIndex]=="078_2017_07_25 FNU cleaned.csv"|
+       Level0_files_log$Level0_profiles[fileIndex]=="081_2017_07_25 FNU cleaned.csv"|
+       Level0_files_log$Level0_profiles[fileIndex]=="087_2017_05_18 cleaned.csv"|
+       Level0_files_log$Level0_profiles[fileIndex]=="087_2017_07_25 FNU cleaned.csv"|
+       Level0_files_log$Level0_profiles[fileIndex]=="107_2017_05_16 cleaned.csv"|
+       Level0_files_log$Level0_profiles[fileIndex]=="108_2017_05_17 cleaned.csv"|
+       Level0_files_log$Level0_profiles[fileIndex]=="110_2017_05_17 cleaned.csv"|
+       Level0_files_log$Level0_profiles[fileIndex]=="121_2017_05_18 cleaned.csv"|
+       Level0_files_log$Level0_profiles[fileIndex]=="150_2017_05_18 cleaned.csv"|
+       Level0_files_log$Level0_profiles[fileIndex]=="179_2017_07_25 FNU cleaned.csv"|
+       Level0_files_log$Level0_profiles[fileIndex]=="180_2017_07_25 FNU cleaned.csv"|
+       Level0_files_log$Level0_profiles[fileIndex]=="258_2017_05_17 cleaned.csv"|
+       Level0_files_log$Level0_profiles[fileIndex]=="317_2017_07_25 FNU cleaned.csv"
+       ){dateReplace<-1}else{dateReplace==0}
         
     #This also decaps the first bunch of rows to start with row skip_rows
     #The file encoding is necessary because there are some odd characters in the file that need to be bypassed
@@ -105,6 +121,7 @@ for(fileIndex in 1:length(Level0_files)){
                                 dplyr::select(-any_of(c("Time..HH.MM.SS.","Time","X")))%>% #also removes the X column which is row names
                                 mutate(Date..MM.DD.YYYY.=if('Date..MM.DD.YYYY.'%in% colnames(.)){Date..MM.DD.YYYY.}else{if('Date'%in% colnames(.)){Date}else{paste0(Level0_files_log$month[fileIndex],"/", Level0_files_log$day[fileIndex],"/", Level0_files_log$year[fileIndex])}})%>% #Create a Time variable that selects from any of the column headers... if nothing exists, then assign 12:00
                                 dplyr::select(-any_of(c("Date")))%>%
+                                mutate(Date..MM.DD.YYYY.=ifelse(dateReplace==1,paste0(Level0_files_log$month[fileIndex],"/",Level0_files_log$day[fileIndex],"/",Level0_files_log$year[fileIndex]),Date..MM.DD.YYYY.))%>%
                                 mutate(date=mdy(Date..MM.DD.YYYY.),  #Convert date to date, time to time, merge to a dateTime variable####
                                       dateTime=ymd_hms(paste(date,Time..HH.mm.ss.,sep=" ")),
                                       MULakeNumber=strsplit(Level0_files_log$Level0_profiles[fileIndex],'_')[[1]][1], #Extract the MULakeNumber from the file name
