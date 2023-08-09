@@ -245,3 +245,15 @@ Oxycline_threshold<-function(depth.array,DO.array,threshold=2){
 #Does the difference (bottom density-top density)/(depth_bottom-depth_top####
 
 ####End of densityGradientAcrossMetalimnion####
+
+#Function pigmentRatios####
+#ratios of BGA to chl at max depth#
+pigmentRatios<-function(BGA_vector,CHL_vector,Depth_vector){
+  depthChlMax_m<-depthDOmax(depth_vector=Depth_vector,do_vector=CHL_vector)
+  depthBGMax_m=depthDOmax(depth_vector=Depth_vector,do_vector=BGA_vector)
+  if(is.na(depthChlMax_m)|is.na(depthBGMax_m)){ratio<-NA}else{ratio<-BGA_vector[Depth_vector==depthBGMax_m]/CHL_vector[Depth_vector==depthChlMax_m]}
+  return(ratio)
+}
+####End of pigmentRatios####
+
+

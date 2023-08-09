@@ -59,7 +59,7 @@ profiles2%>%
   group_by(MULakeNumber,date)%>%
   summarize(
     # minDepth_m=min(depth_m,na.rm=TRUE), #smallest depth
-    # maxDepth_m=max(depth_m,na.rm=TRUE), #deepest depth
+    maxDepth_m=max(depth_m,na.rm=TRUE), #deepest depth
     # numberOfMeasurements_temperature=sum(!is.na(temp_degC)), #number of temperature measurements
     # thermoclineDepth_m_thresh0.3=thermocline.Depth(depth.array=depth_m,temp.array=temp_degC,thresh = 0.3), #thermocline depth at 0.3 density threshold
     top_metalimnion_m=meta.depths(wtr=temp_degC,depths=depth_m)[1], #Top of metalimnion using rLakeAnalyzer
@@ -86,7 +86,18 @@ profiles2%>%
     # Oxycline_m=thermocline.Depth.max(depth.array=depth_m,temp.array=doConcentration_mgpL), #Find where the fastest rate of DO change is
     # Hypoxycline_m=Oxycline_threshold(depth.array=depth_m,DO.array=doConcentration_mgpL,threshold=2), #find the first depth where DO is less than or equal to the threshold of 2, NA means no DO values (all NAs) OR no values below threshold
     # Anoxycline_m=Oxycline_threshold(depth.array=depth_m,DO.array=doConcentration_mgpL,threshold=1), #find the first depth where DO is less than or equal to the threshold of 2, NA means no DO values (all NAs) OR no values below threshold
-    depthChlMax_m=depthDOmax(depth_vector=depth_m,do_vector=chlorophyll_RFU), #depth of the chlorophyll maximum
-    depthBGMax_m=depthDOmax(depth_vector=depth_m,do_vector=phycocyaninBGA_RFU), #depth of the phycocyanin BGA maximum 
-    #NEEDS A FUNCTION: #ratioMaxBGtochl_RFUperRFU=phycocyaninBGA_RFU[depth_m==depthBGMax_m]/chlorophyll_RFU[depth_m==depthChlMax_m], #the ratio of the BG value at its max to the chl value at its max
+    # depthChlMax_m=depthDOmax(depth_vector=depth_m,do_vector=chlorophyll_RFU), #depth of the chlorophyll maximum
+    # depthBGMax_m=depthDOmax(depth_vector=depth_m,do_vector=phycocyaninBGA_RFU), #depth of the phycocyanin BGA maximum 
+    # ratioMaxBGtochl_RFUperRFU=pigmentRatios(phycocyaninBGA_RFU,chlorophyll_RFU,depth_m), #the ratio of the BG value at its max to the chl value at its max
+    # epilimnion_chlorophyll_RFU=mean(chlorophyll_RFU[depth_m<=top_metalimnion_m],na.rm=TRUE), #average chlorophyll above the top of the metalimnion
+    # epilimnion_phycocyaninBGA_RFU=mean(phycocyaninBGA_RFU[depth_m<=top_metalimnion_m],na.rm=TRUE), #average chlorophyll above the top of the metalimnion
+    # ratioEpiBGtochl_RFUperRFU=epilimnion_phycocyaninBGA_RFU/epilimnion_chlorophyll_RFU, #Ratio of BGA to chl from the average of each above the top of the metalimnion,be warned, sometimes this is negative because one or the other is negative
+    # hypolimnion_orp_mV=mean(orp_mV[depth_m>=bottom_metalimnion_m],na.rm=TRUE), #average ORP below the metalimnion bottom
+    # bottom0.5m_orp_mV=mean(orp_mV[depth_m>=(maxDepth_m-0.5)],na.rm=TRUE), #average ORP in the bottom 0.5 m
+    # site_latitude=mean(latitude,na.rm=TRUE), #average latitude from handheld
+    # site_longitude=mean(longitude,na.rm=TRUE), #average longitude from handheld
+    # site_altitude_m=mean(altitude_m,na.rm=TRUE), #average elevation from handheld
+    surface_doConcentration_mgpL=mean(doConcentration_mgpL[depth_m<=0.5],na.rm=TRUE), #average DO concentration in the top 0.5 m
+    surface_temp_degC=mean(temp_degC[depth_m<=0.5],na.rm=TRUE), #average temperature in the top 0.5 m
+    surface_pH=log10(mean(10^pH[depth_m<=0.5],na.rm=TRUE)), #average pH in the top 0.5 m, note, the average is taken by backtransforming first.
     ) #end of summarize
