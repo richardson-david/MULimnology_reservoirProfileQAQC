@@ -238,3 +238,10 @@ Oxycline_threshold<-function(depth.array,DO.array,threshold=2){
   return(Oxycline)
 }
 ####End of Oxycline_threshold function#
+
+#Function densityGradientAcrossMetalimnion####
+#find the water density at the top of the metalimn, the water density at the bottom from the closest measurements
+#finds the depths for those measurements
+#Does the difference (bottom density-top density)/(depth_bottom-depth_top####
+
+####End of densityGradientAcrossMetalimnion####
