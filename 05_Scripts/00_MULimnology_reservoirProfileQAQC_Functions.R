@@ -243,8 +243,52 @@ Oxycline_threshold<-function(depth.array,DO.array,threshold=2){
 #find the water density at the top of the metalimn, the water density at the bottom from the closest measurements
 #finds the depths for those measurements
 #Does the difference (bottom density-top density)/(depth_bottom-depth_top####
-
+densityGradientAcrossMetalimnion<-function(Depth_vector,Temp_vector,meta_top,meta_bottom){
+  if(sum(is.na(Temp_vector))==length(Temp_vector)|sum(is.na(Depth_vector))==length(Depth_vector)|is.na(meta_top)|is.na(meta_bottom)){return(NA)}else{ #checks if there are NAs in any of the measurements and returns NA if so
+    #Find the closest depth to the top
+    top_depth<-Depth_vector[abs(Depth_vector - meta_top) == min(abs(Depth_vector - meta_top))]
+    #Find the water density of that measurement closest to metalimnion top
+    top_density<-water.density(Temp_vector[abs(Depth_vector - meta_top) == min(abs(Depth_vector - meta_top))])
+    #Find the closest depth to the top
+    bottom_depth<-Depth_vector[abs(Depth_vector - meta_bottom) == min(abs(Depth_vector - meta_bottom))]
+    #Find the water density of that measurement closest to metalimnion top
+    bottom_density<-water.density(Temp_vector[abs(Depth_vector - meta_bottom) == min(abs(Depth_vector - meta_bottom))])
+    #calculate the density gradient in kg m-3 m-1#
+    delta_dens<-(bottom_density-top_density)
+    #Calculate the distance
+    delta_depth<-(bottom_depth-top_depth)
+    #Calculate the density gradient
+    return(delta_dens/delta_depth)
+    
+  }
+  }
 ####End of densityGradientAcrossMetalimnion####
+
+#Function densityGradientEpiToHypo####
+#find the water density at the top of the metalimn, the water density at the bottom from the closest measurements
+#finds the depths for those measurements
+#Does the difference (bottom density-top density)/(depth_bottom-depth_top####
+densityGradientAcrossEpiToHypo<-function(maxDepth_m,epilimnion_temp_degC,hypolimnion_temp_degC,meta_top,meta_bottom){
+  if(is.na(epilimnion_temp_degC)|is.na(hypolimnion_temp_degC)|is.na(maxDepth_m)|is.na(meta_top)|is.na(meta_bottom)){return(NA)}else{ #checks if there are NAs in any of the measurements and returns NA if so
+    #Find the midpoint of the epilimnion
+    epi_depth<-(meta_top+0)/2
+    #Find the water density of the average epi temp
+    epi_density<-water.density(epilimnion_temp_degC)
+    #Find the midpoint of the epilimnion
+    hypo_depth<-(meta_bottom+maxDepth_m)/2
+    #Find the water density of the average hypo temp
+    hypo_density<-water.density(hypolimnion_temp_degC)
+    #calculate the density gradient in kg m-3 m-1#
+    delta_dens<-(hypo_density-epi_density)
+    #Calculate the distance
+    delta_depth<-(hypo_depth-epi_depth)
+    #Calculate the density gradient
+    return(delta_dens/delta_depth)
+    
+  }
+}
+####End of densityGradientAcrossMetalimnion####
+
 
 #Function pigmentRatios####
 #ratios of BGA to chl at max depth#
