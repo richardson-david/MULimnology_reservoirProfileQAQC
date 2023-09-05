@@ -2,10 +2,10 @@ givenName	middleInitial	surName	organizationName	electronicMailAddress	userId	ro
 David	C.	Richardson	SUNY New Paltz	richardsond@newpaltz.edu	0000-0001-9374-9624	PI			
 David	C.	Richardson	SUNY New Paltz	richardsond@newpaltz.edu	0000-0001-9374-9624	contact			
 David	C.	Richardson	SUNY New Paltz	richardsond@newpaltz.edu	0000-0001-9374-9624	creator			
-Rebecca L. North University of Missouri northr@missouri.edu 0000-0003-3762-5939 PI
+Rebecca L. North  University of Missouri northr@missouri.edu 0000-0003-3762-5939 PI
 John R. Jones University of Missouri jonesj@missouri.edu 0000-0002-1046-3792 PI
 Alba Argerich University of Missouri argericha@missouri.edu 0000-0001-6430-0449
 Anthony P. Thorpe University of Missouri thorpet@missouri.edu
-Daniel V. Obrecht University of Missouri
+Daniel V. Obrecht University of Missouri  creator
 Andrea Price University of Missouri amp4c8@missouri.edu
 K Santamaria
