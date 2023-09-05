@@ -244,7 +244,7 @@ Oxycline_threshold<-function(depth.array,DO.array,threshold=2){
 #finds the depths for those measurements
 #Does the difference (bottom density-top density)/(depth_bottom-depth_top####
 densityGradientAcrossMetalimnion<-function(Depth_vector,Temp_vector,meta_top,meta_bottom){
-  if(sum(is.na(Temp_vector))==length(Temp_vector)|sum(is.na(Depth_vector))==length(Depth_vector)|is.na(meta_top)|is.na(meta_bottom)){return(NA)}else{ #checks if there are NAs in any of the measurements and returns NA if so
+  if(sum(is.na(Temp_vector))==length(Temp_vector)|sum(is.na(Depth_vector))==length(Depth_vector)|is.na(meta_top)|is.na(meta_bottom)|meta_top==meta_bottom){return(NA)}else{ #checks if there are NAs in any of the measurements and returns NA if so
     #Find the closest depth to the top
     top_depth<-Depth_vector[abs(Depth_vector - meta_top) == min(abs(Depth_vector - meta_top))]
     #Find the water density of that measurement closest to metalimnion top

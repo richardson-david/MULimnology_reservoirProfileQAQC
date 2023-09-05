@@ -28,7 +28,7 @@ source("05_Scripts/00_MULimnology_reservoirProfileQAQC_Functions.R")
 
 #Read in level 2 files from a particular year####
 #Set years here, update each year here####
-yearIndex<-2021
+yearIndex<-"2022"
   #possible years: c("Historical","2017","2018","2019","2020","2021","2022")
 
 #*Set the directory path here####
@@ -37,7 +37,15 @@ dirPath<-paste0("02_Level2_Data/")
 
 #Stack all the profiles together####
 profiles2<-read_csv(file=paste0(dirPath,"/",yearIndex,"_Level2.csv"), col_types = cols()) #last argument suppresses the message on input about column types, helpful for mass upload
-
+  
+  #Check how many profiles exist
+    #merge MULakeNumber and dateTime
+    length(unique(paste0(profiles2$MULakeNumber,"_",profiles2$date)))
+    #8266 profiles for historical
+    #Ok - this gets the same number of 8266
+    profiles2%>%
+    group_by(MULakeNumber,date)%>%summarize(count=n())
+  
 #Stack all the logs together####
 logs2<-read_csv(file=paste0("06_Outputs/",yearIndex,"_QAQC_log.csv"), col_types = cols())
 
@@ -71,7 +79,7 @@ summary3<-profiles2%>%
     delta_hypo_epi_waterDensity_kgperm3=water.density(hypolimnion_temp_degC)-water.density(epilimnion_temp_degC), #density difference between hypolimnion water and epilimnion water, bigger difference is stronger stratification
     metalimnionDensityGradient_kgperm3perm=densityGradientAcrossMetalimnion(Depth_vector=depth_m,Temp_vector = temp_degC,meta_top =top_metalimnion_m,meta_bottom = bottom_metalimnion_m), #Function that calculates the water density gradient from the temperate at the top of the metalimnion relative to the bottom correcting for distance between those two measurements######
     epiToHypoDensityGradient_kgperm3perm=densityGradientAcrossEpiToHypo(maxDepth_m=maxDepth_m,epilimnion_temp_degC=epilimnion_temp_degC,hypolimnion_temp_degC=hypolimnion_temp_degC,meta_top =top_metalimnion_m,meta_bottom = bottom_metalimnion_m), #Function that calculates the water density gradient from average epilimnion temperature relative to the bottom, correcting for the distance between the midpoints of the two layers######
-    buoyancyfrequency_1_s2=max(buoyancy.freq(wtr=temp_degC,depths=depth_m)), #generate the maximum buoyancy frequency using rLakeAnalyzer buoyancy frequency vector
+    buoyancyfrequency_1_s2=max(buoyancy.freq(wtr=temp_degC,depths=depth_m),na.rm=TRUE), #generate the maximum buoyancy frequency using rLakeAnalyzer buoyancy frequency vector
     numberOfMeasurements_do=sum(!is.na(doConcentration_mgpL)), #number of depth measurements
     minDO_mgpL=minDO(doConcentration_mgpL), #lowest DO concentration
     maxDO_mgpL=maxDO(doConcentration_mgpL), #highest DO concentration
@@ -102,6 +110,12 @@ summary3<-profiles2%>%
     surface_temp_degC=mean(temp_degC[depth_m<=0.5],na.rm=TRUE), #average temperature in the top 0.5 m
     surface_pH=log10(mean(10^pH[depth_m<=0.5],na.rm=TRUE)), #average pH in the top 0.5 m, note, the average is taken by backtransforming first.
     ) #end of summarize
-
+    
+    #Convert any Inf or -Inf into NA across all numeric columns####
+    summary3<-summary3 %>%
+      mutate(across(where(is.numeric), ~na_if(., -Inf)))%>%
+      mutate(across(where(is.numeric), ~na_if(., Inf)))%>%
+      mutate(buoyancyfrequency_1_s2=ifelse(numberOfMeasurements_temperature<4,NA,buoyancyfrequency_1_s2)) #Remove buoyancy frequencies if there is less than 4 temperature measurements
+      
 #Export the level3 summary file####
 write_csv(summary3,file=paste0("03_Level3_Data/",yearIndex,"_Level3.csv"))
