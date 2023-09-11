@@ -19,16 +19,18 @@
 
 #Libraries
 if (!require(tidyverse)) {install.packages("tidyverse")}
+if(!require(patchwork)){install.packages("patchwork")}
 
 #Load packages
 library(tidyverse)
+library(patchwork) #laying out multipanel plots with the same size
 
 #Run functions script to upload all the user defined functions####
 source("05_Scripts/00_MULimnology_reservoirProfileQAQC_Functions.R")
 
 #Read in level 2 files from a particular year####
 #Set years here, update each year here####
-yearIndex<-"2022"
+yearIndex<-"Historical"
   #possible years: c("Historical","2017","2018","2019","2020","2021","2022")
 
 #*Set the directory path here####
@@ -94,7 +96,7 @@ summary3<-profiles2%>%
     depthMaxDOpercentage_m=depthDOmax(depth_vector=depth_m,do_vector=doSaturation_percent), #calculates the depth of the maximum DO
     Oxycline_m=thermocline.Depth.max(depth.array=depth_m,temp.array=doConcentration_mgpL), #Find where the fastest rate of DO change is
     Hypoxycline_m=Oxycline_threshold(depth.array=depth_m,DO.array=doConcentration_mgpL,threshold=2), #find the first depth where DO is less than or equal to the threshold of 2, NA means no DO values (all NAs) OR no values below threshold
-    Anoxycline_m=Oxycline_threshold(depth.array=depth_m,DO.array=doConcentration_mgpL,threshold=1), #find the first depth where DO is less than or equal to the threshold of 2, NA means no DO values (all NAs) OR no values below threshold
+    Anoxycline_m=Oxycline_threshold(depth.array=depth_m,DO.array=doConcentration_mgpL,threshold=1), #find the first depth where DO is less than or equal to the threshold of 1, NA means no DO values (all NAs) OR no values below threshold
     depthChlMax_m=depthDOmax(depth_vector=depth_m,do_vector=chlorophyll_RFU), #depth of the chlorophyll maximum
     depthBGAMax_m=depthDOmax(depth_vector=depth_m,do_vector=phycocyaninBGA_RFU), #depth of the phycocyanin BGA maximum
     ratioMaxBGtochl_RFUperRFU=pigmentRatios(phycocyaninBGA_RFU,chlorophyll_RFU,depth_m), #the ratio of the BG value at its max to the chl value at its max
@@ -120,48 +122,66 @@ summary3<-profiles2%>%
 #Export the level3 summary file####
 write_csv(summary3,file=paste0("03_Level3_Data/",yearIndex,"_Level3.csv"))
 
-
+#Export as a page per####
+pdf(paste0("06_Outputs/Level3_QAQC_plots_",yearIndex,".pdf"), onefile = TRUE,width=8.5,height=11)
+    
 #tick through the profiles and graph them in a 4 panel graph####    
 #profile.index<-1
 for(profile.index in 1:nrow(summary3)){
   temp_summary<-summary3[profile.index,]
   temp_profile<-profiles2%>%filter(MULakeNumber==temp_summary$MULakeNumber&date==temp_summary$date)
   #GG1: Plot of temp vs. depth####
-  gg1<-ggplot(temp_profile%>%arrange(depth_m),aes(y=depth_m,x=temp_degC))+geom_point()+geom_path()+scale_y_reverse()+
+  gg1<-ggplot(temp_profile%>%arrange(depth_m)%>%drop_na(temp_degC),aes(y=depth_m,x=temp_degC))+geom_point()+geom_path()+scale_y_reverse()+
     theme_bw()+
     labs(x=bquote(Temp~(degree*C)),y="Depth (m)")+
     geom_hline(yintercept=c(temp_summary$top_metalimnion_m,temp_summary$thermoclineDepth_m_thresh0.3,temp_summary$bottom_metalimnion_m),color=c("red","purple","blue"))+
     geom_segment(data=temp_summary, aes(x=above_thermocline_temp_degC,xend=above_thermocline_temp_degC,y=thermoclineDepth_m_thresh0.3,yend=minDepth_m),color="purple")+
     geom_segment(data=temp_summary, aes(x=below_thermocline_temp_degC,xend=below_thermocline_temp_degC,y=thermoclineDepth_m_thresh0.3,yend=maxDepth_m),color="purple")+
     geom_segment(data=temp_summary, aes(x=epilimnion_temp_degC,xend=epilimnion_temp_degC,y=top_metalimnion_m,yend=minDepth_m),color="red")+
-    geom_segment(data=temp_summary, aes(x=hypolimnion_temp_degC,xend=hypolimnion_temp_degC,y=bottom_metalimnion_m,yend=maxDepth_m),color="blue")
+    geom_segment(data=temp_summary, aes(x=hypolimnion_temp_degC,xend=hypolimnion_temp_degC,y=bottom_metalimnion_m,yend=maxDepth_m),color="blue")+
+    theme(panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank())+
+    geom_text(aes(x=-Inf,y=-Inf,hjust=-0.2,vjust=1.3,label=paste0(temp_summary$MULakeNumber,"-",temp_summary$date)))
   
   #GG2: Plot of DO vs. depth####
-  gg2<-ggplot(temp_profile%>%arrange(depth_m),aes(y=depth_m,x=doConcentration_mgpL))+geom_point()+geom_path()+scale_y_reverse()+ #geom_path to connect in order that data appear in data frame
+  gg2<-ggplot(temp_profile%>%arrange(depth_m)%>%drop_na(doConcentration_mgpL),aes(y=depth_m,x=doConcentration_mgpL))+geom_point()+geom_path()+scale_y_reverse()+ #geom_path to connect in order that data appear in data frame
     theme_bw()+
     labs(x=bquote(DO~(mg/L)),y="Depth (m)")+
     geom_hline(yintercept=c(temp_summary$top_metalimnion_m,temp_summary$thermoclineDepth_m_thresh0.3,temp_summary$bottom_metalimnion_m),color=c("red","purple","blue"))+
     geom_segment(data=temp_summary, aes(x=epilimnion_DO_mgpL,xend=epilimnion_DO_mgpL,y=top_metalimnion_m,yend=minDepth_m),color="red")+
     geom_segment(data=temp_summary, aes(x=hypolimnion_DO_mgpL,xend=hypolimnion_DO_mgpL,y=bottom_metalimnion_m,yend=maxDepth_m),color="blue")+
     geom_hline(yintercept=c(temp_summary$Oxycline_m,temp_summary$Hypoxycline_m,temp_summary$Anoxycline_m),color=c("light grey","grey","dark grey"))+
-    geom_hline(yintercept=c(temp_summary$depthMaxDOpercentage_m),color=c("green"))
+    geom_hline(yintercept=c(temp_summary$depthMaxDOpercentage_m),color=c("green"))+
+    theme(panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank())
     
   #GG3: Plot of chl/bga vs. depth####
-  gg3<-ggplot(temp_profile%>%arrange(depth_m),aes(y=depth_m,x=chlorophyll_RFU))+geom_point(color="seagreen3")+geom_path(color="seagreen3")+scale_y_reverse()+ #geom_path to connect in order that data appear in data frame
+  gg3<-ggplot(temp_profile%>%arrange(depth_m)%>%drop_na(chlorophyll_RFU,phycocyaninBGA_RFU),aes(y=depth_m,x=chlorophyll_RFU))+geom_point(color="seagreen3")+geom_path(color="seagreen3")+scale_y_reverse()+ #geom_path to connect in order that data appear in data frame
     theme_bw()+
     labs(x=bquote(Photopigment~(RFU)),y="Depth (m)")+
     geom_path(aes(x=phycocyaninBGA_RFU),color="turquoise")+
     geom_point(aes(x=phycocyaninBGA_RFU),color="turquoise")+
     geom_hline(yintercept=c(temp_summary$top_metalimnion_m,temp_summary$thermoclineDepth_m_thresh0.3,temp_summary$bottom_metalimnion_m),color=c("red","purple","blue"))+
-    geom_hline(yintercept=c(temp_summary$depthMaxDOpercentage_m,temp_summary$depthChlMax_m,temp_summary$depthBGAMax_m),color=c("green","seagreen3","turquoise"),size=c(0.5,1.5,1.5))
+    geom_hline(yintercept=c(temp_summary$depthMaxDOpercentage_m,temp_summary$depthChlMax_m,temp_summary$depthBGAMax_m),color=c("green","seagreen3","turquoise"),size=c(0.5,1.5,1.5))+
+    theme(panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank())
     
   #GG4: Plot of other potentially interesting things vs. depth####
-  gg4<-ggplot(temp_profile%>%arrange(depth_m),aes(y=depth_m,x=turbidity_FNU))+geom_point(color="tan2")+geom_path(color="tan2")+scale_y_reverse()+ #geom_path to connect in order that data appear in data frame
+  gg4<-ggplot(temp_profile%>%arrange(depth_m)%>%drop_na(turbidity_FNU,pH),aes(y=depth_m,x=turbidity_FNU))+geom_point(color="tan2")+geom_path(color="tan2")+scale_y_reverse()+ #geom_path to connect in order that data appear in data frame
     theme_bw()+
     labs(x=bquote(Turbidity~(RFU)~or~pH),y="Depth (m)")+
     geom_path(aes(x=pH),color="black")+
     geom_point(aes(x=pH),color="black")+
-    geom_hline(yintercept=c(temp_summary$top_metalimnion_m,temp_summary$thermoclineDepth_m_thresh0.3,temp_summary$bottom_metalimnion_m),color=c("red","purple","blue"))
-    
+    geom_hline(yintercept=c(temp_summary$top_metalimnion_m,temp_summary$thermoclineDepth_m_thresh0.3,temp_summary$bottom_metalimnion_m),color=c("red","purple","blue"))+
+    theme(panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank())
+  
+  List<-list(gg1,gg2,gg3,gg4)
+  
+  #Plot them using patchwork####
+  gg.4panel<-wrap_plots(List,ncol = 2,nrow = 2)
+  print(gg.4panel)
   ####STOPPED HERE: CONSTRUCT a 4 panel version, then print on multiple page pdf for each year####
 }    
+    
+dev.off()    
