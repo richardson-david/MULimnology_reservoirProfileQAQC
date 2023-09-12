@@ -82,7 +82,7 @@ Level0_files_log<-tibble(Level0_profiles=Level0_files,Level0to1_done="No",Level0
 
 
 #***This 1 can be subbed in with the new file index from the log####
-    #Debug fileIndex<-1
+    #Debug fileIndex<-4
     #Debug: fileIndex 
     #       Level0_files_log$Level0_profiles[fileIndex]
 for(fileIndex in 1:length(Level0_files)){
@@ -237,8 +237,12 @@ for(fileIndex in 1:length(Level0_files)){
                            )%>%
                           mutate(altitude_m=ifelse(altitude_m==99.9,NA,altitude_m)) #99.9 seems to be an error code, only a little bit of the southeastern part of missouri is actually at that elevation of 99.9 m or 327.7559 feet (https://oembed-dnr.mo.gov/document-search/surface-elevation-map-mo-pub2874/pub2874)
       
-                  
-    
+     #Find any columns where chlorophyll is all 0 and set it to NA, this is unique to 2018####
+     if(sum(!is.na(qaqcProfile$chlorophyll_RFU))>0&sum(qaqcProfile$chlorophyll_RFU==0,na.rm=TRUE)==nrow(qaqcProfile)){qaqcProfile<-qaqcProfile%>%mutate(chlorophyll_RFU=NA)}         
+  
+     #Find any columns where chlorophyll is all 0 and set it to NA, this is unique to 2018####
+     if(sum(!is.na(qaqcProfile$phycocyaninBGA_RFU))>0&sum(qaqcProfile$phycocyaninBGA_RFU==0,na.rm=TRUE)==nrow(qaqcProfile)){qaqcProfile<-qaqcProfile%>%mutate(phycocyaninBGA_RFU=NA)}         
+     
     #Store any details in the log####
     Level0_files_log$maxDepth_m[fileIndex]<-max(qaqcProfile$verticalPosition_m,na.rm=TRUE)
     Level0_files_log$latitude[fileIndex]<-mean(qaqcProfile$latitude,na.rm=TRUE)
