@@ -96,7 +96,7 @@ for(fileIndex in 1:length(Level0_files)){
     #There are currently three options of file types, if it is sep= then skip 9 rows, if it is Date, then skip 0 rows, otherwise skip 8####
     if(Level0_files_log$Level0_profiles[fileIndex]=="094_2018_09_19.csv"){skip_rows=15}else if(firstEntry=="sep="){
       if(year==2018){ #in 2018, there is often a mising header row - this adjusts for that by checking what is in row 12 of the read.table version####
-                    if(Level0_files_log$Level0_profiles[fileIndex]=="074_2018_09_27_P.csv"){skip_rows=9 #find specific cases where the below code doesn't work
+                    if(Level0_files_log$Level0_profiles[fileIndex]=="074_2018_09_27_P.csv"|Level0_files_log$Level0_profiles[fileIndex]=="048_2018_05_14.csv"|Level0_files_log$Level0_profiles[fileIndex]=="087_2018_05_14.csv"){skip_rows=9 #find specific cases where the below code doesn't work
                     }else if(read.table(paste0(dirPath,"/",Level0_files_log$Level0_profiles[fileIndex]),nrows=23,header=F,skipNul=TRUE,sep=",",fileEncoding=fileEncoding_set)$V1[12]=="CT"){skip_rows=16}else{skip_rows=15}
                     }else{skip_rows=9}
     }else{
@@ -106,7 +106,7 @@ for(fileIndex in 1:length(Level0_files)){
     }
     
     #List of files that do not have commas at the end####
-    files_nocommas<-c("074_2018_09_27_P.csv","092_2018_09_13.csv","093_2018_09_13.csv","094_2018_09_19.csv","114_2018_05_30_P.csv",
+    files_nocommas<-c("048_2018_05_14.csv","074_2018_09_27_P.csv","087_2018_05_14.csv","092_2018_09_13.csv","093_2018_09_13.csv","094_2018_09_19.csv","114_2018_05_30_P.csv",
                       "118_2018_06_13_P.csv","121_2018_08_01_P.csv","143_2018_09_11.csv","149_2018_09_06.csv","149_2018_09_26.csv","179_2018_09_12.csv",
                       "180_2018_09_12.csv","181_2018_09_12.csv","185_2018_08_08.csv","185_2018_09_11_P.csv","186_2018_09_30.csv")
     #Read in files differentially for 2018 vs. other years####
