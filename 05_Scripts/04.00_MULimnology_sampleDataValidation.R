@@ -21,7 +21,7 @@ chemistry_record<-chemistry_record%>%
               mutate(year=year(dateTime))
 
 #Specify a year, can maybe loop
-#year.index<-2017
+#year.index<-2020
 
 #Initialize storage location####
 List_inChemistrynotLog<-list() #in chemistry but not log
@@ -66,6 +66,11 @@ inChemistrynotLevel3<-do.call(bind_rows, List_inChemistrynotLevel3)
 #Combine the two together to get ones in Level3 or the Log####
 inLevel3orLogNotChemistry<-full_join(inLognotChemistry%>%mutate(Log="log"),inLevel3notChemistry%>%mutate(Level3="Level3"),by="merged_ProfileID")%>%print(n=Inf)
 
+#Combine the two together to get ones in Level3 or the Log####
+inChemistryNotLogorLevel3<-full_join(inChemistrynotLog%>%mutate(Log="log"),inChemistrynotLevel3%>%mutate(Level3="Level3"),by=c("merged_ProfileID","sampleID"))%>%print(n=Inf)
+
+
 #Write out just the level3 
 write_csv(inLevel3orLogNotChemistry,file="06_Outputs/inLevel3orLogNotChemistry.csv")
-write_csv(inChemistrynotLevel3,file="06_Outputs/inChemistrynotLevel3.csv")
+write_csv(inChemistryNotLogorLevel3,file="06_Outputs/inChemistrynotLogorLevel3.csv")
+
