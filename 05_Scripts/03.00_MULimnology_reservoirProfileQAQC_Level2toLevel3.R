@@ -30,8 +30,8 @@ source("05_Scripts/00_MULimnology_reservoirProfileQAQC_Functions.R")
 
 #Read in level 2 files from a particular year####
 #Set years here, update each year here####
-yearIndex<-"2018"
-  #possible years: c("Historical","2017","2018","2019","2020","2021","2022")
+yearIndex<-"2023"
+  #possible years: c("Historical","2017","2018","2019","2020","2021","2022","2023")
 
 #*Set the directory path here####
 dirPath<-paste0("02_Level2_Data/")
