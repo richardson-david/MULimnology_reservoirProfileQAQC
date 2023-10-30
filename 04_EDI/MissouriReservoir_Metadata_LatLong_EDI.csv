@@ -80,7 +80,7 @@ MULakeNumber,waterBody,waterBodyLatitude,waterBodyLongitude,notes
 80,Viking,39.9378,-94.0569,
 81,Pony Express,39.8044,-94.38,
 82,Maysville,39.8781,-94.3785,
-83,Bethany (North),40.3136,-94.0309,new
+83,Bethany (North),40.3136,-94.0309,
 84,Paho,40.4004,-93.6548,
 85,Marie,40.4867,-93.5525,
 86,New Milan,40.1983,-93.1042,sometimes MU#142
@@ -134,7 +134,7 @@ MULakeNumber,waterBody,waterBodyLatitude,waterBodyLongitude,notes
 139,Marceline (North),39.7225,-92.9195,
 140,Cameron (Century),39.7624,-94.2615,
 141,Showme,40.4397,-92.2177,
-143,Bethany (South),40.2864,-94.0244,old
+143,Bethany (South),40.2864,-94.0244,
 144,Pinewoods ,36.918,-90.7722,
 145,Mark Twain,39.5223,-91.6467,
 146,Crane ,37.4236,-90.6272,
@@ -293,7 +293,6 @@ MULakeNumber,waterBody,waterBodyLatitude,waterBodyLongitude,notes
 320,Quarry Heights,38.9413,-92.3448,
 322,Whitecliff,38.5561,-90.3688,
 323,Wyandote,39.1679,-94.7786,
-401,Field Blank,0,0,
 402,Flat Creek,36.6595,-93.8868,
 403,Mallard ,38.7024,-90.4946,
 404,Novus,38.7094,-90.6817,
