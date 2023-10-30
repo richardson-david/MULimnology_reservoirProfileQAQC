@@ -1,0 +1,8 @@
+MULakeNumber,date,dateTime,depth_m,verticalPosition_m,temp_degC,doConcentration_mgpL,doSaturation_percent,chlorophyll_RFU,phycocyaninBGA_RFU,turbidity_FNU,pH,orp_mV,specificConductivity_uSpcm,salinity_psu,tds_mgpL,waterPressure_barA,latitude,longitude,altitude_m,barometerAirHandheld_mbars
+030,2017-09-13,2017-09-13T08:40:00Z,0,0,22.1,6.5,61.1,6.8,0.34,NA,7.36,286,NA,NA,NA,NA,NA,NA,NA,NA
+030,2017-09-13,2017-09-13T08:40:00Z,0.5,0.5,22.1,5.3,60.7,7.1,0.22,NA,7.42,284,NA,NA,NA,NA,NA,NA,NA,NA
+030,2017-09-13,2017-09-13T08:40:00Z,1,1,22.1,5.2,60.2,7.4,0.15,NA,7.48,281,NA,NA,NA,NA,NA,NA,NA,NA
+030,2017-09-13,2017-09-13T08:40:00Z,2,2,22.1,5.2,59.7,7.6,0.15,NA,7.49,282,NA,NA,NA,NA,NA,NA,NA,NA
+030,2017-09-13,2017-09-13T08:40:00Z,2.5,2.5,22.1,5.2,59.6,8,0.15,NA,7.51,282,NA,NA,NA,NA,NA,NA,NA,NA
+030,2017-09-13,2017-09-13T08:40:00Z,3,3,22.1,5.1,59,7.7,0.19,NA,7.51,282,NA,NA,NA,NA,NA,NA,NA,NA
+030,2017-09-13,2017-09-13T08:40:00Z,3.4,3.4,22.1,5,58,10,2.46,NA,7.52,282,NA,NA,NA,NA,NA,NA,NA,NA
