@@ -24,7 +24,7 @@ library(stringr)
 source("05_Scripts/00_MULimnology_reservoirProfileQAQC_Functions.R")
 
 #Set year here####
-year<-2023
+year<-2019
 
 #Read in the sensor limits file####
 sensorLimits<-read_csv("00_Level0_Data/MissouriReservoirs-YSI_EXO3_SensorLimits.csv")
@@ -40,7 +40,7 @@ Level0_files<-list.files(dirPath,pattern = "*.csv")
   #columns include when they have been loaded and the date they are done####
   #***This will not be created each time, just one initial and then loaded in####
 Level0_files_log<-tibble(Level0_profiles=Level0_files,Level0to1_done="No",Level0to1_done_date=as_date(NA))%>% #Marks that Level 0 to 1 is done and what date
-                  separate(Level0_profiles,c("MULakeNumber","year","month","day","csv"),remove=FALSE)%>% #use separate function to pull out each component of the 
+                  separate(Level0_profiles,c("MULakeNumber","year","month","day","csv"),sep=c("\\_|\\."),remove=FALSE)%>% #use separate function to pull out each component of the 
                   #HERE IS WHERE TO TRY TO FIGURE OUT WHERE THE ARMS WOULD GO####
                    mutate(profile_date=ymd(paste(year,month,day,sep="-")),
                          maxDepth_m=NA,
@@ -82,7 +82,7 @@ Level0_files_log<-tibble(Level0_profiles=Level0_files,Level0to1_done="No",Level0
 
 
 #***This 1 can be subbed in with the new file index from the log####
-    #Debug fileIndex<-131
+    #Debug fileIndex<-88
     #Debug: fileIndex 
     #       Level0_files_log$Level0_profiles[fileIndex]
 for(fileIndex in 1:length(Level0_files)){
@@ -91,13 +91,16 @@ for(fileIndex in 1:length(Level0_files)){
   #Read in the file####
     #Start by checking what the file encoding each file has####
     fileEncoding_set<-guess_encoding(paste0(dirPath,"/",Level0_files_log$Level0_profiles[fileIndex]),n_max=1000)[1,1]%>%pull()
+    #If the file encoding is NA, then set to "ASCII"
+    if(is.na(fileEncoding_set)){fileEncoding_set<-"ASCII"}
+    
     #Read in the first entry to check####
     firstEntry<-read.table(paste0(dirPath,"/",Level0_files_log$Level0_profiles[fileIndex]),nrows=1,header=F,skipNul=TRUE,sep=",",fileEncoding=fileEncoding_set)$V1
     #There are currently three options of file types, if it is sep= then skip 9 rows, if it is Date, then skip 0 rows, otherwise skip 8####
     if(firstEntry=="sep="){
       skip_rows=9
     }else{
-        if(firstEntry=="Date"){skip_rows=0}else{
+        if(firstEntry=="Date"|firstEntry=="Date..MM.DD.YYYY."|firstEntry=="Date (MM/DD/YYYY)"){skip_rows=0}else if(firstEntry=="Unit ID:"){skip_rows=15}else{
                                 skip_rows=8
         }
     }

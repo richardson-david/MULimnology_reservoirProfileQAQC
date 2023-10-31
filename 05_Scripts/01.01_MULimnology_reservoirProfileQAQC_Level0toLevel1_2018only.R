@@ -40,8 +40,9 @@ Level0_files<-list.files(dirPath,pattern = "*.csv")
   #columns include when they have been loaded and the date they are done####
   #***This will not be created each time, just one initial and then loaded in####
 Level0_files_log<-tibble(Level0_profiles=Level0_files,Level0to1_done="No",Level0to1_done_date=as_date(NA))%>% #Marks that Level 0 to 1 is done and what date
-                  separate(Level0_profiles,c("MULakeNumber","year","month","day","csv"),remove=FALSE)%>% #use separate function to pull out each component of the 
+                  separate(Level0_profiles,c("MULakeNumber","year","month","day","csv"),sep=c("\\_|\\."),remove=FALSE)%>% #use separate function to pull out each component of the file name - anything that is separated by an underscore "_" or period "." gets separated out 
                   #HERE IS WHERE TO TRY TO FIGURE OUT WHERE THE ARMS WOULD GO####
+                  #Format for arms is to separate by dashes e.g., 094-EA-05-02_2018_10_30.csv OR 094-04-00_2018_06_06.csv
                    mutate(profile_date=ymd(paste(year,month,day,sep="-")),
                          maxDepth_m=NA,
                          latitude=NA,
@@ -55,7 +56,6 @@ Level0_files_log<-tibble(Level0_profiles=Level0_files,Level0to1_done="No",Level0
                          nrow_Level1=NA, #Number of Level1 profile 
                          Level1FileName=paste0(MULakeNumber,"_",year,"_",month,"_",day,ifelse(csv=="csv","_Level1.csv",paste0("_",csv,"_Level1.csv"))) #new file name which is old file name with _Level1 ammended
                          ) 
-
 
 #For loop through the files####
   #Check the log to see if the file has already been loaded
@@ -108,7 +108,12 @@ for(fileIndex in 1:length(Level0_files)){
     #List of files that do not have commas at the end####
     files_nocommas<-c("048_2018_05_14.csv","074_2018_09_27_P.csv","087_2018_05_14.csv","092_2018_09_13.csv","093_2018_09_13.csv","094_2018_09_19.csv","114_2018_05_30_P.csv",
                       "118_2018_06_13_P.csv","121_2018_08_01_P.csv","143_2018_09_11.csv","149_2018_09_06.csv","149_2018_09_26.csv","179_2018_09_12.csv",
-                      "180_2018_09_12.csv","181_2018_09_12.csv","185_2018_08_08.csv","185_2018_09_11_P.csv","186_2018_09_30.csv")
+                      "180_2018_09_12.csv","181_2018_09_12.csv","185_2018_08_08.csv","185_2018_09_11_P.csv","186_2018_09_30.csv","219_2018_02_15.csv",
+                      "219_2018_03_08.csv","219_2018_03_20.csv","219_2018_04_05.csv","219_2018_04_19.csv","219_2018_05_04.csv",
+                      "219_2018_05_17.csv","219_2018_05_31.csv","219_2018_06_14.csv","219_2018_06_28.csv","219_2018_07_12.csv","219_2018_07_27.csv",
+                      "219_2018_08_01.csv","219_2018_08_10.csv","219_2018_09_07.csv","219_2018_09_21.csv","219_2018_10_19.csv","219_2018_11_02.csv",
+                      "219_2018_11_19.csv","219_2018_11_30.csv","219_2018_12_17.csv","438_2018_06_22.csv","438_2018_07_13.csv","438_2018_08_17.csv",
+                      "438_2018_09_25.csv","440_2018_06_15.csv","440_2018_07_20.csv","440_2018_08_03.csv")
     #Read in files differentially for 2018 vs. other years####
     if(!(Level0_files_log$Level0_profiles[fileIndex]%in%files_nocommas)){
       readProfile<-tibble(read.csv(file=paste0(dirPath,"/",Level0_files_log$Level0_profiles[fileIndex]),skip=skip_rows,fileEncoding=fileEncoding_set,row.names=NULL))
@@ -119,7 +124,7 @@ for(fileIndex in 1:length(Level0_files)){
            }
     
     #Special modification to Time variable####
-    files_timeDecimal<-c("121_2018_08_01_P.csv")
+    files_timeDecimal<-c("121_2018_08_01_P.csv","219_2018_09_07.csv","438_2018_08_17.csv","440_2018_08_03.csv")
     if(Level0_files_log$Level0_profiles[fileIndex]%in%files_timeDecimal){
       readProfile<-readProfile%>%mutate(Time=paste0("11:",substr(Time, start = 1, stop = 5)))
     }else{} #Do nothing
