@@ -28,7 +28,7 @@ library(stringr)
 source("05_Scripts/00_MULimnology_reservoirProfileQAQC_Functions.R")
 
 #Set year here####
-year<-2019
+year<-2020
 
 #*Set the directory path here####
 dirPath<-paste0("01_Level1_Data/",year,"_Level1_Data")
@@ -90,7 +90,7 @@ List_qaqc1<-list()
 #Debug fileIndex<-45
 #Debug: fileIndex 
 #       Level1_files_log$Level0_profiles[fileIndex]
-for(fileIndex in 1:length(Level1_files)){
+for(fileIndex in 83:length(Level1_files)){
   
   #read in file####
   readProfile1<-read_csv(file=paste0(dirPath,"/",Level1_files_log$Level1FileName[fileIndex]), col_types = cols()) #last argument suppresses the message on input about column types, helpful for mass upload

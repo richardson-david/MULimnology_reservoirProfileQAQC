@@ -82,7 +82,7 @@ Level0_files_log<-tibble(Level0_profiles=Level0_files,Level0to1_done="No",Level0
 
 
 #***This 1 can be subbed in with the new file index from the log####
-    #Debug fileIndex<-88
+    #Debug fileIndex<-82
     #Debug: fileIndex 
     #       Level0_files_log$Level0_profiles[fileIndex]
 for(fileIndex in 1:length(Level0_files)){
