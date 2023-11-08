@@ -1,0 +1,76 @@
+This file is the outline of the...
+LOG DETAILS TOO
+
+
+####Level 0 to 1 outline####
+*Reads in raw data file and makes sure there are correct headers
+	**If the profile has more than 400 rows, then the profile was done really slowly. For these, we average to 3 seconds worth of data
+*Remove any rows that have vertical position >=0m (would indicate above the surface)
+*Remove any readings that have a vertical position difference (from depth to depth) of less than 0.02 m. This cuts out places where the sensor was pulled up or was stationary or settled at the bottom
+*Check all columns for errors or data outside the sensor bounds as specified by YSI - convert all those to NA
+*Export individual profiles as Level 1 files to 01_Level1_Data folder
+*Export the log with details about each profile (max depth, average lat/long/altitude, date of completion of level 0 to 1 QA/QC, etc…) to 06_Outputs folder
+
+####Level 1 to 2 outline####
+*Check for high salinity to use for density conversion
+*Convert temperature to density
+*Check for non-monotonically decreasing densities
+*Check each column for large jumps from depth to depth
+	**+ 3x to -1/3x 
+*Check for valid sensor values that are extreme biologically (<4.2 deg C or all pH 4.0 or 7.0)
+*Create flags for jumps
+*Cut out entire profile of ph if any are less than 5, this indicates the YSI pH sensor was accidentally left in the standard bottle.
+*Cut off bottom rows if there are jumps in turb chl or bga in bottom 15% of rows from the minimum jump 
+*Cut starting at the first jump in the bottom 15% down to the lowest point
+*Recalculate the max depth
+*Cut off top if there are jumps in turb, chl, or bga in top 3 rows
+*Cut out entire profile if nrow < 5 
+*Cut out entire profile if any temperatures are below 4.2 unless it is November to April 
+*Create pdf with profile plots that looks at that column or profile (make a graph)
+*Row bind all profiles together
+*Export Level 2 for that year as one distinct csv with all the data
+
+####Level 2 to 3 outline####
+*Calculate the following summary columns for each profile. The column header is first followed by a description of the column calculation second
+	**minDepth_m: #minimum depth measurement
+	**maxDepth_m: #maximum depth measurement
+	**numberOfMeasurements: #number of depth measurements
+	**thermoclineDepth_m_thresh0.3: #thermocline depth at 0.3 density threshold (check units, can do other thresholds here)
+	**top_metalimnion_m: #top of metalimnion from rLakeAnalyzer
+	**bottom_metalimnion_m: #bottom of metalimnion from rLakeAnalyzer
+	**epilimnion_temp_degC: #average temperature above metalimnion top
+	**hypolimnion_temp_degC: #average temperature below the metalimnion bottom
+	**above_thermocline_temp_degC: #average temperature above or equal to the thermocline
+	**below_thermocline_temp_degC: #average temperature below the thermocline
+	**delta_hypo_epi_waterDensity_kgperm3: #density difference between hypolimnion water and epilimnion water, bigger difference is stronger stratification
+	**Buoyancyfrequency_1_s2: #generate the maximum buoyancy frequency using rLakeAnalyzer buoyancy frequency vector
+	**minDO_mgpL: #lowest DO concentration
+	**maxDO_mgpL: #highest DO concentration
+	**minDO_percentage: #lowest DO percentage
+	**maxDO_percentage: #highest DO percentage
+	**DO_mgpL_profileMean: #overall average DO mgpL
+	**DO_percent_profileMean: #overall average DO percentage
+	**epilimnion_DO_mgpL: #average temperature above metalimnion top
+	**hypolimnion_DO_mgpL: #average temperature below the metalimnion bottom
+	**epilimnion_DO_percent: #average temperature above metalimnion top
+	**hypolimnion_DO_percent: #average temperature below the metalimnion bottom
+	**depthMaxDOpercentage_m: #calculates the depth of the maximum DO
+	**Oxycline_m: #Find where the fastest rate of DO change is
+	**Hypoxycline_m: #find the first depth where DO is less than or equal to the threshold of 2, NA means no DO values (all NAs) OR no values below threshold
+	**Anoxycline_m: #find the first depth where DO is less than or equal to the threshold of 1, NA means no DO values (all NAs) OR no values below threshold, minDO_mgpL should indicate that there are no values below 2 - it will say NA if there are no DO values
+	**depthChlMax_m: #depth of the chlorophyll maximum
+	**depthBGMax_m: #depth of the bg maximum
+	**ratioMaxBGtochl_RFUperRFU: #the ratio of the BG value at its max to the chl value at its max
+	**epilimnion_chlorophyll_RFU: #average chlorophyll above the top of the metalimnion
+	**epilimnion_phycocyaninBGA_RFU: #average chlorophyll above the top of the metalimnion
+	**ratioEpiBGtochl_RFUperRFU: #Ratio of BGA to chl from the average of each above the top of the metalimnion, be warned, sometimes this is negative because one or the other is negative
+	**hypolimnion_orp_mV: #average ORP below the metalimnion bottom
+	**bottom0.5m_orp_mV: #average ORP in the bottom 0.5 m
+	**site_latitude: #average latitude from handheld
+	**site_longitude: #average longitude from handheld
+	**site_altitude_m: #average elevation from handheld
+	**surface_doConcentration_mgpL: #average DO concentration in the top 0.5 m
+	**surface_temp_degC: #average temperature in the top 0.5 m
+	**surface_pH: #average pH in the top 0.5 m, note, the average is taken by backtransforming first.
+	**metalimnionDensityGradient_kgperm3perm: #Function that calculates the water density gradient from the temperate at the top of the metalimnion relative to the bottom correcting for distance between those two measurements######
+	**epiToHypoDensityGradient_kgperm3perm: #Function that calculates the water density gradient from average epilimnion temperature relative to the bottom, correcting for the distance between the midpoints of the two layers######

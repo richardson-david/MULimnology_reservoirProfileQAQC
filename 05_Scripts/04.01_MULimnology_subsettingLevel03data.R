@@ -1,0 +1,48 @@
+##Script 04.01: Loading and selecting specific level3 profiles for MU students####
+##Created 26Sep2023 by David Richardson (hereafter DCR)
+##This loads level 3 summary data from all the years, then subsets specific profiles####
+
+#Libraries
+if (!require(tidyverse)) {install.packages("tidyverse")}
+if (!require(lubridate)) {install.packages("lubridate")}
+if (!require(stringr)) {install.packages("stringr")}
+
+#Load packages
+library(tidyverse)
+library(lubridate)
+library(stringr)
+
+#Run functions script to upload all the user defined functions####
+source("05_Scripts/00_MULimnology_reservoirProfileQAQC_Functions.R")
+
+#*Set the directory path here####
+dirPath<-paste0("03_Level3_Data/")
+
+#Identify all the individual .csv files####
+Level3_files<-list.files(dirPath,pattern = "*.csv")
+
+#Initialize storage location####
+List_Level3<-list()
+
+#Loop through all the level3 files and load them individually####
+#debug fileIndex<-1
+for(fileIndex in 1:length(Level3_files)){
+  List_Level3[[fileIndex]]<-read_csv(file=paste0(dirPath,Level3_files[fileIndex]), col_types = cols()) #last argument suppresses the message on input about column types, helpful for mass upload
+}
+
+#Bind them all together####
+Level3_allData<-do.call(bind_rows, List_Level3)
+
+#Load in Yusuf's list (or any other list here)####
+Yusuf_profiles_list<-read_csv("07_MiscFiles/Updated_Specific_Lakes_and_Dates_YusufOlaleye.csv")%>%
+                rename(MULakeNumber=`Lake#`,
+                       ReservoirName=`Reservoir Name`,
+                       date=Dates)%>%
+                mutate(MULakeNumber=sprintf("%03d",MULakeNumber),
+                       date=mdy(date))
+
+#Merge all them together keeping Yusuf's profiles####              
+Yusuf_profiles<-left_join(Yusuf_profiles_list,Level3_allData,by=c("MULakeNumber","date"))
+
+#Write out Yusuf's profiles####
+write_csv(Yusuf_profiles,file="06_Outputs/YusufOlaleye_Level3Profiles.csv")
