@@ -57,9 +57,13 @@ filterLatLongs<-Level3_allData%>%
   group_by(MULakeNumber)%>%
   summarize(site_latitude=mean(site_latitude),
             site_longitude=mean(site_longitude))
+write_csv(x=filterLatLongs,file="06_Outputs/LakeYSIHandheldLatLong.csv")
 
 #Read in metadata from the database####
 metaDataFromDatabase<-read_csv("04_EDI/MissouriReservoir_Metadata_LatLong_EDI.csv")%>%mutate(MULakeNumber=as.character(sprintf("%03d", MULakeNumber)))
 
 #Merge them together
 all_latlong<-left_join(metaDataFromDatabase,filterLatLongs,by="MULakeNumber")
+
+#Output the merged lat/longs####
+write_csv(x=all_latlong%>%dplyr::select(-notes),file="06_Outputs/LakeLatLongMetadata.csv")
