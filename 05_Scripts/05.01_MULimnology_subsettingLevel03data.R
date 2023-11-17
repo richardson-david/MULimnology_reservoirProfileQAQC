@@ -46,3 +46,20 @@ Yusuf_profiles<-left_join(Yusuf_profiles_list,Level3_allData,by=c("MULakeNumber"
 
 #Write out Yusuf's profiles####
 write_csv(Yusuf_profiles,file="06_Outputs/YusufOlaleye_Level3Profiles.csv")
+
+
+
+##################################################
+#Subset to data with lats/longs#########################
+filterLatLongs<-Level3_allData%>%
+  filter((!is.na(site_latitude))&(!is.na(site_longitude)))%>% #reduce to ones with Lat/Longs in there
+  dplyr::select(MULakeNumber,site_latitude,site_longitude)%>% 
+  group_by(MULakeNumber)%>%
+  summarize(site_latitude=mean(site_latitude),
+            site_longitude=mean(site_longitude))
+
+#Read in metadata from the database####
+metaDataFromDatabase<-read_csv("04_EDI/MissouriReservoir_Metadata_LatLong_EDI.csv")%>%mutate(MULakeNumber=as.character(sprintf("%03d", MULakeNumber)))
+
+#Merge them together
+all_latlong<-left_join(metaDataFromDatabase,filterLatLongs,by="MULakeNumber")
