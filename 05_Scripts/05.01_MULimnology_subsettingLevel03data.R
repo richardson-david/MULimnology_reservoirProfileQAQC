@@ -67,3 +67,15 @@ all_latlong<-left_join(metaDataFromDatabase,filterLatLongs,by="MULakeNumber")
 
 #Output the merged lat/longs####
 write_csv(x=all_latlong%>%dplyr::select(-notes),file="06_Outputs/LakeLatLongMetadata.csv")
+
+#Subset to the non-NA data####
+#There are are 97 of them####
+##Find ones where the lats OR longs are more than 0.005 away######
+all_latlong%>%
+  filter((!is.na(site_latitude))&(!is.na(site_longitude)))%>%
+  filter((abs(waterBodyLatitude-site_latitude)>0.005)|(abs(waterBodyLongitude-site_longitude)>0.005))
+
+#17 are identified:
+#The following are problematic c("011","070","089","098","139","179","180","185","213")
+temp<-Level3_allData%>%filter(MULakeNumber%in%c("213"))%>%dplyr::select(date,site_latitude,site_longitude)%>%print(n=Inf)
+

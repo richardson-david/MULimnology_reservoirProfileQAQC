@@ -1,2 +1,2 @@
 geographicDescription	westBoundingCoordinate	eastBoundingCoordinate	northBoundingCoordinate	southBoundingCoordinate
-global	-95.76416	-89.08348	40.61698	35.99894
+global	-97.79329	-89.08348	44.22162	35.99894
