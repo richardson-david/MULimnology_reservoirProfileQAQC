@@ -77,5 +77,5 @@ all_latlong%>%
 
 #17 are identified:
 #The following are problematic c("011","070","089","098","139","179","180","185","213")
-temp<-Level3_allData%>%filter(MULakeNumber%in%c("213"))%>%dplyr::select(date,site_latitude,site_longitude)%>%print(n=Inf)
+temp<-Level3_allData%>%filter(MULakeNumber%in%c("139"))%>%dplyr::select(date,site_latitude,site_longitude)%>%print(n=Inf)
 
