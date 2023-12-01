@@ -1,2 +1,5 @@
 id	unitType	parentSI	multiplierToSI	description
-microsiemensPerCentimeter	Conductivity	siemensPerCentimeter	0.001	Electrical conductance for lower conductivity
+microSiemensPerCentimeter	conductance	siemensPerCentimeter	0.001	Electrical conductance for lower conductivity
+RelativeFluorescenceUnits	dimensionless	NA	NA	measurement of the relative amount of fluorescence excitation detected in response to particular wavelength of light
+FormazinNephelometricUnits	dimensionless	NA	NA	measures scattered light at 90 degrees from the incident light beam with an infrared light source according to the ISO 7027
+PracticalSalinityUnit	salinity	gramsPerLiter	1	measure of conductivity at a constant pressure and temperature that is about equivalent to ppt

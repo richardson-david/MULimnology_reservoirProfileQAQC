@@ -1,12 +1,17 @@
-limnology
-Missouri
-aquatic ecosystems
-reservoirs
-stratification
-freshwater
-Missouri Statewide Lake Assessment Project
-Missouri Department of Natural Resources
-MU Limnology Lab
-water temperature
-water dissolved oxygen
-water depth
+keyword	keywordThesaurus
+limnology	Missouri University limnology controlled vocabulary
+Missouri	Missouri University limnology controlled vocabulary
+aquatic ecosystems	lter controlled vocabulary
+lakes	lter controlled vocabulary
+reservoirs	Missouri University limnology controlled vocabulary
+stratification	Missouri University limnology controlled vocabulary
+freshwater	lter controlled vocabulary
+Missouri Statewide Lake Assessment Project	Missouri University limnology controlled vocabulary
+Missouri Department of Natural Resources	Missouri University limnology controlled vocabulary
+MU Limnology Lab	Missouri University limnology controlled vocabulary
+water temperature	lter controlled vocabulary
+dissolved oxygen	lter controlled vocabulary
+water depth	Missouri University limnology controlled vocabulary
+profiles	Missouri University limnology controlled vocabulary
+North Lab	Missouri University limnology controlled vocabulary
+ph	lter controlled vocabulary

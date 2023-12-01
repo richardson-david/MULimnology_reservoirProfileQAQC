@@ -1,0 +1,5 @@
+attributeName	code	definition
+class	character	
+class	Date	
+class	numeric	
+missingValueCodeExplanation	MissingValue	

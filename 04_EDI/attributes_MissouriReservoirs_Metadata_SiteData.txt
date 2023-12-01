@@ -1,0 +1,5 @@
+attributeName	attributeDefinition	class	unit	dateTimeFormatString	missingValueCode	missingValueCodeExplanation
+MULakeNumber	Missouri University identifier for that lake or reservoir	character			NA	MissingValue
+waterBody	Most commonly used name	character			NA	MissingValue
+waterBodyLatitude_degree	Latitude in decimal degrees	numeric	degree		NA	MissingValue
+waterBodyLongitude_degree	Longitude in decimal degrees	numeric	degree		NA	MissingValue

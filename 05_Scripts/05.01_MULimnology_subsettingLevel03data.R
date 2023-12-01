@@ -60,7 +60,7 @@ filterLatLongs<-Level3_allData%>%
 write_csv(x=filterLatLongs,file="06_Outputs/LakeYSIHandheldLatLong.csv")
 
 #Read in metadata from the database####
-metaDataFromDatabase<-read_csv("04_EDI/MissouriReservoir_Metadata_LatLong_EDI.csv")%>%mutate(MULakeNumber=as.character(sprintf("%03d", MULakeNumber)))
+metaDataFromDatabase<-read_csv("07_MiscFiles/MissouriReservoir_Metadata_SiteData.csv")%>%mutate(MULakeNumber=as.character(sprintf("%03d", MULakeNumber)))
 
 #Merge them together
 all_latlong<-left_join(metaDataFromDatabase,filterLatLongs,by="MULakeNumber")
