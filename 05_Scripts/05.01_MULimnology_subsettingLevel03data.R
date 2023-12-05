@@ -79,3 +79,25 @@ all_latlong%>%
 #The following are problematic c("043","139")
 temp<-Level3_allData%>%filter(MULakeNumber%in%c("139"))%>%dplyr::select(date,site_latitude,site_longitude)%>%print(n=Inf)
 
+
+########################Figure out the distributions of the depths for each lake####################
+#Get teh unique list of sites####
+uniqueLakeNumbers<-sort(unique(Level3_allData$MULakeNumber))
+
+#Lake.index=1
+#Export a histogram of the maxdepth for each profile by site as a page####
+pdf(paste0("06_Outputs/Level3_MaxDepth_plots.pdf"), onefile = TRUE,width=8.5,height=11)
+
+#Go through all the lakes####
+#lake.index=1
+for(lake.index in 1:length(uniqueLakeNumbers)){
+  temp<-Level3_allData%>%filter(MULakeNumber==uniqueLakeNumbers[lake.index]) #Extract the data just for that lake
+  gg.temp<-ggplot(data=temp,aes(x=maxDepth_m))+geom_histogram()+labs(title=paste0("MULakeNumber: ",uniqueLakeNumbers[lake.index])) #create the histogram plot####
+  print(gg.temp)
+}
+
+dev.off()
+
+#Check 149####
+Level3_allData%>%filter(MULakeNumber%in%uniqueLakeNumbers[which(substr(uniqueLakeNumbers,1,3)=="149")])%>%print(n=Inf)
+####
