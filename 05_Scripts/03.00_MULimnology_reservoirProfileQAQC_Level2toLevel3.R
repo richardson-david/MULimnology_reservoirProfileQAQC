@@ -70,7 +70,7 @@ summary3<-profiles2%>%
   summarize(
     minDepth_m=min(depth_m,na.rm=TRUE), #smallest depth
     maxDepth_m=max(depth_m,na.rm=TRUE), #deepest depth
-    numberOfMeasurements_temperature=sum(!is.na(temp_degC)), #number of temperature measurements
+    numberOfMeasurements_temperature=as.numeric(sum(!is.na(temp_degC))), #number of temperature measurements
     thermoclineDepth_m_thresh0.3=thermocline.Depth(depth.array=depth_m,temp.array=temp_degC,thresh = 0.3), #thermocline depth at 0.3 density threshold
     top_metalimnion_m=meta.depths(wtr=temp_degC,depths=depth_m)[1], #Top of metalimnion using rLakeAnalyzer
     bottom_metalimnion_m=meta.depths(wtr=temp_degC,depths=depth_m)[2], #Bottom of metalimnion using rLakeAnalyzer
@@ -82,7 +82,7 @@ summary3<-profiles2%>%
     metalimnionDensityGradient_kgperm3perm=densityGradientAcrossMetalimnion(Depth_vector=depth_m,Temp_vector = temp_degC,meta_top =top_metalimnion_m,meta_bottom = bottom_metalimnion_m), #Function that calculates the water density gradient from the temperate at the top of the metalimnion relative to the bottom correcting for distance between those two measurements######
     epiToHypoDensityGradient_kgperm3perm=densityGradientAcrossEpiToHypo(maxDepth_m=maxDepth_m,epilimnion_temp_degC=epilimnion_temp_degC,hypolimnion_temp_degC=hypolimnion_temp_degC,meta_top =top_metalimnion_m,meta_bottom = bottom_metalimnion_m), #Function that calculates the water density gradient from average epilimnion temperature relative to the bottom, correcting for the distance between the midpoints of the two layers######
     buoyancyfrequency_1_s2=max(buoyancy.freq(wtr=temp_degC,depths=depth_m),na.rm=TRUE), #generate the maximum buoyancy frequency using rLakeAnalyzer buoyancy frequency vector
-    numberOfMeasurements_do=sum(!is.na(doConcentration_mgpL)), #number of depth measurements
+    numberOfMeasurements_do=as.numeric(sum(!is.na(doConcentration_mgpL))), #number of depth measurements
     minDO_mgpL=minDO(doConcentration_mgpL), #lowest DO concentration
     maxDO_mgpL=maxDO(doConcentration_mgpL), #highest DO concentration
     minDO_percent=minDO(doSaturation_percent), #lowest DO percentage
