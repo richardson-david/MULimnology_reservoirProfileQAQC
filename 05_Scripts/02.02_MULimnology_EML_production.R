@@ -153,9 +153,9 @@ template_table_attributes(path = "04_EDI/",
                          data.path = "04_EDI/",
                          data.table = dataFiles)
 #Identify which variables are categorical####              
-template_categorical_variables(path = "04_EDI/",
-                               data.path = "04_EDI/",
-                               write.file = TRUE)
+# template_categorical_variables(path = "04_EDI/",
+#                                data.path = "04_EDI/",
+#                                write.file = TRUE)
 
 #Specify geographic coverage for all our data files####
 #Not needed if geograph_coverage.txt is already existing

@@ -85,7 +85,7 @@
       <electronicMailAddress>richardsond@newpaltz.edu</electronicMailAddress>
       <userId directory="https://orcid.org">https://orcid.org/0000-0001-9374-9624</userId>
     </creator>
-    <pubDate>2023-12-01</pubDate>
+    <pubDate>2023-12-06</pubDate>
     <abstract>
       <para>This dataset of limnological profiles starts in 1978 and is from 250 reservoirs in the state of Missouri (MO) in the USA collected by the University of Missouri Limnology Lab. Physical parameters derived from sensors include temperature and oxygen with depth. After 2017, sondes were upgraded to Yellow Springs Instruments (YSI) EXO3s; profiles include a range of physical, chemical, and biological parameters including depth, conductivity, pH, oxidative-reductive potential (ORP), chlorophyll a, phycocyanin (BGA), and turbidity. Most of the profiles were collected during the summer months (May-September) when the reservoirs were thermally stratified, but a few were taken during the rest of the year (October-April). The majority of profiles were taken at the deepest point in the reservoir directly up-reservoir of the dam. Sampling was conducted from a boat most of the time, but a few profiles were taken from bridges and docks. The bulk of the data come from the Statewide Lake Assessment Project (SLAP), funded by the Missouri Department of Natural Resources. The profiles are divided into a single file for 1978-2016 and then annual compiled datasets for 2017 and beyond. This data has been quality controlled for basic errors and any data outside of normal factory issued sensor ranges. &#13;
 </para>
@@ -1136,8 +1136,8 @@ Strakhovenko, V., Subetto, D., Ovdina, E., Danilenko, I., Belkina, N., Efremenko
       <entityDescription>MissouriReservoirs_ProfileData_2018</entityDescription>
       <physical>
         <objectName>MissouriReservoirs_ProfileData_2018.csv</objectName>
-        <size unit="bytes">5086864</size>
-        <authentication method="MD5">ddd69b91e38c048025a981e05cbab15b</authentication>
+        <size unit="bytes">5055568</size>
+        <authentication method="MD5">c7dbc7ad913a8572219230197d8db6e8</authentication>
         <dataFormat>
           <textFormat>
             <numHeaderLines>1</numHeaderLines>
@@ -1510,7 +1510,7 @@ Strakhovenko, V., Subetto, D., Ovdina, E., Danilenko, I., Belkina, N., Efremenko
                 <numberType>real</numberType>
                 <bounds>
                   <minimum exclusive="false">-95.13315</minimum>
-                  <maximum exclusive="false">-78.4057833333333</maximum>
+                  <maximum exclusive="false">-84.9111358333333</maximum>
                 </bounds>
               </numericDomain>
             </ratio>
@@ -1567,7 +1567,7 @@ Strakhovenko, V., Subetto, D., Ovdina, E., Danilenko, I., Belkina, N., Efremenko
           </missingValueCode>
         </attribute>
       </attributeList>
-      <numberOfRecords>36197</numberOfRecords>
+      <numberOfRecords>35938</numberOfRecords>
     </dataTable>
     <dataTable>
       <entityName>MissouriReservoirs_ProfileData_2019</entityName>
@@ -2450,8 +2450,8 @@ Strakhovenko, V., Subetto, D., Ovdina, E., Danilenko, I., Belkina, N., Efremenko
       <entityDescription>MissouriReservoirs_ProfileData_2021</entityDescription>
       <physical>
         <objectName>MissouriReservoirs_ProfileData_2021.csv</objectName>
-        <size unit="bytes">3490383</size>
-        <authentication method="MD5">937eede748769b3181176993dd4b5a6f</authentication>
+        <size unit="bytes">3495044</size>
+        <authentication method="MD5">0e5e8c8e5ab345b0e53afff28250b792</authentication>
         <dataFormat>
           <textFormat>
             <numHeaderLines>1</numHeaderLines>
@@ -2881,15 +2881,15 @@ Strakhovenko, V., Subetto, D., Ovdina, E., Danilenko, I., Belkina, N., Efremenko
           </missingValueCode>
         </attribute>
       </attributeList>
-      <numberOfRecords>20780</numberOfRecords>
+      <numberOfRecords>20761</numberOfRecords>
     </dataTable>
     <dataTable>
       <entityName>MissouriReservoirs_ProfileData_2022</entityName>
       <entityDescription>MissouriReservoirs_ProfileData_2022</entityDescription>
       <physical>
         <objectName>MissouriReservoirs_ProfileData_2022.csv</objectName>
-        <size unit="bytes">3122122</size>
-        <authentication method="MD5">7142c954ed426a24d3c2c6ec82200bc5</authentication>
+        <size unit="bytes">3115361</size>
+        <authentication method="MD5">fe4b2dbd1c337dfa0975b50073fa6a63</authentication>
         <dataFormat>
           <textFormat>
             <numHeaderLines>1</numHeaderLines>
@@ -3319,15 +3319,15 @@ Strakhovenko, V., Subetto, D., Ovdina, E., Danilenko, I., Belkina, N., Efremenko
           </missingValueCode>
         </attribute>
       </attributeList>
-      <numberOfRecords>22994</numberOfRecords>
+      <numberOfRecords>22922</numberOfRecords>
     </dataTable>
     <dataTable>
       <entityName>MissouriReservoirs_ProfileData_2023</entityName>
       <entityDescription>MissouriReservoirs_ProfileData_2023</entityDescription>
       <physical>
         <objectName>MissouriReservoirs_ProfileData_2023.csv</objectName>
-        <size unit="bytes">4903988</size>
-        <authentication method="MD5">22cc0042c732ea25f9c431573e1a0be9</authentication>
+        <size unit="bytes">4885274</size>
+        <authentication method="MD5">267405f66a6c6d415fb277beb49a9d71</authentication>
         <dataFormat>
           <textFormat>
             <numHeaderLines>1</numHeaderLines>
@@ -3700,7 +3700,7 @@ Strakhovenko, V., Subetto, D., Ovdina, E., Danilenko, I., Belkina, N., Efremenko
                 <numberType>real</numberType>
                 <bounds>
                   <minimum exclusive="false">-95.13322</minimum>
-                  <maximum exclusive="false">-61.0258133333333</maximum>
+                  <maximum exclusive="false">-90.28542</maximum>
                 </bounds>
               </numericDomain>
             </ratio>
@@ -3757,7 +3757,7 @@ Strakhovenko, V., Subetto, D., Ovdina, E., Danilenko, I., Belkina, N., Efremenko
           </missingValueCode>
         </attribute>
       </attributeList>
-      <numberOfRecords>27400</numberOfRecords>
+      <numberOfRecords>27324</numberOfRecords>
     </dataTable>
   </dataset>
   <additionalMetadata>
