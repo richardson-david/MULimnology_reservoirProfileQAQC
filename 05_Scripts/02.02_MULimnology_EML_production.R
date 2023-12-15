@@ -22,18 +22,18 @@ library(tidyverse)
 
 #Create files and attribute tables####
   #*Read in metadata from the database####
-  metaDataFromDatabase<-read_csv("07_MiscFiles/MissouriReservoir_Metadata_SiteData.csv")%>%mutate(MULakeNumber=as.character(sprintf("%03d", MULakeNumber)))
+  metaDataFromDatabase<-read_csv("07_MiscFiles/MissouriReservoir_Metadata_SiteData_full.csv")
   #*Check the dictionary for units####
     #view_unit_dictionary()
-  #*modify the column headers, remove the notes column
-  metaDataFromDatabase_edi<-metaDataFromDatabase%>%rename(waterBodyLatitude_degree=waterBodyLatitude,waterBodyLongitude_degree=waterBodyLongitude)%>%dplyr::select(-notes)
+  #*modify the column headers, keep the notes column
+  metaDataFromDatabase_edi<-metaDataFromDatabase%>%rename(waterBodyLatitude_degree=waterBodyLatitude,waterBodyLongitude_degree=waterBodyLongitude)
   #*write out the csv file####
   write_csv(x=metaDataFromDatabase_edi,file="04_EDI/MissouriReservoirs_Metadata_SiteData.csv")
   #*Create attribute table for the lat/long metadata####
   metaDataFromDatabase_attributeTable<-tibble(attributeName=names(metaDataFromDatabase_edi),
-         attributeDefinition=c("Missouri University identifier for that lake or reservoir","Most commonly used name","Latitude in decimal degrees","Longitude in decimal degrees"),
-         class=c("character","character","numeric","numeric"),
-         unit=c("","","degree","degree"),
+         attributeDefinition=c("Missouri University identifier for that lake or reservoir","Most commonly used name","Latitude in decimal degrees","Longitude in decimal degrees","Notes on locations"),
+         class=c("character","character","numeric","numeric","character"),
+         unit=c("","","degree","degree",""),
          dateTimeFormatString="",
          missingValueCode=NA,
          missingValueCodeExplanation=rep("MissingValue",length(names(metaDataFromDatabase_edi))))
@@ -184,7 +184,7 @@ make_eml(path = "04_EDI/",
          maintenance.description = "complete", 
          user.domain = "EDI",
          user.id = "richardsond",
-         package.id='edi.1079.1'
+         package.id='edi.1079.2'
          )
 
 ## Step 8: Check your data product! ####

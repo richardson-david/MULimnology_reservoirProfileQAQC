@@ -1,0 +1,20 @@
+attributeName	attributeDefinition	class	unit	dateTimeFormatString	missingValueCode	missingValueCodeExplanation
+MULakeNumber		numeric	!Add units here!			
+date		Date		!Add datetime specifier here!		
+dateTime		Date		!Add datetime specifier here!		
+depth_m		numeric	!Add units here!			
+temp_degC		numeric	!Add units here!			
+doConcentration_mgpL		numeric	!Add units here!			
+doSaturation_percent		numeric	!Add units here!			
+chlorophyll_RFU		character				
+phycocyaninBGA_RFU		character				
+turbidity_FNU		character				
+salinity_psu		character				
+specificConductivity_uSpcm		character				
+tds_mgpL		character				
+orp_mV		character				
+pH		character				
+latitude		character				
+longitude		character				
+altitude_m		character				
+barometerAirHandheld_mbars		character				

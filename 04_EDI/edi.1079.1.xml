@@ -11,7 +11,7 @@
     </allow>
   </access>
   <dataset>
-    <title>Missouri reservoir profile data including temperature, depth, and oxygen profiles (1978-current)</title>
+    <title>Missouri reservoir profile data including temperature, depth, and oxygen profiles (1989-current)</title>
     <creator>
       <individualName>
         <givenName>John</givenName>
@@ -85,9 +85,9 @@
       <electronicMailAddress>richardsond@newpaltz.edu</electronicMailAddress>
       <userId directory="https://orcid.org">https://orcid.org/0000-0001-9374-9624</userId>
     </creator>
-    <pubDate>2023-12-11</pubDate>
+    <pubDate>2023-12-15</pubDate>
     <abstract>
-      <para>This dataset of limnological profiles was collected from 250 reservoirs in Missouri (MO, USA) by the University of Missouri Limnology Lab beginning in 1978. Physical parameters derived from sensors include temperature and oxygen with depth. In 2017, sondes were upgraded to Yellow Springs Instruments (YSI) EXO3s; profiles include a range of physical, chemical, and biological parameters including depth, conductivity, pH, oxidative-reductive potential (ORP), chlorophyll a, phycocyanin (BGA), and turbidity. Most profiles were collected during summer (May-September) when the reservoirs were thermally stratified, with some collections during other seasons (October-April). Profiles were typically measured at the deepest point in the reservoir directly up-reservoir of the dam. Sampling was routinely conducted from a boat, but a few profiles were taken from bridges and docks. Data mainly come from the Statewide Lake Assessment Project (SLAP), funded by the Missouri Department of Natural Resources. Profiles are presented as a single file for 1978-2016 and as annual compiled datasets beginning in 2017. These data were quality controlled for basic errors and measurements outside of normal factory issued sensor ranges. &#13;
+      <para>This dataset of limnological profiles was collected from 250 reservoirs in Missouri (MO, USA) by the University of Missouri Limnology Lab beginning in 1989. Physical parameters derived from sensors include temperature and oxygen with depth. In 2017, sondes were upgraded to Yellow Springs Instruments (YSI) EXO3s; profiles include a range of physical, chemical, and biological parameters including depth, conductivity, pH, oxidative-reductive potential (ORP), chlorophyll a, phycocyanin (BGA), and turbidity. Most profiles were collected during summer (May-September) when the reservoirs were thermally stratified, with some collections during other seasons (October-April). Profiles were typically measured at the deepest point in the reservoir directly up-reservoir of the dam. Sampling was routinely conducted from a boat, but a few profiles were taken from bridges and docks. Data mainly come from the Statewide Lake Assessment Project (SLAP), funded by the Missouri Department of Natural Resources. Profiles are presented as a single file for 1989-2016 and as annual compiled datasets beginning in 2017. These data were quality controlled for basic errors and measurements outside of normal factory issued sensor ranges. &#13;
 </para>
     </abstract>
     <keywordSet>
@@ -118,7 +118,7 @@
     </intellectualRights>
     <coverage>
       <geographicCoverage>
-        <geographicDescription>global</geographicDescription>
+        <geographicDescription>midwest USA</geographicDescription>
         <boundingCoordinates>
           <westBoundingCoordinate>-97.79329</westBoundingCoordinate>
           <eastBoundingCoordinate>-89.08348</eastBoundingCoordinate>
@@ -129,7 +129,7 @@
       <temporalCoverage>
         <rangeOfDates>
           <beginDate>
-            <calendarDate>1978-01-01</calendarDate>
+            <calendarDate>1989-01-01</calendarDate>
           </beginDate>
           <endDate>
             <calendarDate>2023-12-31</calendarDate>
@@ -153,13 +153,14 @@
     <methods>
       <methodStep>
         <description>
-          <para>Profiling equipment: A Yellow Springs Instrument (YSI) model 50B was used to take profiles prior to 2000, while model 85 was used between 2000 and 2006, and model 550A was used from 2006 to 2016. Prior to 2017, temperature (50B and 85: accuracy: ±0.1 °C, resolution: 0.1°C; 550A: accuracy: ±0.2°C, resolution: 0.1°C) and dissolved oxygen (accuracy: ±0.3 mg/L, resolution: 0.01 mg/L) measurements were made at discrete, vertical depths (0.5 m intervals). After 2016, dissolved oxygen (optical, luminescence; accuracy: ±0.1 mg/L, resolution: 0.01 mg/L) and temperature (accuracy: ±0.01°C, resolution: 0.001°C) profiles were continuous and collected using a YSI EXO3. In addition, the EXO3 included sensors for: depth (stainless steel strain gauge), conductivity (4-electrode nickel cell), pH (glass combination electrode), oxidative-reductive potential (ORP, platinum button), chlorophyll a (optical, fluorescence), phycocyanin (BGA, optical, fluorescence), and turbidity (optical, 90° scatter). This sensor data is associated with water quality parameters published in Jones et al. (2020).&#13;
-Data quality assurance/quality control (QA/QC): From collection, the data for each profile was carefully QA/QC’ed using automated processes to ensure data quality. First, if the profile had more than 400 readings, the sonde was lowered very slowly with likely replicate readings at different depths. The data, therefore, was averaged across all parameters by 3 second bins. Next, all rows with depths recorded as ≥ 0m were deleted as that would indicate readings from above the water surface. Any profile readings were deleted with a depth difference from one sequential depth to the next of ≤ 0.02 m. This step eliminated locations in the profile where the sensor was pulled upward, was stationary, or had settled at the bottom of the waterbody. All remaining data points were checked for error codes or data outside the sensor bounds as specific by the instrumentation and were converted to NA. Next, all water temperature values were converted to density and densities profiles were checked for any non-monotonically decreasing densities. All temperature values were checked for values that were within the sensor limits but were unrealistic (e.g., &lt; 4.2°C outside of November to April). Those profiles were removed in their entirety. All turbidity, chlorophyll a, and phycocyanin fluorescence were checked for large jumps (3x) in the bottom 15% of rows. If there was a large jump in any of those values, the sensor had entered the transition layer at the sediment/water interface consisting of loosely packed colloidal suspensions (“fluffy layer”, Strakhovenko et al. 2020). The rows of data were deleted from the first jump in the bottom 15% of data down to the lowest point. The maximum depth for these profiles is considered the new maximum depth after the preceding QA/QC steps. Any profiles were excluded if there were less than 5 readings in the profile. All data prior to 2017 was included in a single data file; each year 2017 and later each has a single data file for all profiles taken in that year. &#13;
-A subset of this historical profile data has been previously published in Jane et al. (2021).&#13;
-Citations:&#13;
-Jane, S.F., Hansen, G.J.A., Kraemer, B.M., Leavitt, P.R., North, R.L., Pilla, R.M., Williamson, C.E., Woolway, R.I., Arvola, L., Chandra, S., DeGasperi, C.L., Diemer, L., Dunalska, J., Erina, O., Flaim, G., Grossart, H.P., Hambright, K.D., Hein, C., Hejzlar, J., Janus, L.L., Jenny, J.P., Jones, J., Knoll, L.B., Leoni, B., MacKay, E., Matsuzaki, S.I., McBride, C., Muller-Navarra, D.C., Paterson, A.M., Pierson, D., Rogora, M., Rusak, J., Sadro, S., Saulnier-Talbot, E., Schmid, M., Sommaruga, R., Thiery, W., Verburg, P., Weyhenmeyer, G., Yokota, K., Rose, K.C. 2021. Widespread deoxygenation of temperate lakes. Nature. DOI:10.1038/s41586-021-03550-y.&#13;
-Jones, J.R., A. Argerich, D.V. Obrecht, A.P. Thorpe, and R.L. North. 2020. Missouri Lakes and Reservoirs Long-term Limnological Dataset ver 1. Environmental Data Initiative. https://doi.org/10.6073/pasta/86d8d176e91410566b4de51df44c2624 (Accessed 2020-05-30).&#13;
-Strakhovenko, V., Subetto, D., Ovdina, E., Danilenko, I., Belkina, N., Efremenko, N., &amp; Maslov, A. 2020. Mineralogical and geochemical composition of Late Holocene bottom sediments of Lake Onego. Journal of Great Lakes Research, 46(3), 443-455.&#13;
+          <para>Profiling equipment: A Yellow Springs Instrument (YSI) model 50B was used to take profiles prior to 2000, while model 85 was used between 2000 and 2006, and model 550A was used from 2006 to 2016. Prior to 2017, temperature (50B and 85: accuracy: ±0.1°C, resolution: 0.1°C; 550A: accuracy: ±0.2°C, resolution: 0.1°C) and dissolved oxygen (accuracy: ±0.3 mg/L, resolution: 0.01 mg/L) measurements were made at discrete, vertical depths (0.5 m intervals). After 2016, dissolved oxygen (optical, luminescence; accuracy: ±0.1 mg/L, resolution: 0.01 mg/L) and temperature (accuracy: ±0.01°C, resolution: 0.001°C) profiles were continuous and collected using a YSI EXO3. In addition, the EXO3 included sensors for: depth (stainless steel strain gauge, resolution: 0.001 m), conductivity (4-electrode nickel cell, resolution: 0.1 microsiemens/cm to 10 microsiemens/cm, range dependent), pH (glass combination electrode, resolution: 0.01), oxidative-reductive potential (ORP, platinum button, resolution: 0.1 mV), chlorophyll a (optical, fluorescence, resolution: 0.01 RFU), phycocyanin (BGA, optical, fluorescence, resolution: 0.01 RFU), and turbidity (optical, 90° scatter, resolution: 0.01 FNU). This sensor data is associated with water quality parameters published in Jones et al. (2020).</para>
+          <para>Data quality assurance/quality control (QA/QC): From collection, the data for each profile was carefully QA/QC’ed using automated processes to ensure data quality. First, if the profile had more than 400 readings, the sonde was lowered very slowly with likely replicate readings at different depths. The data, therefore, was averaged across all parameters by 3 second bins. Next, all rows with depths recorded as ≥ 0m were deleted as that would indicate readings from above the water surface. Any profile readings were deleted with a depth difference from one sequential depth to the next of ≤ 0.02 m. This step eliminated locations in the profile where the sensor was pulled upward, was stationary, or had settled at the bottom of the waterbody. All remaining data points were checked for error codes or data outside the sensor bounds as specific by the instrumentation and were converted to NA. Next, all water temperature values were converted to density and densities profiles were checked for any non-monotonically decreasing densities. All temperature values were checked for values that were within the sensor limits but were unrealistic (e.g., &lt; 4.2°C outside of November to April). Those profiles were removed in their entirety. All turbidity, chlorophyll a, and phycocyanin fluorescence were checked for large jumps (3x) in the bottom 15% of rows. If there was a large jump in any of those values, the sensor had entered the transition layer at the sediment/water interface consisting of loosely packed colloidal suspensions (“fluffy layer”, Strakhovenko et al. 2020). The rows of data were deleted from the first jump in the bottom 15% of data down to the lowest point. The maximum depth for these profiles is considered the new maximum depth after the preceding QA/QC steps. Any profiles were excluded if there were less than 5 readings in the profile. All data prior to 2017 was included in a single data file; each year 2017 and later each has a single data file for all profiles taken in that year. </para>
+          <para>A subset of this historical profile data has been previously published in Jane et al. (2021).</para>
+          <para>&#13;
+Citations:</para>
+          <para>Jane, S.F., Hansen, G.J.A., Kraemer, B.M., Leavitt, P.R., North, R.L., Pilla, R.M., Williamson, C.E., Woolway, R.I., Arvola, L., Chandra, S., DeGasperi, C.L., Diemer, L., Dunalska, J., Erina, O., Flaim, G., Grossart, H.P., Hambright, K.D., Hein, C., Hejzlar, J., Janus, L.L., Jenny, J.P., Jones, J., Knoll, L.B., Leoni, B., MacKay, E., Matsuzaki, S.I., McBride, C., Muller-Navarra, D.C., Paterson, A.M., Pierson, D., Rogora, M., Rusak, J., Sadro, S., Saulnier-Talbot, E., Schmid, M., Sommaruga, R., Thiery, W., Verburg, P., Weyhenmeyer, G., Yokota, K., Rose, K.C. 2021. Widespread deoxygenation of temperate lakes. Nature. DOI:10.1038/s41586-021-03550-y.</para>
+          <para>Jones, J.R., A. Argerich, D.V. Obrecht, A.P. Thorpe, and R.L. North. 2020. Missouri Lakes and Reservoirs Long-term Limnological Dataset ver 1. Environmental Data Initiative. https://doi.org/10.6073/pasta/86d8d176e91410566b4de51df44c2624 (Accessed 2020-05-30).</para>
+          <para>Strakhovenko, V., Subetto, D., Ovdina, E., Danilenko, I., Belkina, N., Efremenko, N., &amp; Maslov, A. 2020. Mineralogical and geochemical composition of Late Holocene bottom sediments of Lake Onego. Journal of Great Lakes Research, 46(3), 443-455.&#13;
 </para>
         </description>
       </methodStep>
@@ -228,8 +229,8 @@ Strakhovenko, V., Subetto, D., Ovdina, E., Danilenko, I., Belkina, N., Efremenko
       <entityDescription>MissouriReservoirs_Metadata_SiteData</entityDescription>
       <physical>
         <objectName>MissouriReservoirs_Metadata_SiteData.csv</objectName>
-        <size unit="bytes">11513</size>
-        <authentication method="MD5">0781a5d3c39fef859054d44dd952593a</authentication>
+        <size unit="bytes">20386</size>
+        <authentication method="MD5">348c16e65db84ba488b8f2e9a27367c3</authentication>
         <dataFormat>
           <textFormat>
             <numHeaderLines>1</numHeaderLines>
@@ -291,7 +292,7 @@ Strakhovenko, V., Subetto, D., Ovdina, E., Danilenko, I., Belkina, N., Efremenko
                 <numberType>real</numberType>
                 <bounds>
                   <minimum exclusive="false">36.5308</minimum>
-                  <maximum exclusive="false">44.2229</maximum>
+                  <maximum exclusive="false">44.2244262598543</maximum>
                 </bounds>
               </numericDomain>
             </ratio>
@@ -324,14 +325,32 @@ Strakhovenko, V., Subetto, D., Ovdina, E., Danilenko, I., Belkina, N., Efremenko
             <codeExplanation>MissingValue</codeExplanation>
           </missingValueCode>
         </attribute>
+        <attribute>
+          <attributeName>notes</attributeName>
+          <attributeDefinition>Notes on locations</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Notes on locations</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>MissingValue</codeExplanation>
+          </missingValueCode>
+        </attribute>
       </attributeList>
-      <numberOfRecords>358</numberOfRecords>
+      <numberOfRecords>432</numberOfRecords>
     </dataTable>
     <dataTable>
-      <entityName>MissouriReservoirs_ProfileData_1978-2016</entityName>
-      <entityDescription>MissouriReservoirs_ProfileData_1978-2016</entityDescription>
+      <entityName>MissouriReservoirs_ProfileData_1989-2016</entityName>
+      <entityDescription>MissouriReservoirs_ProfileData_1989-2016</entityDescription>
       <physical>
-        <objectName>MissouriReservoirs_ProfileData_1978-2016.csv</objectName>
+        <objectName>MissouriReservoirs_ProfileData_1989-2016.csv</objectName>
         <size unit="bytes">8220545</size>
         <authentication method="MD5">dd9d6f91d961fe96cf84a3280d454a75</authentication>
         <dataFormat>
@@ -722,8 +741,8 @@ Strakhovenko, V., Subetto, D., Ovdina, E., Danilenko, I., Belkina, N., Efremenko
       <entityDescription>MissouriReservoirs_ProfileData_2017</entityDescription>
       <physical>
         <objectName>MissouriReservoirs_ProfileData_2017.csv</objectName>
-        <size unit="bytes">4365448</size>
-        <authentication method="MD5">6b1a1dcfbd0303b09dbfb9d65b422a9f</authentication>
+        <size unit="bytes">4337988</size>
+        <authentication method="MD5">469078ad4ea27b94ad06a66d1119af65</authentication>
         <dataFormat>
           <textFormat>
             <numHeaderLines>1</numHeaderLines>
@@ -1136,8 +1155,8 @@ Strakhovenko, V., Subetto, D., Ovdina, E., Danilenko, I., Belkina, N., Efremenko
       <entityDescription>MissouriReservoirs_ProfileData_2018</entityDescription>
       <physical>
         <objectName>MissouriReservoirs_ProfileData_2018.csv</objectName>
-        <size unit="bytes">5055568</size>
-        <authentication method="MD5">c7dbc7ad913a8572219230197d8db6e8</authentication>
+        <size unit="bytes">5019630</size>
+        <authentication method="MD5">ab38f3851437b27b37995b82648ac32a</authentication>
         <dataFormat>
           <textFormat>
             <numHeaderLines>1</numHeaderLines>
@@ -1574,8 +1593,8 @@ Strakhovenko, V., Subetto, D., Ovdina, E., Danilenko, I., Belkina, N., Efremenko
       <entityDescription>MissouriReservoirs_ProfileData_2019</entityDescription>
       <physical>
         <objectName>MissouriReservoirs_ProfileData_2019.csv</objectName>
-        <size unit="bytes">5540537</size>
-        <authentication method="MD5">468eb2a8f5f52cc1e092461b3c345510</authentication>
+        <size unit="bytes">5491932</size>
+        <authentication method="MD5">9d43d9b9348b325f9b12eca4a775656b</authentication>
         <dataFormat>
           <textFormat>
             <numHeaderLines>1</numHeaderLines>
@@ -2005,15 +2024,15 @@ Strakhovenko, V., Subetto, D., Ovdina, E., Danilenko, I., Belkina, N., Efremenko
           </missingValueCode>
         </attribute>
       </attributeList>
-      <numberOfRecords>34528</numberOfRecords>
+      <numberOfRecords>34411</numberOfRecords>
     </dataTable>
     <dataTable>
       <entityName>MissouriReservoirs_ProfileData_2020</entityName>
       <entityDescription>MissouriReservoirs_ProfileData_2020</entityDescription>
       <physical>
         <objectName>MissouriReservoirs_ProfileData_2020.csv</objectName>
-        <size unit="bytes">3992169</size>
-        <authentication method="MD5">15a197611ff93849e305b5d8b1461f98</authentication>
+        <size unit="bytes">3967570</size>
+        <authentication method="MD5">622769d7e7e2052156ea98e64ceeb8f2</authentication>
         <dataFormat>
           <textFormat>
             <numHeaderLines>1</numHeaderLines>
@@ -2450,8 +2469,8 @@ Strakhovenko, V., Subetto, D., Ovdina, E., Danilenko, I., Belkina, N., Efremenko
       <entityDescription>MissouriReservoirs_ProfileData_2021</entityDescription>
       <physical>
         <objectName>MissouriReservoirs_ProfileData_2021.csv</objectName>
-        <size unit="bytes">3495044</size>
-        <authentication method="MD5">0e5e8c8e5ab345b0e53afff28250b792</authentication>
+        <size unit="bytes">3474283</size>
+        <authentication method="MD5">559d8be3077c560e3d54183edd0cd5a6</authentication>
         <dataFormat>
           <textFormat>
             <numHeaderLines>1</numHeaderLines>
@@ -2888,8 +2907,8 @@ Strakhovenko, V., Subetto, D., Ovdina, E., Danilenko, I., Belkina, N., Efremenko
       <entityDescription>MissouriReservoirs_ProfileData_2022</entityDescription>
       <physical>
         <objectName>MissouriReservoirs_ProfileData_2022.csv</objectName>
-        <size unit="bytes">3116945</size>
-        <authentication method="MD5">2aac5c86c4807a49065609330f369b98</authentication>
+        <size unit="bytes">3108100</size>
+        <authentication method="MD5">2128587b721f531286068c8e16b26d69</authentication>
         <dataFormat>
           <textFormat>
             <numHeaderLines>1</numHeaderLines>
@@ -3319,15 +3338,15 @@ Strakhovenko, V., Subetto, D., Ovdina, E., Danilenko, I., Belkina, N., Efremenko
           </missingValueCode>
         </attribute>
       </attributeList>
-      <numberOfRecords>22922</numberOfRecords>
+      <numberOfRecords>23039</numberOfRecords>
     </dataTable>
     <dataTable>
       <entityName>MissouriReservoirs_ProfileData_2023</entityName>
       <entityDescription>MissouriReservoirs_ProfileData_2023</entityDescription>
       <physical>
         <objectName>MissouriReservoirs_ProfileData_2023.csv</objectName>
-        <size unit="bytes">4885274</size>
-        <authentication method="MD5">267405f66a6c6d415fb277beb49a9d71</authentication>
+        <size unit="bytes">4857950</size>
+        <authentication method="MD5">84cc0b7b5ec7b72ef29241a123ec3485</authentication>
         <dataFormat>
           <textFormat>
             <numHeaderLines>1</numHeaderLines>

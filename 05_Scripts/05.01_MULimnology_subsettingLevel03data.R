@@ -34,8 +34,29 @@ for(fileIndex in 1:length(Level3_files)){
 Level3_allData<-do.call(bind_rows, List_Level3)
 
 
+############################Lat log matching#####################
+#Read in lat/long data#####
+latlongMetadata<-read_csv("07_MiscFiles/MissouriReservoir_Metadata_SiteData.csv")%>%mutate(MULakeNumber=as.character(sprintf("%03d", MULakeNumber)))%>%mutate(notes=NA)
+
+#Find the unique list of the Level3 data####
+#Take the mean of lat and long
+handheldLatLong<-Level3_allData%>%group_by(MULakeNumber)%>%summarize(site_latitude=mean(site_latitude,na.rm=TRUE), site_longitude=mean(site_longitude,na.rm=TRUE))
+
+#Find ones that are not in the main lat/longs#####
+Extras<-handheldLatLong%>%
+        filter(!(MULakeNumber %in% latlongMetadata$MULakeNumber))%>%
+        rename(waterBodyLatitude=site_latitude,
+               waterBodyLongitude=site_longitude)%>%
+        mutate(notes=ifelse(is.nan(waterBodyLatitude),paste("See MULakeNumber: ",substr(MULakeNumber,1,3)," for lake location. Email corresponding author for exact site location",sep=""),NA))
 
 
+#Stack and sort the two lat/longs, export the file####
+combined_LatLong<-bind_rows(latlongMetadata,Extras)%>%arrange(MULakeNumber)
+
+#Export the file to 07_MiscFiles folder####
+write_csv(x=combined_LatLong,file="07_MiscFiles/MissouriReservoir_Metadata_SiteData_full.csv")
+
+###################################################################################
 
 #Load in Yusuf's list (or any other list here)####
 Yusuf_profiles_list<-read_csv("07_MiscFiles/Updated_Specific_Lakes_and_Dates_YusufOlaleye.csv")%>%
