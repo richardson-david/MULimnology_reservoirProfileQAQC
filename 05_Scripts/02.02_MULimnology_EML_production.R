@@ -45,14 +45,17 @@ library(tidyverse)
   #*Identify all the individual .csv files####
   Level2_files<-list.files("02_Level2_Data/",pattern = "*.csv")
   #Set the year - this will be in the for loop####
-  #file.index<-8
+  #file.index<-5
   for(file.index in 1:length(Level2_files)){
   #*Read in a level 2 file####
-  temp_level2<-read_csv(paste("02_Level2_Data/",Level2_files[file.index],sep=""))
+  temp_level2<-read_csv(paste("02_Level2_Data/",Level2_files[file.index],sep=""))%>%
+                mutate(date=as.character(date), #make sure the date exports correctly
+                  dateTime=as.character(dateTime)) #make sure the dateTime exports correctly
+  
   #*pull out the year####
   Extract_year<-sub("\\_.*", "", Level2_files[file.index])
   #*rename extract year for historical####
-  if(Extract_year=="Historical"){Extract_year<-"1978-2016"}
+  if(Extract_year=="Historical"){Extract_year<-"1989-2016"}
   #Create a new EDI friendly file name####
   fileName<-paste("04_EDI/MissouriReservoirs_ProfileData_",Extract_year,".csv",sep="")
   #*Paste in EDI file####
@@ -171,17 +174,17 @@ template_table_attributes(path = "04_EDI/",
   #Notes on issues
     #make sure the keywords are tab delimited, have column headers of keyword and keywordThesaurus - some can come from the LTER controlled vocabulary: https://emily.lternet.edu/vocab/vocab/index.php
 make_eml(path = "04_EDI/",
-         dataset.title = "Missouri reservoir profile data including temperature, depth, and oxygen profiles (1978-current)", 
+         dataset.title = "Missouri reservoir profile data including temperature, depth, and oxygen profiles (1989-current)", 
          data.path = "04_EDI/",
          eml.path = "04_EDI/",
          data.table  = dataFiles,
          data.table.name=sub(".csv$","",dataFiles),
          data.table.description = sub(".csv$","",dataFiles),
-         temporal.coverage = c("1978-01-01", paste(max(as.numeric(sub("\\_.*", "", Level2_files)),na.rm=TRUE),"-12-31",sep="")), #gives the end date as the last year of the list 31Dec
+         temporal.coverage = c("1989-01-01", paste(max(as.numeric(sub("\\_.*", "", Level2_files)),na.rm=TRUE),"-12-31",sep="")), #gives the end date as the last year of the list 31Dec
          maintenance.description = "complete", 
          user.domain = "EDI",
-         user.id = "northr",
-         package.id='edi.1091.1'
+         user.id = "richardsond",
+         package.id='edi.1079.1'
          )
 
 ## Step 8: Check your data product! ####
