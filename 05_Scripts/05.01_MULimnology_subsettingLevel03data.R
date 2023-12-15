@@ -33,6 +33,10 @@ for(fileIndex in 1:length(Level3_files)){
 #Bind them all together####
 Level3_allData<-do.call(bind_rows, List_Level3)
 
+
+
+
+
 #Load in Yusuf's list (or any other list here)####
 Yusuf_profiles_list<-read_csv("07_MiscFiles/Updated_Specific_Lakes_and_Dates_YusufOlaleye.csv")%>%
                 rename(MULakeNumber=`Lake#`,

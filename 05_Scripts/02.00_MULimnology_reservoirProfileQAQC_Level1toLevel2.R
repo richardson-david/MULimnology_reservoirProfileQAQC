@@ -28,7 +28,7 @@ library(stringr)
 source("05_Scripts/00_MULimnology_reservoirProfileQAQC_Functions.R")
 
 #Set year here####
-year<-2022
+year<-2019
 
 #*Set the directory path here####
 dirPath<-paste0("01_Level1_Data/",year,"_Level1_Data")
