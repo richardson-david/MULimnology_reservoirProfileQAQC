@@ -152,9 +152,9 @@ attributeFiles<-str_subset(list.files("04_EDI/",pattern = "*.csv"),pattern="^att
 dataFiles<-str_subset(list.files("04_EDI/",pattern = "*.csv"),pattern="^Missouri")
 
 #compile attribute template files - don't do this if they already exist####
-template_table_attributes(path = "04_EDI/",
-                         data.path = "04_EDI/",
-                         data.table = dataFiles)
+# template_table_attributes(path = "04_EDI/",
+#                          data.path = "04_EDI/",
+#                          data.table = dataFiles)
 #Identify which variables are categorical####              
 # template_categorical_variables(path = "04_EDI/",
 #                                data.path = "04_EDI/",
