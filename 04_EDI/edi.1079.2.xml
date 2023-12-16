@@ -229,8 +229,8 @@ Citations:</para>
       <entityDescription>MissouriReservoirs_Metadata_SiteData</entityDescription>
       <physical>
         <objectName>MissouriReservoirs_Metadata_SiteData.csv</objectName>
-        <size unit="bytes">20386</size>
-        <authentication method="MD5">348c16e65db84ba488b8f2e9a27367c3</authentication>
+        <size unit="bytes">20260</size>
+        <authentication method="MD5">9f65c6afd424bc2e44e8da10218b4b92</authentication>
         <dataFormat>
           <textFormat>
             <numHeaderLines>1</numHeaderLines>
