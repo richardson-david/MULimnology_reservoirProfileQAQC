@@ -183,8 +183,8 @@ make_eml(path = "04_EDI/",
          temporal.coverage = c("1989-01-01", paste(max(as.numeric(sub("\\_.*", "", Level2_files)),na.rm=TRUE),"-12-31",sep="")), #gives the end date as the last year of the list 31Dec
          maintenance.description = "complete", 
          user.domain = "EDI",
-         user.id = "richardsond",
-         package.id='edi.1079.2'
+         user.id = "northr",
+         package.id='edi.1544.1'
          )
 
 ## Step 8: Check your data product! ####
