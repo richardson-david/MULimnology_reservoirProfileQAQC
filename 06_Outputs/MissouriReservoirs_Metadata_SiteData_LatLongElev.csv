@@ -1,0 +1,433 @@
+MULakeNumber,waterBody,waterBodyLatitude_degree,waterBodyLongitude_degree,notes,elevation_m_extract
+001,Glover,38.8476,-91.8876,NA,193.85
+002,Pinnacle,38.8258,-91.4197,NA,188.85
+003,Bowling Green (East),39.3416,-91.153,NA,241.3
+004,Bowling Green (West),39.3423,-91.1611,NA,234.3
+005,Lincoln,39.0203,-90.9217,NA,172.75
+006,St. Louis,38.8011,-90.7653,NA,152.33
+007,Kraut Run,38.7353,-90.7619,NA,152.36
+009,Creve Coeur,38.7214,-90.4833,NA,134.73
+010,Northwoods,38.4311,-91.4814,NA,241.9
+011,Peaceful Valley,38.3587,-91.539,NA,235.46
+012,Ben Branch,38.5676,-91.7911,NA,235.25
+013,Binder,38.6019,-92.3008,NA,197.52
+014,Tishomingo,38.3172,-90.6028,NA,165.39
+015,Wauwanoka,38.2267,-90.53,NA,175.46
+016,Timberline,37.9925,-90.5419,NA,242.15
+017,Carmel,37.9264,-90.6389,NA,268
+018,Capri,37.8978,-90.6275,NA,253.36
+019,Marseilles,37.895,-90.6214,NA,254.83
+020,Monsanto,37.8118,-90.5006,NA,277.37
+021,Goose Creek,37.9811,-90.3223,NA,192.97
+022,Ann,37.9527,-90.2064,NA,152.65
+023,Wanda Lee,37.9376,-90.235,NA,155.35
+024,Fredricktown City,37.5772,-90.3092,NA,215.36
+025,Perry County,37.7242,-89.9142,NA,157.9
+026,Bella Vista,37.4728,-89.5783,NA,139.67
+027,Boutin,37.4522,-89.4878,NA,164.3
+028,Girardeau,37.2792,-89.8433,NA,112.33
+029,Tywappity,37.1869,-89.6383,NA,122.02
+030,Wappapello,36.9311,-90.2806,NA,127.75
+031,Beaver,36.8007,-90.6234,NA,170.32
+032,Ripley,36.6585,-90.955,NA,200.95
+033,Fourche Creek,36.636,-91.0514,NA,175.54
+034,McCormack,36.8197,-91.3506,NA,179.94
+035,Miller Community,37.0467,-90.9031,NA,258.99
+036,Clearwater,37.1339,-90.7722,NA,186.12
+037,Lower Taum Sauk,37.495,-90.8375,NA,215.62
+038,Killarney,37.5906,-90.5644,NA,245.98
+039,Council Bluff,37.7325,-90.9145,NA,330.52
+040,Sunnen,37.9528,-90.9311,NA,257.36
+041,Rocky Fork,39.0717,-92.3131,NA,212.03
+042,Tri-City Community,39.1897,-92.2089,NA,251.25
+043,D.C. Rogers,39.1544,-92.7083,NA,201.51
+044,Peters,39.165,-92.7303,NA,217.12
+045,Nehai Tonkayea,39.5906,-92.8917,NA,227.41
+046,Thomas Hill,39.5511,-92.6444,NA,220.13
+047,Sugar Creek,39.4736,-92.4792,NA,229.31
+048,Long Branch,39.7514,-92.515,NA,251.94
+049,Macon,39.7478,-92.4942,NA,238.74
+050,Spring,40.1006,-92.6786,NA,235.56
+051,Mahoney,40.5003,-93.0242,NA,297.18
+052,Thunderhead,40.5306,-93.0197,NA,294.91
+053,Memphis City,40.4472,-92.2003,NA,218.99
+054,Ella Ewing,40.3411,-92.0066,NA,215.67
+055,Baring Country Club,40.2328,-92.1994,NA,242.43
+056,Edina City,40.1908,-92.1778,NA,235.41
+057,Deer Ridge,40.1803,-91.8269,NA,199.85
+058,Wakonda,40.0076,-91.5091,NA,143.1
+059,Shelbina,39.7261,-92.0436,NA,217.44
+060,Monroe City,39.6208,-91.7339,NA,217.21
+061,Vandalia Community,39.2375,-91.5389,NA,227.48
+062,Tebo,38.6072,-93.2886,NA,259.51
+063,Spring Fork,38.5683,-93.2414,NA,272
+064,Odessa (Lower),38.9711,-93.9894,NA,247.07
+065,Tapawingo,39.0242,-94.3156,NA,259.81
+066,Prairie Lee,38.9437,-94.3301,NA,268.47
+067,Lotawana,38.9353,-94.2464,NA,257.36
+068,Longview,38.9247,-94.4661,NA,267.06
+069,Harrisonville,38.7644,-94.3258,NA,270.7
+070,North,38.6861,-94.3583,NA,282.58
+071,Waukomis,39.2286,-94.6325,NA,282.17
+072,Smithville,39.3975,-94.5495,NA,262.75
+073,Rocky Hollow,39.3556,-94.2758,NA,242.12
+074,Watkins Mill,39.3933,-94.2631,NA,273.8
+075,Sugar,39.5457,-95.0493,NA,237.35
+076,Contrary (Oxbow),39.7203,-94.9071,NA,243.06
+077,Allaman,39.6567,-94.2147,NA,277.6
+078,Hamilton City,39.7431,-94.0347,NA,282.38
+079,Breckenridge City,39.78,-93.8072,NA,245.56
+080,Viking,39.9378,-94.0569,NA,263.5
+081,Pony Express,39.8044,-94.38,NA,295.77
+082,Maysville,39.8781,-94.3785,NA,273.87
+083,Bethany (North),40.3136,-94.0309,NA,280.71
+084,Paho,40.4004,-93.6548,NA,287.62
+085,Marie,40.4867,-93.5525,NA,292.29
+086,New Milan,40.1983,-93.1042,NA,263.62
+087,Brookfield,39.7961,-93.0283,NA,243.61
+088,Marceline (South),39.6617,-92.9956,NA,230.69
+089,Truman,38.2639,-93.4083,NA,215.32
+090,Montrose,38.3086,-93.9169,NA,221.31
+091,Atkinson,38.0064,-94.0461,NA,219.7
+092,Pomme De Terre,37.9017,-93.32,NA,268.47
+093,Stockton,37.6917,-93.7667,NA,264.37
+094,Lamar City,37.48,-94.2617,NA,293.84
+094-04-00,NA,NA,NA,See MULakeNumber: 094 for lake location. Email corresponding author for exact site location,NA
+094-EA-05-00,NA,37.48220560636857,-94.24331957723577,NA,290.84
+094-EA-05-02,NA,37.482964251656306,-94.2458692094622,NA,290.84
+094-MD-04-00,NA,37.482969237542626,-94.25171114330048,NA,290.84
+094-NA-05-00,NA,37.485745180868186,-94.25080721652692,NA,290.84
+094-SA-03-00,NA,37.47958849218606,-94.2531351740746,NA,290.84
+094-WL-02-00,NA,NA,NA,See MULakeNumber: 094 for lake location. Email corresponding author for exact site location,NA
+094-WL-02-10,NA,NA,NA,See MULakeNumber: 094 for lake location. Email corresponding author for exact site location,NA
+094-WL-02-20,NA,NA,NA,See MULakeNumber: 094 for lake location. Email corresponding author for exact site location,NA
+094-WL-02-30,NA,NA,NA,See MULakeNumber: 094 for lake location. Email corresponding author for exact site location,NA
+095,McDaniel,37.2939,-93.3142,NA,331.96
+096,Fellows,37.3153,-93.23,NA,385.38
+097,Springfield,37.112,-93.2637,NA,342.73
+098,Table Rock,36.595,-93.3108,NA,244.52
+098-MB-02-00,NA,36.60895028409091,-93.31403460227271,NA,278.26
+099,Taneycomo,36.6589,-93.1239,NA,210.66
+100,Bull Shoals,36.5308,-92.6047,NA,198.67
+101,Norfork,36.5857,-92.2883,NA,167.9
+102,Noblett,36.9072,-92.0972,NA,299.46
+104,Sims Valley,37.006100000000004,-91.8483,NA,372.05
+105,Austin,37.1619,-92.1853,NA,444.69
+106,Roby,37.5186,-92.123,NA,373.28
+107,Ziske,37.6478,-91.5072,NA,357.51
+108,Turner,37.6472,-91.5139,NA,353.52
+109,Loggers,37.3871,-91.2624,NA,307.27
+110,Little Prairie,37.9969,-91.6917,NA,314.07
+111,Indian Hills,38.1075,-91.4575,NA,270.89
+112,Shayne,37.8976,-90.6413,NA,270.77
+113,Pape (Concordia),38.9331,-93.5814,NA,212.75
+114,Henry Sever,40.0058,-91.975,NA,200.81
+115,Hunnewell,39.7072,-91.8619,NA,208.11
+116,Jacomo,38.9931,-94.3078,NA,255.96
+117,Little Dixie,38.9056,-92.1222,NA,254.92
+118,Raintree,38.835,-94.3817,NA,294.31
+119,Sterling Price,39.4,-92.8433,NA,204.64
+120,Winnebago,38.8181,-94.3561,NA,279.8
+121,Higginsville,39.0617,-93.67,NA,230.05
+122,Lewistown,40.0978,-91.8189,NA,208.64
+123,Shelbyville,39.8064,-92.0511,NA,220.62
+124,Wyconda,40.3991,-91.9075,NA,211.76
+127,Clarence (East),39.7488,-92.2284,NA,234.3
+128,Clarence (West),39.7486,-92.2362,NA,237.06
+129,LaBelle City (East),40.0911,-91.8997,NA,207.75
+130,LaPlata (East),40.0117,-92.43,NA,266.17
+131,Hazel Creek,40.3,-92.6278,NA,257.61
+132,Lancaster City (South),40.5158,-92.5481,NA,278.85
+133,Forest,40.1714,-92.6548,NA,242.76
+134,Jamesport City,39.9906,-93.8111,NA,270.97
+135,Trenton (Upper East),40.0795,-93.5775,NA,240.89
+137,Green City,40.2644,-92.9201,NA,305.06
+139,Marceline (North),39.7225,-92.9195,NA,248.99
+140,Cameron (Century),39.7624,-94.2615,NA,285.9
+141,Showme,40.4397,-92.2177,NA,234.2
+143,Bethany (South),40.2864,-94.0244,NA,274.72
+144,Pinewoods,36.918,-90.7722,NA,237.89
+145,Mark Twain,39.5223,-91.6467,NA,183.88
+146,Crane,37.4236,-90.6272,NA,263.88
+148,Blue Springs,39.0141,-94.3371,NA,244.6
+149,Lake of the Ozarks,38.2039,-92.6236,NA,169.97
+149-04-10,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-04-20,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-04-30,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-04-40,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-04-50,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-08-00,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-08-10,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-08-20,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-08-30,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-08-40,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-08-50,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-16-10,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-16-20,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-16-30,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-16-40,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-16-50,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-18-10,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-18-20,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-18-30,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-18-40,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-28-10,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-28-20,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-28-30,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-28-40,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-28-50,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-39-10,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-39-20,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-39-30,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-39-40,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-39-50,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-45-10,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-45-20,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-45-30,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-45-50,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-60-10,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-60-20,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-60-21,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-60-30,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-GA-02-10,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-GA-02-20,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-GA-02-30,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-GA-02-40,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-GA-02-50,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-GG-03-10,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-GG-03-20,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-GG-03-30,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-GG-03-40,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-GG-03-50,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-GG-20-04,NA,38.10113076923077,-92.65719907692308,NA,199.67
+149-NA-32-10,NA,38.01908145833333,-92.82750208333331,NA,199.67
+149-NA-33-10,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-NA-33-20,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-NA-33-30,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-NA-33-40,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-NA-33-50,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-NA-40-10,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-NA-40-20,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-NA-40-30,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-NA-40-40,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+149-NA-40-50,NA,NA,NA,See MULakeNumber: 149 for lake location. Email corresponding author for exact site location,NA
+150,Blind Pony,39.0317,-93.3681,NA,219.04
+152,Lafayette,37.8925,-90.5942,NA,235.38
+155,Weatherby,39.2283,-94.7031,NA,269.2
+157,Holden City,38.7611,-94.0344,NA,243.53
+158,Amarugia Highlands W.A.,38.5394,-94.4347,NA,252.52
+159,Harmony Mission C.A.,38.0735,-94.4288,NA,260.81
+160,Four Rivers,38.015,-94.3367,NA,225.95
+161,Bushwacker,37.6717,-94.4056,NA,246.12
+162,Maple Leaf,38.9889,-93.7806,NA,237.37
+163,King,40.02,-94.4372,NA,290.23
+164,Elmwood,40.2244,-93.1156,NA,270.03
+165,Jackrabbit,38.8886,-94.3228,NA,300.88
+166,Catclaw,38.8892,-94.3167,NA,300.27
+167,Cottontail,38.8831,-94.3161,NA,292.82
+168,Nell,38.8797,-94.3228,NA,297.73
+169,Gopher,38.8733,-94.3147,NA,284.48
+170,Coot,38.8694,-94.3398,NA,296.33
+178,Daniel Boone,39.7896,-92.2631,NA,225.89
+179,Nodaway County,40.4264,-94.8578,NA,329.29
+180,Bilby Ranch,40.3481,-95.1333,NA,301.02
+181,Mozingo,40.3495,-94.7776,NA,321.73
+182,Fox Valley,40.4977,-91.7668,NA,189.57
+183,Hazel Hill,38.8458,-93.7779,NA,221.14
+184,Manito,38.5911,-92.8072,NA,267
+185,Harrison County,40.3988,-94.0871,NA,292.85
+186,Carl DiSalvo,37.7297,-90.6347,NA,309.62
+187,Belcher Branch,39.5839,-94.7331,NA,266.47
+188,Big Oak,36.6403,-89.2919,NA,88.62
+189,Butler City,38.2756,-94.4286,NA,240.55
+190,Charity,40.4756,-95.5842,NA,290.7
+191,Indian Creek,39.8975,-93.6957,NA,246.95
+192,Jo Shelby,39.7168,-93.3222,NA,212.53
+193,Busch 37,38.7133,-90.7913,NA,182.87
+194,Lawson City,39.4547,-94.2022,NA,311.3
+195,Limpp,40.0625,-94.5381,NA,313.45
+196,Lone Jack,38.8917,-94.1942,NA,283.17
+197,Prairie,38.7083,-90.6903,NA,173.48
+198,Ray County,39.3092,-93.9939,NA,225.14
+199,Rothwell,39.4183,-92.4617,NA,247.39
+200,Savannah City,39.9492,-94.863,NA,316.81
+201,Upper Big,36.9544,-89.3648,NA,97.95
+202,Whiteside,39.1722,-91.0111,NA,229.68
+203,Willow Brook,39.8722,-94.3811,NA,276.89
+204,Worth County,40.3994,-94.5247,NA,327.79
+210,NA,38.993973295454545,-92.4888334090909,NA,238.13
+211,Cameron (Sunrise),39.7627,-94.2583,NA,287.63
+212,Grindstone,39.773,-94.2942,NA,274.44
+213,Cameron (Eagle),39.7739,-94.2722,NA,277.55
+214,Bennitt,39.2448,-92.4586,NA,237.77
+215,White,39.3264,-91.8642,NA,220.8
+216,Big Whetstone,38.9657,-91.7347,NA,232.14
+217,Windy Whetstone,38.9594,-91.7338,NA,237.2
+218,Bucklin City,39.7672,-92.8814,NA,257.88
+219,Dairy 1,38.9938,-92.489,NA,238.13
+220,Dairy 3,38.9896,-92.4727,NA,239.17
+221,Edina (Section 7),40.1844,-92.164,NA,234.84
+222,Ewing,40.0211,-91.7171,NA,181.29
+223,Greenly Farms,40.0171,-92.1924,NA,243.61
+224,Happy Holler,40.0256,-94.7336,NA,287.12
+225,Higbee Railroad,39.3052,-92.5193,NA,263.46
+226,Higbee City,39.3109,-92.4961,NA,250.77
+227,Horseshoe,38.9447,-91.7184,NA,238.93
+228,Jamesport Community,39.9987,-93.8423,NA,251.11
+229,King City (West),40.0641,-94.5127,NA,315.02
+230,King City (East),40.0619,-94.5085,NA,315.02
+231,LaPlata (West),40.0186,-92.4653,NA,268.86
+232,Lick Creek,39.1508,-92.3846,NA,225.08
+233,Linneus,39.8872,-93.1994,NA,229.69
+234,Malta Bend,39.1759,-93.3852,NA,220.32
+235,Redman,39.8743,-94.3656,NA,273.92
+236,McCredie,38.9477,-91.9105,NA,250.09
+237,Milan (North),40.2002,-93.1048,NA,261.5
+238,Monroe (Route J),39.6063,-91.6661,NA,203.26
+239,LaBelle City (West),40.0918,-91.9123,NA,209.86
+240,North Whetstone,38.9823,-91.7309,NA,232.56
+241,Phillips,38.8957,-92.2934,NA,233.83
+242,Pike,39.9516,-93.6746,NA,241.23
+243,Pin Oak,37.4357,-94.5657,NA,287.44
+244,Pine Ridge,39.3987,-92.8011,NA,201.45
+245,Poosey 17,39.9221,-93.7168,NA,281.62
+246,Poosey 18,39.9281,-93.7087,NA,285.74
+247,Poosey 20,39.9282,-93.7014,NA,282.55
+248,Johnson,38.7789,-92.6015,NA,249.76
+249,Reform 1,38.7605,-91.7957,NA,254.23
+250,Santa Fe,40.0362,-92.4763,NA,272.31
+251,Sears Community,40.2613,-93.0764,NA,274.54
+252,South Farm,38.9039,-92.2781,NA,244.68
+253,Tobacco Hill,39.4229,-94.8044,NA,272.26
+254,Walter,39.0675,-91.6299,NA,229.65
+255,Watershed,40.3,-91.9341,NA,197.03
+256,Wellsville City,39.0356,-91.5769,NA,217.02
+257,Whitesell,39.0728,-91.6323,NA,235.42
+258,Winegar,38.4777,-92.3971,NA,210.03
+260,Busch 16,38.7051,-90.7578,NA,194.99
+261,Adrian City,38.3907,-94.3364,NA,257.09
+263,Brays,37.892,-91.7784,NA,290.3
+264,Drexel City,38.4744,-94.6061,NA,293.95
+265,Drexel Reservoir,38.4638,-94.6069,NA,295.76
+266,Garden City,38.5218,-94.1695,NA,261.5
+267,Niangua,37.9356,-92.8504,NA,217.1
+268,Nims,37.6384,-90.3307,NA,258.16
+269,Shepherd Mountain,37.5919,-90.6579,NA,297.19
+270,Vandalia,39.3769,-91.4084,NA,202.39
+271,Palmer,37.8227,-90.9217,NA,335.04
+272,Perry,39.4239,-91.6747,NA,205.74
+273,Odessa (Upper),38.9701,-93.9782,NA,247.47
+274,Alpine,38.7496,-91.0812,NA,207.29
+275,Ascencio,39.343,-94.8554,NA,269.84
+276,Ashland,38.7553,-92.2058,NA,213.17
+277,Aspen,38.7576,-91.04,NA,203.39
+278,Aspenetter,38.763,-91.0326,NA,203.65
+279,Autumn,38.2075,-92.7141,NA,211.52
+280,Sherwood (Big Lake),38.6648,-90.9875,NA,189.77
+281,Buteo,38.7489,-93.5814,NA,229.71
+282,Cardinal,38.761,-91.0089,NA,226.29
+283,Castlenovo,38.7669,-91.0509,NA,208.47
+284,Charrette,38.7659,-91.023,NA,225.06
+285,Clearfork,38.7517,-93.5972,NA,224.05
+286,Crystal,39.3567,-94.1914,NA,261.39
+287,Doniphan (Lower),38.3239,-94.1965,NA,277.45
+288,Doniphan (Upper),39.3274,-94.1953,NA,271.77
+289,Eleanor,38.6726,-90.9734,NA,213.36
+290,Eureka,38.5159,-90.6429,NA,149.12
+291,Foxtail,38.7745,-91.0233,NA,236.61
+292,Good Oak,38.1982,-92.7169,NA,215.67
+293,Innsbrook,38.7684,-91.0545,NA,204.28
+294,January Wabash,38.7528,-90.3111,NA,168.98
+295,Jennings,38.7384,-90.2583,NA,137.72
+296,Konstanz,38.7624,-91.074,NA,216.91
+297,Lake of the Woods,38.9954,-94.5206,NA,238.49
+298,Ste. Louise,38.7994,-90.7911,NA,165.78
+299,Lakeview,39.1546,-91.89,NA,240.47
+300,Lucern,38.7756,-91.0595,NA,211.58
+301,Penn Valley,39.0783,-94.5927,NA,252.19
+302,Red Fox,38.7717,-91.0255,NA,232.36
+304,Robin Hood,38.674,-90.9874,NA,197.51
+305,Scheffborg,38.786,-91.0583,NA,221.16
+306,Simpson,38.5581,-90.4639,NA,122.73
+307,St. Gallen,38.75,-91.0301,NA,222.46
+308,Stephens,38.9511,-92.3085,NA,209.96
+309,Sugar Hollow,38.6714,-90.9777,NA,198.16
+310,Treeline,38.1933,-92.7351,NA,214.9
+311,Troost,39.0754,-94.5646,NA,274.92
+312,Trophy,38.7742,-91.0274,NA,228.48
+313,Wanderfern,38.7671,-91.0729,NA,207.46
+314,Waterworks,39.4162,-92.4646,NA,246.1
+315,Whippoorwill,38.7654,-91.0339,NA,213.58
+316,Wood,38.9956,-92.2153,NA,260.26
+317,Buffalo Bill,39.8155,-94.3832,NA,290.64
+318,Apollo,37.8158,-90.491,NA,285
+320,Quarry Heights,38.9413,-92.3448,NA,194.98
+322,Whitecliff,38.5561,-90.3688,NA,155.6
+323,Wyandote,39.1679,-94.7786,NA,253.17
+400,Woodrail,38.9214,-92.3581,NA,197
+402,Flat Creek,36.6595,-93.8868,NA,406.93
+403,Mallard,38.7024,-90.4946,NA,134.73
+404,Novus,38.7094,-90.6817,NA,169.22
+405,Pierson,39.0679,-94.7119,NA,256.26
+406,Riss,39.2005,-94.6767,NA,266.76
+407,Roaring River,36.555,-93.7699,NA,285.35
+408,Big Eleven,39.1182,-94.6368,NA,251.84
+409,Carondelet Boathouse,38.5624,-90.2666,NA,146.12
+410,Caswell,38.8966,-92.3512,NA,207.09
+411,Cedar,38.8966,-92.3512,NA,207.09
+412,Barry Harbor,39.2428,-94.6045,NA,302.18
+413,Jaycee,38.5625,-92.2684,NA,231.96
+414,Crowder,40.0959,-93.6606,NA,232.72
+415,Ethel,39.8872,-92.7527,NA,253.42
+416,Leisure (Grundy Co),40.1104,-93.7273,NA,244.77
+417,Middle Fork Water,40.2886,-94.4329,NA,271.09
+418,Bass,38.8391,-91.7668,NA,219.56
+419,Butterfly,37.788,-90.9259,NA,372.3
+420,Daizy Valley,38.4743,-91.3901,NA,216.45
+421,Leisure (Callaway Co),38.8978,-91.8209,NA,205.79
+422,Lochaweeno,38.8285,-91.7632,NA,211.28
+423,Port Hudson,38.4735,-91.2678,NA,213.27
+424,Iron Mountain,37.693,-90.6225,NA,323.25
+425,Kellogg,37.1875,-94.2934,NA,288.2
+426,Potosi,37.8823,-90.6806,NA,264.65
+427,Primrose,37.9927,-90.5628,NA,244.03
+428,Sayersbrook,37.9867,-90.9259,NA,272.21
+429,Wahoo,38.0012,-90.5468,NA,251.03
+430,Bluestem,38.8715,-94.3244,NA,297.78
+431,Bodarc,38.8708,-94.3167,NA,290.35
+432,Harrisonville City,38.6645,-94.3391,NA,283.95
+433,Luna,38.6616,-94.3462,NA,276.35
+434,Sever Lake North,40.2556,-92.1485,NA,227.32
+435,Hurdland Severs,40.1121,-92.294,NA,261.41
+436,Finger Lake,39.0872,-92.3157,NA,225.82
+437,Thunderbird (Lower),38.8068,-91.8085,NA,196.78
+438,Bethel,38.9012,-92.3421,NA,222.82
+439,Cheney,37.7266,-97.7933,NA,441.44
+440,Crow Pond,38.8938,-91.7372,NA,244.67
+441,Montauk,37.4579,-91.6847,NA,283.78
+442,Callaway Fork,38.6824,-90.845,NA,182.02
+443,Spanish,38.8005,-90.2035,NA,148.77
+444,Cole,38.0193,-90.567,NA,250.34
+445,Rock Lake Village,38.8853,-94.0729,NA,295.03
+446,Sakatah,44.2229,-93.5625,NA,304.55
+446-01-00,NA,44.22442625985434,-93.55670113006484,NA,304.55
+446-02-00,NA,44.22161680555555,-93.56584368055556,NA,304.55
+447,Black Hawk,42.3036,-95.0393,NA,371.8
+448,Riata,38.4698,-91.4061,NA,232.49
+449,Pleasant Hill,38.8223,-94.2962,NA,272.43
+450,Marion,38.3675,-90.7568,NA,180.29
+451,Serene,38.4132,-90.7849,NA,158.26
+452,Katy,38.9199,-92.3952,NA,184.95
+453,Lafayette Park,38.6156,-90.216,NA,163.42
+454,Cedar Hill (Lake 1),38.3337,-90.6549,NA,156.71
+455,West Arrowhead,39.4848,-94.3117,NA,283.91
+456,Timberland,37.9178,-93.97,NA,241.51
+457,OFallon Park,38.6792,-90.2194,NA,156.57
+458,Crystal (Morgan),38.3942,-92.9464,NA,265.94
+459,Fon du Lac,38.4898,-90.4693,NA,157.66
+460,Houston,39.1904,-94.6185,NA,249.04
+461,See Tal,38.6881,-91.4368,NA,179.53
+462,Tilles Park,38.6222,-90.3636,NA,154.37
+463,McKee Pond,38.671,-92.2592,NA,185.42
+464,Cedar (Randolph),39.3925,-92.4234,NA,256.63
+465,McKee Prairie,38.8375,-94.2319,NA,304.68
