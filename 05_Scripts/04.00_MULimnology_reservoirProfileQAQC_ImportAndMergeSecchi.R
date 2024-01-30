@@ -147,4 +147,6 @@ ggplot(data=Level4_allData,aes(x=E24_umolpm2s))+geom_histogram(color="black",fil
 Level4_fileName<-paste0("Level4Data_",min(year(Level4_allData$date)),"-",max(year(Level4_allData$date)),".csv")
 #Export the Level 4 data 
 write_csv(Level4_allData,file=paste0("06_Outputs/",Level4_fileName))
+
+
           

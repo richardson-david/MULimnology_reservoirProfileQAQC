@@ -73,6 +73,15 @@ Yusuf_profiles<-left_join(Yusuf_profiles_list,Level3_allData,by=c("MULakeNumber"
 write_csv(Yusuf_profiles,file="06_Outputs/YusufOlaleye_Level3Profiles.csv")
 
 
+#Subset level 4 data here####
+Level4_allData<-read_csv("06_Outputs/Level4Data_1989-2023.csv")
+
+#Merge all them together keeping Yusuf's profiles####              
+Yusuf_profiles_Level4<-left_join(Yusuf_profiles_list,Level4_allData,by=c("MULakeNumber","date"))
+
+#Write out Yusuf's profiles####
+write_csv(Yusuf_profiles_Level4,file="06_Outputs/YusufOlaleye_Level4Profiles.csv")
+
 
 ##################################################
 #Subset to data with lats/longs#########################
