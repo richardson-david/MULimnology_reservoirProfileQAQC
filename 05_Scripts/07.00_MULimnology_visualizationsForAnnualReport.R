@@ -31,6 +31,7 @@ ggplot()+
   geom_polygon(data=state%>%filter(region=="missouri"),aes(x=long,y=lat),color='black',fill="light grey")+
   coord_quickmap()+
   geom_polygon(data=county%>%filter(region=="missouri"),aes(x=long,y=lat,group=subregion),color='black',fill="light grey")+
-  geom_point(data=Level4_summary%>%filter(latitude_degree_best<41),aes(x=longitude_degree_best,y=latitude_degree_best,fill=E24_umolpm2s),shape=21,size=3)
+  geom_point(data=Level4_summary%>%filter(latitude_degree_best<41),aes(x=longitude_degree_best,y=latitude_degree_best,fill=E24_umolpm2s),shape=21,size=3)+
+  theme_bw()
 
 
