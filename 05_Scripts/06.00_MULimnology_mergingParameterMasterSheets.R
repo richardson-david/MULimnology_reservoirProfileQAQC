@@ -16,24 +16,42 @@ dir<-paste0("08_ParameterMasterSheets/",year,"_ParameterMasterSheets")
 
 #Read in master parameter sheets####
 ###############################
+#*Read in secchi sheet####
+#Gives secchi and date Time#
+#**Read in Secchi from sheet 1####
+secchiMaster<-read_excel(paste0(dir,"/2023 SLAP Secchi depth masterfile 01-11-2024.xlsx"),sheet="Sheet1")%>%
+  rename(LakeName=`Lake name`, #rename some columns
+         date=Date,
+         time=Time,
+         secchiDepth_m=`Depth (m)`)%>%
+  mutate(date=ymd(date), #extract the date
+         hour=hour(time), #extract the hour
+         minute=minute(time), #extract the minute
+         second=second(time), #extract the second
+         time=paste(hour,minute,second,sep=":"), #put back together time without the artificial date
+         dateTime=ymd(date)+hms(time))%>% #put a dateTime together
+  dplyr::select(-hour,-minute,-second) #get rid of the extraneous hour, minute, second
+
+###############################
 #*Read in chlorophyll sheet####
   #Gives total chlorophyll, Chla corrected and Pheophytin#
 #**Read in Chlorophyll master from data for pivot table sheet####
-chlMaster<-read_excel(paste0(dir,"/2023 SLAP chl compiled.xlsx"),sheet="data for pivot table")%>%
+chlMaster<-read_excel(paste0(dir,"/2023 SLAP chl compiled 02-12-2024.xlsx"),sheet="data for pivot table")%>%
             rename(MULakeNumber=`Lake/Site`,
-                   dateTime=Date,
+                   date=Date,
                    Total_chl_ugpL=TCHL,
                    Chla_ugpL=CHLa,
                    Pheo_ugpL=Pheo)
 
 #**Bring in the chlorophyll from the all sheet####
-chlMaster_All<-read_excel(paste0(dir,"/2023 SLAP chl compiled.xlsx"),sheet="All",skip=2)%>%
+chlMaster_FinalChl<-read_excel(paste0(dir,"/2023 SLAP chl compiled 02-12-2024.xlsx"),sheet="Final Chl",skip=2)%>%
                 rename(MULakeNumber=`Lake/Site`,
-                       dateTime=Date,
+                       date=Date,
                        DepthChl=Depth,
-                       Total_chl_ugpL=`ug/L...16`,
-                       Chla_ugpL=`ug/L...17`,
-                       Pheo_ugpL=`ug/L...18`)%>%
+                       Total_chl_ugpL=`mg/L...11`,
+                       Chla_mgpL=`mg/L...13`,
+                       Pheo_mgpL=`mg/L...15`)%>%
+                mutate(date=ymd(date))
                 dplyr::select(MULakeNumber,dateTime,DepthChl,Total_chl_ugpL,Chla_ugpL,Pheo_ugpL)
 
 #**Things to do: get rid of all with "Field Blank" in MULakeNumber
@@ -44,7 +62,7 @@ chlMaster_All<-read_excel(paste0(dir,"/2023 SLAP chl compiled.xlsx"),sheet="All"
 #Gives total NH4 concentration#
 
 #**Bring in the NH4 from the all sheet####
-Ammonium_NH<-read_excel(paste0(dir,"/Ammonia SLAP 2023 mastersheet.xlsx"),sheet="NH",skip=0)%>%
+Ammonium_NH<-read_excel(paste0(dir,"/Ammonia SLAP 2023 mastersheet 02-08-24.xlsx"),sheet="Final NH4",skip=0)%>%
   rename(MULakeNumber=`Lake #`,
          dateTime=Date,
          DepthNH4=Depth,
@@ -58,7 +76,35 @@ Ammonium_NH<-read_excel(paste0(dir,"/Ammonia SLAP 2023 mastersheet.xlsx"),sheet=
 #**Things to do: get rid of all with "Field Blank" in MULakeNumber
 #**Things to do: get rid of field dupes (FD at the end of MULakeNumber)
 
+###############################
+#*Read in Toxin data from across all sheets####
+#Gives Microcystin, Cylindro, and Saxitoxin concentrations#
+#**Bring in the Toxins from the Final toxins sheet####
+toxins<-read_excel(paste0(dir,"/Toxin SLAP 2023 mastersheet 02-09-24.xlsx"),sheet="Final toxins",skip=0)%>%
+  rename(MULakeNumber=`Lake #`,
+         date=`Sample date`,
+         )%>%
+  mutate(date=as.Date(as.numeric(date),origin="1899-12-30")) #%>%
+  #dplyr::select(MULakeNumber,date,DepthTN,TN_mgpL)                
 
+#**Things to do: check the units for the toxins
+#**Figure out what to do with the ?? for dates
+#**Figure out what flags mean and what to do with them 
+                    
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
 ###############################
 #*Read in Nitrogen from across all sheets####
 #Gives TN, TDN, NO3, and NH4 concentrations#
