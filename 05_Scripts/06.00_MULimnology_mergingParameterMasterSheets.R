@@ -32,6 +32,12 @@ secchiMaster<-read_excel(paste0(dir,"/2023 SLAP Secchi depth masterfile 01-11-20
          dateTime=ymd(date)+hms(time))%>% #put a dateTime together
   dplyr::select(-hour,-minute,-second) #get rid of the extraneous hour, minute, second
 
+#Create a secchi dateTime to match with the MULakeNumber and Date columns####
+dateTime<-secchiMaster%>%dplyr::select(MULakeNumber,date,dateTime)%>%
+          rename(Date=date)%>%
+          mutate(MULakeNumber=as.character(MULakeNumber))
+          
+
 #Secchi: create a subdata frame with the long format that will be merged####   
 secchi_merge<-secchiMaster%>%
               mutate(Lakevisit=NA,
@@ -453,7 +459,74 @@ TSS_merge<-TSSMaster%>%
   dplyr::select(Lakevisit,MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,BottleTubeFilter_number,parameterType,unit,parameterValue,parameterValueQCCodeID)
 
 #**Things to do: check the units for the TSS               
-                
+
+###################################################################
+#Read in the 2023 profile data for the surface DO, temp, and pH####
+profileLevel3<-read_csv(paste0("03_Level3_Data/",year,"_Level3.csv"))
+
+#DO merge####   
+DO_merge<-profileLevel3%>%
+  mutate(Lakevisit=NA,
+         Date=date,
+         beginDepth=0,
+         endDepth_char="SURF",
+         endDepth_m="0.5",
+         BottleTubeFilter_number=NA,
+         parameterType="DO",
+         unit="mg/L",
+         parameterValue=surface_doConcentration_mgpL,
+         parameterValueQCCodeID=NA
+  )%>%
+  dplyr::select(Lakevisit,MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,BottleTubeFilter_number,parameterType,unit,parameterValue,parameterValueQCCodeID)
+
+#Temp merge####   
+Temp_merge<-profileLevel3%>%
+  mutate(Lakevisit=NA,
+         Date=date,
+         beginDepth=0,
+         endDepth_char="SURF",
+         endDepth_m="0.5",
+         BottleTubeFilter_number=NA,
+         parameterType="Temp",
+         unit="C",
+         parameterValue=surface_temp_degC,
+         parameterValueQCCodeID=NA
+  )%>%
+  dplyr::select(Lakevisit,MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,BottleTubeFilter_number,parameterType,unit,parameterValue,parameterValueQCCodeID)
+
+#pH merge####   
+pH_merge<-profileLevel3%>%
+  mutate(Lakevisit=NA,
+         Date=date,
+         beginDepth=0,
+         endDepth_char="SURF",
+         endDepth_m="0.5",
+         BottleTubeFilter_number=NA,
+         parameterType="pH",
+         unit="unitless",
+         parameterValue=surface_pH,
+         parameterValueQCCodeID=NA
+  )%>%
+  dplyr::select(Lakevisit,MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,BottleTubeFilter_number,parameterType,unit,parameterValue,parameterValueQCCodeID)
+
+#############Lat/Long data####################
+#Get out the handheld data for 2023########
+handheld2023_LatLong<-profileLevel3%>%
+                      group_by(MULakeNumber)%>%
+                      summarize(site_latitude=mean(site_latitude,na.rm=TRUE), site_longitude=mean(site_longitude,na.rm=TRUE))
+
+#Get in the dam locations for lat/long####  
+latlongMetadata<-read_csv("07_MiscFiles/MissouriReservoir_Metadata_SiteData.csv")%>%
+                 mutate(MULakeNumber=as.character(sprintf("%03d", MULakeNumber)))%>%
+                 dplyr::select(-waterBody,-notes)
+
+#Merge them together#####
+latlong_best<-left_join(handheld2023_LatLong,latlongMetadata,by="MULakeNumber")%>%
+  mutate(samplingSiteLatitude=ifelse(is.na(site_latitude),waterBodyLatitude,site_latitude), #If there is no handheld, use the dam location
+         samplingSiteLongitude=ifelse(is.na(site_longitude),waterBodyLatitude,site_longitude))%>% #If there is no handheld, use the dam location
+  dplyr::select(MULakeNumber,samplingSiteLatitude,samplingSiteLongitude)%>%
+  mutate(MULakeNumber=ifelse(nchar(MULakeNumber)==3,as.character(as.numeric(MULakeNumber)),MULakeNumber)) #Make sure to convert 003 back to 3 here for merge
+
 ######################STACK ALL THE MERGE FILES IN LONG FORM###########################
 #row_bind all the merge files:
 databaseImport<-
@@ -474,11 +547,15 @@ databaseImport<-
                     TP_merge,
                     PIM_merge,
                     POM_merge,
-                    TSS_merge
+                    TSS_merge,
+                    DO_merge,
+                    Temp_merge,
+                    pH_merge
                     )%>%
-          arrange(Date,parameterType) #order by date, parameteType to match the 2022 import file
-                
-           
+            left_join(.,latlong_best)%>% #add in the latitudes and longitudes      
+            arrange(Date,parameterType)%>% #order by date, parameteType to match the 2022 import file
+            left_join(.,dateTime,by=c("MULakeNumber","Date"))
+
 
 #Trying to figure out the missing toxin data####                
 boolean<-unique(databaseImport%>%filter(MULakeNumber!="?"|MULakeNumber!="401")%>%mutate(code=paste(MULakeNumber,as.character(Date),sep="-"))%>%dplyr::select(code)%>%pull()) %in% unique(databaseImport%>%filter(parameterType=="ANA_tox"&MULakeNumber!="?")%>%mutate(code=paste(MULakeNumber,as.character(Date),sep="-"))%>%dplyr::select(code)%>%pull()) 
