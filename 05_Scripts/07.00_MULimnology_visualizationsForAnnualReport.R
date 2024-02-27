@@ -62,8 +62,10 @@ gg.MapMULakeNUmber<-ggplot()+
   #coord_map(xlim = lon_lim, ylim = lat_lim)+
   coord_sf(crs = 4326,xlim = lon_lim, ylim = lat_lim)+
   ggspatial::annotation_north_arrow(location = "tr")+
-  geom_label_repel(data=figure1map.df,aes(x=samplingSiteLongitude,y=samplingSiteLatitude,label=MULakeNumber),fill="white",size=2,min.segment.length = 0)+
+  geom_label_repel(data=figure1map.df,aes(x=samplingSiteLongitude,y=samplingSiteLatitude,label=MULakeNumber),fill=alpha("white",0.9),size=2,min.segment.length = 0)+
   #coord_equal()+
+  xlab("Longitude")+
+  ylab("Latitude")+
   theme_bw()+
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
