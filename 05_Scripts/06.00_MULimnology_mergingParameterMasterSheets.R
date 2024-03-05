@@ -35,24 +35,24 @@ secchiMaster<-read_excel(paste0(dir,"/2023 SLAP Secchi depth masterfile 01-11-20
 #Create a secchi dateTime to match with the MULakeNumber and Date columns####
 dateTime<-secchiMaster%>%dplyr::select(MULakeNumber,date,dateTime)%>%
           rename(Date=date)%>%
-          mutate(MULakeNumber=as.character(MULakeNumber))
+          mutate(MULakeNumber=as.character(MULakeNumber))%>%
+          distinct(.) #keep only the unique values for merging
           
 
 #Secchi: create a subdata frame with the long format that will be merged####   
 secchi_merge<-secchiMaster%>%
-              mutate(Lakevisit=NA,
+              mutate(
                      MULakeNumber=as.character(MULakeNumber),
                      Date=date,
                      beginDepth=0,
                      endDepth_char="ACTUAL",
                      endDepth_m="ACTUAL",
-                     BottleTubeFilter_number=NA,
                      parameterType="SECCHI",
                      unit="m",
                      parameterValue=secchiDepth_m,
                      parameterValueQCCodeID=NA
                      )%>%
-  dplyr::select(Lakevisit,MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,BottleTubeFilter_number,parameterType,unit,parameterValue,parameterValueQCCodeID)
+  dplyr::select(MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,parameterType,unit,parameterValue,parameterValueQCCodeID)
 
 #**This dateTime has the sampling time, can create separate file and merge in later####
 
@@ -71,78 +71,73 @@ chlMaster_FinalChl<-read_excel(paste0(dir,"/2023 SLAP chl compiled 02-12-2024.xl
 
 #Acid_fluor merge####   
 Acid_fluor_merge<-chlMaster_FinalChl%>%
-  mutate(Lakevisit=NA,
+  mutate(
          Date=date,
          beginDepth=0,
          endDepth_char=depthChl,
          endDepth_m=NA,
-         BottleTubeFilter_number=NA,
          parameterType="Acid_fluor",
          unit="RFU",
          parameterValue=`Acid Fluor (RFU)`,
          parameterValueQCCodeID=NA
   )%>%
-  dplyr::select(Lakevisit,MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,BottleTubeFilter_number,parameterType,unit,parameterValue,parameterValueQCCodeID)
+  dplyr::select(MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,parameterType,unit,parameterValue,parameterValueQCCodeID)
 
 #Tot_fluor merge####   
 Tot_fluor_merge<-chlMaster_FinalChl%>%
-  mutate(Lakevisit=NA,
+  mutate(
          Date=date,
          beginDepth=0,
          endDepth_char=depthChl,
          endDepth_m=NA,
-         BottleTubeFilter_number=NA,
          parameterType="Tot_fluor",
          unit="RFU",
          parameterValue=`Tot Fluor (RFU)`,
          parameterValueQCCodeID=NA
   )%>%
-  dplyr::select(Lakevisit,MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,BottleTubeFilter_number,parameterType,unit,parameterValue,parameterValueQCCodeID)
+  dplyr::select(MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,parameterType,unit,parameterValue,parameterValueQCCodeID)
 
 #CHL_A_COR merge####   
 CHL_A_COR_merge<-chlMaster_FinalChl%>%
-  mutate(Lakevisit=NA,
+  mutate(
          Date=date,
          beginDepth=0,
          endDepth_char=depthChl,
          endDepth_m=NA,
-         BottleTubeFilter_number=NA,
          parameterType="CHL_A_COR",
          unit="mg/L",
          parameterValue=ChlaCor_mgpL,
-         parameterValueQCCodeID=NA
+         parameterValueQCCodeID=Flag...14
   )%>%
-  dplyr::select(Lakevisit,MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,BottleTubeFilter_number,parameterType,unit,parameterValue,parameterValueQCCodeID)
+  dplyr::select(MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,parameterType,unit,parameterValue,parameterValueQCCodeID)
 
 #CHL_A_lab merge####   
 CHL_A_lab_merge<-chlMaster_FinalChl%>%
-  mutate(Lakevisit=NA,
+  mutate(
          Date=date,
          beginDepth=0,
          endDepth_char=depthChl,
          endDepth_m=NA,
-         BottleTubeFilter_number=NA,
          parameterType="CHL_A_lab",
          unit="mg CHL_A/L",
          parameterValue=chlaLab_mgpL,
-         parameterValueQCCodeID=NA
+         parameterValueQCCodeID=Flag...12
   )%>%
-  dplyr::select(Lakevisit,MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,BottleTubeFilter_number,parameterType,unit,parameterValue,parameterValueQCCodeID)
+  dplyr::select(MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,parameterType,unit,parameterValue,parameterValueQCCodeID)
 
 #PHEO merge####   
 PHEO_merge<-chlMaster_FinalChl%>%
-  mutate(Lakevisit=NA,
+  mutate(
          Date=date,
          beginDepth=0,
          endDepth_char=depthChl,
          endDepth_m=NA,
-         BottleTubeFilter_number=NA,
          parameterType="PHEO",
          unit="mg PHEO/L",
          parameterValue=Pheo_mgpL,
-         parameterValueQCCodeID=NA
+         parameterValueQCCodeID=Flag...16
   )%>%
-  dplyr::select(Lakevisit,MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,BottleTubeFilter_number,parameterType,unit,parameterValue,parameterValueQCCodeID)
+  dplyr::select(MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,parameterType,unit,parameterValue,parameterValueQCCodeID)
 
 
 #**Things to do: get rid of all with "Field Blank" in MULakeNumber
@@ -165,18 +160,17 @@ ammoniumMaster<-read_excel(paste0(dir,"/Ammonia SLAP 2023 mastersheet 02-08-24.x
 
 #NH4 merge####   
 NH4_merge<-ammoniumMaster%>%
-  mutate(Lakevisit=NA,
+  mutate(
          Date=date,
          beginDepth=0,
          endDepth_char=depthNH4,
          endDepth_m=`Depth of Epi (m)`,
-         BottleTubeFilter_number=NA,
          parameterType="NH4",
          unit="mg NH4-N/L",
          parameterValue=NH4_mgpL,
-         parameterValueQCCodeID=NA
+         parameterValueQCCodeID=`Flag (MDL 0.005)`
   )%>%
-  dplyr::select(Lakevisit,MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,BottleTubeFilter_number,parameterType,unit,parameterValue,parameterValueQCCodeID)
+  dplyr::select(MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,parameterType,unit,parameterValue,parameterValueQCCodeID)
 
 
 #**Things to do: check the units for NH4
@@ -198,10 +192,20 @@ chlorideMaster<-read_excel(paste0(dir,"/Chloride SLAP 2023 masterfile 02-09-2024
   mutate(date=ymd(date)) #%>%
   #dplyr::select(MULakeNumber,date,DepthTN,TN_mgpL)                
 
-#**Things to do: check the units for chloride
-#**Figure out what to do with the ?? for dates
-#**Figure out what flags mean and what to do with them 
-#**Not in the merged files
+#CL merge####   
+CL_merge<-chlorideMaster%>%
+  mutate(
+    Date=date,
+    beginDepth=0,
+    endDepth_char=depthCl,
+    endDepth_m=`Depth of Epi (m)`,
+    parameterType="CL",
+    unit="mg/L",
+    parameterValue=cloride_mgpL,
+    parameterValueQCCodeID=`Flag (MDL 0.76`
+  )%>%
+  dplyr::select(MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,parameterType,unit,parameterValue,parameterValueQCCodeID)
+
 
 ###############################
 #*Read in nitrate data####
@@ -218,18 +222,17 @@ nitrateMaster<-read_excel(paste0(dir,"/Nitrate SLAP 2023 masterfile 02-08-2024.x
 
 #NO3 merge####   
 NO3_merge<-nitrateMaster%>%
-  mutate(Lakevisit=NA,
+  mutate(
          Date=date,
          beginDepth=0,
          endDepth_char=depthNO3,
          endDepth_m=`Depth of Epi (m)`,
-         BottleTubeFilter_number=NA,
          parameterType="NO3",
          unit="mg NO3-N/L",
          parameterValue=NO3_mgpL,
-         parameterValueQCCodeID=NA
+         parameterValueQCCodeID=`Flag (MDL = 0.004)`
   )%>%
-  dplyr::select(Lakevisit,MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,BottleTubeFilter_number,parameterType,unit,parameterValue,parameterValueQCCodeID)
+  dplyr::select(MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,parameterType,unit,parameterValue,parameterValueQCCodeID)
 
 
 
@@ -251,18 +254,17 @@ DNMaster<-read_excel(paste0(dir,"/TN + DN SLAP mastersheet 02-09-2024.xlsx"),she
 
 #TDN merge####   
 TDN_merge<-DNMaster%>%
-  mutate(Lakevisit=NA,
+  mutate(
          Date=date,
          beginDepth=0,
          endDepth_char=depthDN,
          endDepth_m=`Depth of Epi (m)`,
-         BottleTubeFilter_number=NA,
          parameterType="TDN",
          unit="mg N/L",
          parameterValue=DN_mgpL,
-         parameterValueQCCodeID=NA
+         parameterValueQCCodeID=`Flag (MDL 0.038)`
   )%>%
-  dplyr::select(Lakevisit,MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,BottleTubeFilter_number,parameterType,unit,parameterValue,parameterValueQCCodeID)
+  dplyr::select(MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,parameterType,unit,parameterValue,parameterValueQCCodeID)
 
 
 #**Bring in the TN from the 'Final DN' sheet####
@@ -277,18 +279,17 @@ TNMaster<-read_excel(paste0(dir,"/TN + DN SLAP mastersheet 02-09-2024.xlsx"),she
 
 #TDN merge####   
 TN_merge<-TNMaster%>%
-  mutate(Lakevisit=NA,
+  mutate(
          Date=date,
          beginDepth=0,
          endDepth_char=depthTN,
          endDepth_m=`Depth of Epi (m)`,
-         BottleTubeFilter_number=NA,
          parameterType="TN",
          unit="mg N/L",
          parameterValue=TN_mgpL,
-         parameterValueQCCodeID=NA
+         parameterValueQCCodeID=`Flag (MDL 0.038)`
   )%>%
-  dplyr::select(Lakevisit,MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,BottleTubeFilter_number,parameterType,unit,parameterValue,parameterValueQCCodeID)
+  dplyr::select(MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,parameterType,unit,parameterValue,parameterValueQCCodeID)
 
 
 #**Things to do: check the units for TDN and TN
@@ -302,68 +303,64 @@ toxinsMaster<-read_excel(paste0(dir,"/Toxin SLAP 2023 mastersheet 02-09-24.xlsx"
   rename(MULakeNumber=`Lake #`,
          date=`Sample date`,
   )%>%
-  mutate(date=as.Date(as.numeric(date),origin="1899-12-30")) #%>%
+  mutate(date=as.Date(date)) #%>%
 #dplyr::select(MULakeNumber,date,DepthTN,TN_mgpL)                
 
 #ANA_tox merge####   
 ANA_tox_merge<-toxinsMaster%>%
-  mutate(Lakevisit=NA,
+  mutate(
          Date=date,
          beginDepth=0,
-         endDepth_char=NA,
-         endDepth_m=NA,
-         BottleTubeFilter_number=NA,
+         endDepth_char="SURF",
+         endDepth_m=as.character(0),
          parameterType="ANA_tox",
          unit="ug/L",
          parameterValue=Anatoxin,
          parameterValueQCCodeID=`Anatoxin flag`
   )%>%
-  dplyr::select(Lakevisit,MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,BottleTubeFilter_number,parameterType,unit,parameterValue,parameterValueQCCodeID)
+  dplyr::select(MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,parameterType,unit,parameterValue,parameterValueQCCodeID)
 
 #CYL_tox merge####   
 CYL_tox_merge<-toxinsMaster%>%
-  mutate(Lakevisit=NA,
+  mutate(
          Date=date,
          beginDepth=0,
-         endDepth_char=NA,
-         endDepth_m=NA,
-         BottleTubeFilter_number=NA,
+         endDepth_char="SURF",
+         endDepth_m=as.character(0),
          parameterType="CYL_tox",
          unit="ug/L",
          parameterValue=Cylindro,
          parameterValueQCCodeID=`Cylindro flag`
   )%>%
-  dplyr::select(Lakevisit,MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,BottleTubeFilter_number,parameterType,unit,parameterValue,parameterValueQCCodeID)
+  dplyr::select(MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,parameterType,unit,parameterValue,parameterValueQCCodeID)
 
 #MIC_tox merge####   
 MIC_tox_merge<-toxinsMaster%>%
-  mutate(Lakevisit=NA,
+  mutate(
          Date=date,
          beginDepth=0,
-         endDepth_char=NA,
-         endDepth_m=NA,
-         BottleTubeFilter_number=NA,
+         endDepth_char="SURF",
+         endDepth_m=as.character(0),
          parameterType="MIC_tox",
          unit="ug/L",
          parameterValue=Microcystin,
          parameterValueQCCodeID=`Micro flag`
   )%>%
-  dplyr::select(Lakevisit,MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,BottleTubeFilter_number,parameterType,unit,parameterValue,parameterValueQCCodeID)
+  dplyr::select(MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,parameterType,unit,parameterValue,parameterValueQCCodeID)
 
 #SAX_tox merge####   
 SAX_tox_merge<-toxinsMaster%>%
-  mutate(Lakevisit=NA,
+  mutate(
          Date=date,
          beginDepth=0,
-         endDepth_char=NA,
-         endDepth_m=NA,
-         BottleTubeFilter_number=NA,
+         endDepth_char="SURF",
+         endDepth_m=as.character(0),
          parameterType="SAX_tox",
          unit="ug/L",
-         parameterValue=as.numeric(Saxitoxin), #have to make this as.numeric because there are 2 in there that are labeled as >0.4
+         parameterValue=Saxitoxin, 
          parameterValueQCCodeID=`Saxitoxin flag`
   )%>%
-  dplyr::select(Lakevisit,MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,BottleTubeFilter_number,parameterType,unit,parameterValue,parameterValueQCCodeID)
+  dplyr::select(MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,parameterType,unit,parameterValue,parameterValueQCCodeID)
 
 #**Things to do: check the units for the toxins
 #**Figure out what to do with the ?? for dates
@@ -384,18 +381,17 @@ TPMaster<-read_excel(paste0(dir,"/TP SLAP 2023 mastersheet 02-09-2024.xlsx"),she
 
 #TP merge####   
 TP_merge<-TPMaster%>%
-  mutate(Lakevisit=NA,
+  mutate(
          Date=date,
          beginDepth=0,
          endDepth_char=depthTP,
          endDepth_m=`Depth of Epi (m)`,
-         BottleTubeFilter_number=NA,
          parameterType="TP",
          unit="mg PO4-P/L",
          parameterValue=TP_mgpL,
-         parameterValueQCCodeID=NA
+         parameterValueQCCodeID=`Flag (MDL = 0.0016)`
   )%>%
-  dplyr::select(Lakevisit,MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,BottleTubeFilter_number,parameterType,unit,parameterValue,parameterValueQCCodeID)
+  dplyr::select(MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,parameterType,unit,parameterValue,parameterValueQCCodeID)
 
 
 ###############################
@@ -415,48 +411,45 @@ TSSMaster<-read_excel(paste0(dir,"/TSS SLAP 2023 masterfile 02-09-2024.xlsx"),sh
 
 #PIM merge####   
 PIM_merge<-TSSMaster%>%
-  mutate(Lakevisit=NA,
+  mutate(
          Date=date,
          beginDepth=0,
          endDepth_char=depthTSS,
          endDepth_m=NA,
-         BottleTubeFilter_number=NA,
          parameterType="PIM",
          unit="mg/L",
          parameterValue=PIM_mgpL,
-         parameterValueQCCodeID=NA
+         parameterValueQCCodeID=`PIM/L...9`
   )%>%
-  dplyr::select(Lakevisit,MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,BottleTubeFilter_number,parameterType,unit,parameterValue,parameterValueQCCodeID)
+  dplyr::select(MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,parameterType,unit,parameterValue,parameterValueQCCodeID)
 
 #POM merge####   
 POM_merge<-TSSMaster%>%
-  mutate(Lakevisit=NA,
+  mutate(
          Date=date,
          beginDepth=0,
          endDepth_char=depthTSS,
          endDepth_m=NA,
-         BottleTubeFilter_number=NA,
          parameterType="POM",
          unit="mg/L",
          parameterValue=POM_mgpL,
-         parameterValueQCCodeID=NA
+         parameterValueQCCodeID=`POM/L...10`
   )%>%
-  dplyr::select(Lakevisit,MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,BottleTubeFilter_number,parameterType,unit,parameterValue,parameterValueQCCodeID)
+  dplyr::select(MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,parameterType,unit,parameterValue,parameterValueQCCodeID)
 
 #TSS merge####   
 TSS_merge<-TSSMaster%>%
-  mutate(Lakevisit=NA,
+  mutate(
          Date=date,
          beginDepth=0,
          endDepth_char=depthTSS,
          endDepth_m=NA,
-         BottleTubeFilter_number=NA,
          parameterType="TSS",
          unit="mg/L",
          parameterValue=TSS_mgpL,
-         parameterValueQCCodeID=NA
+         parameterValueQCCodeID=`TSS/L...8`
   )%>%
-  dplyr::select(Lakevisit,MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,BottleTubeFilter_number,parameterType,unit,parameterValue,parameterValueQCCodeID)
+  dplyr::select(MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,parameterType,unit,parameterValue,parameterValueQCCodeID)
 
 #**Things to do: check the units for the TSS               
 
@@ -466,48 +459,45 @@ profileLevel3<-read_csv(paste0("03_Level3_Data/",year,"_Level3.csv"))
 
 #DO merge####   
 DO_merge<-profileLevel3%>%
-  mutate(Lakevisit=NA,
+  mutate(
          Date=date,
          beginDepth=0,
          endDepth_char="SURF",
          endDepth_m="0.5",
-         BottleTubeFilter_number=NA,
          parameterType="DO",
          unit="mg/L",
          parameterValue=surface_doConcentration_mgpL,
          parameterValueQCCodeID=NA
   )%>%
-  dplyr::select(Lakevisit,MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,BottleTubeFilter_number,parameterType,unit,parameterValue,parameterValueQCCodeID)
+  dplyr::select(MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,parameterType,unit,parameterValue,parameterValueQCCodeID)
 
 #Temp merge####   
 Temp_merge<-profileLevel3%>%
-  mutate(Lakevisit=NA,
+  mutate(
          Date=date,
          beginDepth=0,
          endDepth_char="SURF",
          endDepth_m="0.5",
-         BottleTubeFilter_number=NA,
          parameterType="Temp",
          unit="C",
          parameterValue=surface_temp_degC,
          parameterValueQCCodeID=NA
   )%>%
-  dplyr::select(Lakevisit,MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,BottleTubeFilter_number,parameterType,unit,parameterValue,parameterValueQCCodeID)
+  dplyr::select(MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,parameterType,unit,parameterValue,parameterValueQCCodeID)
 
 #pH merge####   
 pH_merge<-profileLevel3%>%
-  mutate(Lakevisit=NA,
+  mutate(
          Date=date,
          beginDepth=0,
          endDepth_char="SURF",
          endDepth_m="0.5",
-         BottleTubeFilter_number=NA,
          parameterType="pH",
          unit="unitless",
          parameterValue=surface_pH,
          parameterValueQCCodeID=NA
   )%>%
-  dplyr::select(Lakevisit,MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,BottleTubeFilter_number,parameterType,unit,parameterValue,parameterValueQCCodeID)
+  dplyr::select(MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,parameterType,unit,parameterValue,parameterValueQCCodeID)
 
 #############Lat/Long data####################
 #Get out the handheld data for 2023########
@@ -550,16 +540,35 @@ databaseImport<-
                     TSS_merge,
                     DO_merge,
                     Temp_merge,
-                    pH_merge
+                    pH_merge,
+                    CL_merge
                     )%>%
             left_join(.,latlong_best)%>% #add in the latitudes and longitudes      
             arrange(Date,parameterType)%>% #order by date, parameteType to match the 2022 import file
-            left_join(.,dateTime,by=c("MULakeNumber","Date"))
+            left_join(.,dateTime,by=c("MULakeNumber","Date"))%>%
+            mutate(endDepth_char=case_when( #Fix up all the endDepth_char
+                    endDepth_char=="Epi"~"EPI",
+                    endDepth_char=="SURF'"~"SURF",
+                    endDepth_char=="Surf"~"SURF",
+                    .default = endDepth_char
+                    ))%>%
+            mutate(endDepth_m=case_when( #fix the end depths, surface = 0; actual (secchi)= NA; anything from the profile is 0.5m
+                            endDepth_char=="SURF"&parameterType=="DO"~as.character(0.5),
+                            endDepth_char=="SURF"&parameterType=="pH"~as.character(0.5),
+                            endDepth_char=="SURF"&parameterType=="Temp"~as.character(0.5),
+                            endDepth_char=="SURF"~as.character(0),
+                            endDepth_char=="ACTUAL"~NA,
+                            .default=endDepth_m
+                            ))  
 
 
-#Trying to figure out the missing toxin data####                
-boolean<-unique(databaseImport%>%filter(MULakeNumber!="?"|MULakeNumber!="401")%>%mutate(code=paste(MULakeNumber,as.character(Date),sep="-"))%>%dplyr::select(code)%>%pull()) %in% unique(databaseImport%>%filter(parameterType=="ANA_tox"&MULakeNumber!="?")%>%mutate(code=paste(MULakeNumber,as.character(Date),sep="-"))%>%dplyr::select(code)%>%pull()) 
+#STOPPED HERE################################################
+#STILL NEED TO UPDATE: STILL NEED TO UPDATE SPECIFIC DATES according to ANDREA's note in the Word doc
+#STILL NEED TO UPDATE THE EPI DEPTH ACCORDING TO THE MASTER SHEET
+unique(databaseImport$endDepth_char)            
+databaseImport%>%filter(is.na(databaseImport$endDepth_char))
+pH_merge%>%filter(is.na(pH_merge$endDepth_char))
 
-unique(databaseImport%>%filter(MULakeNumber!="?")%>%mutate(code=paste(MULakeNumber,as.character(Date),sep="-"))%>%dplyr::select(code)%>%pull())[!boolean]
-databaseImport%>%filter(is.na(Date))
-          
+#Database DNR####
+#Remove anything outside of May to September
+#Remove chloride
