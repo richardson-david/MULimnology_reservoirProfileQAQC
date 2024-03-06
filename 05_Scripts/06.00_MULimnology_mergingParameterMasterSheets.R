@@ -577,12 +577,11 @@ databaseImport<-
                             endDepth_char=="ACTUAL"~NA,
                             .default=endDepth_m
                             ))%>%
-            left_join(.,filterMaster%>%rename(endDepth_m_2=endDepth_m),by=c("MULakeNumber","Date","endDepth_char"))%>% #join in the correct endDepth_m from the filter master sheet. Have to rename it to avoid generating an endDepth_m.x column
+            left_join(.,filterMaster%>%rename(endDepth_m_2=endDepth_m)%>%mutate(MULakeNumber=ifelse((MULakeNumber=="FB"|MULakeNumber=="Field Blank"),"401",MULakeNumber)),by=c("MULakeNumber","Date","endDepth_char"))%>% #join in the correct endDepth_m from the filter master sheet. Have to rename it to avoid generating an endDepth_m.x column, also #Replace all field blank references with 401 (field blank equivelent MULakeNumber)
             mutate(endDepth_m=ifelse(!is.na(endDepth_m_2),endDepth_m_2,endDepth_m))%>% #if the endDepth_m_2 from the filter master has a value, replace endDepth_m with that value
             mutate(endDepth_m=as.numeric(endDepth_m))%>% #make endDepth_m a numeric column now, no NAs introduced by coercion should pop up
             dplyr::select(-endDepth_m_2) #Get rid of the duplicate endDepth_m_2 column
-
-
+             
 
 #STOPPED HERE################################################
 #STILL NEED SIGNIFICANT FIGURES
