@@ -453,6 +453,23 @@ TSS_merge<-TSSMaster%>%
 
 #**Things to do: check the units for the TSS               
 
+###############################
+#*Read in the master filter log####
+#Gives the correct depth of epi for each sampling date/time#
+#**Bring in the filter file from the 'EPI' sheet####
+filterMaster<-read_excel(paste0(dir,"/Master Spreadsheet Filter_Log_Sheet 2023 02-28-24.xlsx"),sheet="EPI",skip=0)%>%
+  rename(MULakeNumber=`Lake #`,
+         Date=Date,
+         endDepth_m=`Depth of Epi (m)`,
+     )%>%
+  mutate(Date=ymd(Date),
+         endDepth_char="EPI")%>%
+  dplyr::select(MULakeNumber,Date,endDepth_char,endDepth_m)%>%
+  distinct(.)%>%
+  filter(!is.na(MULakeNumber))
+
+
+
 ###################################################################
 #Read in the 2023 profile data for the surface DO, temp, and pH####
 profileLevel3<-read_csv(paste0("03_Level3_Data/",year,"_Level3.csv"))
@@ -559,16 +576,30 @@ databaseImport<-
                             endDepth_char=="SURF"~as.character(0),
                             endDepth_char=="ACTUAL"~NA,
                             .default=endDepth_m
-                            ))  
+                            ))%>%
+            left_join(.,filterMaster%>%rename(endDepth_m_2=endDepth_m),by=c("MULakeNumber","Date","endDepth_char"))%>% #join in the correct endDepth_m from the filter master sheet. Have to rename it to avoid generating an endDepth_m.x column
+            mutate(endDepth_m=ifelse(!is.na(endDepth_m_2),endDepth_m_2,endDepth_m))%>% #if the endDepth_m_2 from the filter master has a value, replace endDepth_m with that value
+            mutate(endDepth_m=as.numeric(endDepth_m))%>% #make endDepth_m a numeric column now, no NAs introduced by coercion should pop up
+            dplyr::select(-endDepth_m_2) #Get rid of the duplicate endDepth_m_2 column
+
 
 
 #STOPPED HERE################################################
-#STILL NEED TO UPDATE: STILL NEED TO UPDATE SPECIFIC DATES according to ANDREA's note in the Word doc
-#STILL NEED TO UPDATE THE EPI DEPTH ACCORDING TO THE MASTER SHEET
-unique(databaseImport$endDepth_char)            
-databaseImport%>%filter(is.na(databaseImport$endDepth_char))
-pH_merge%>%filter(is.na(pH_merge$endDepth_char))
+#STILL NEED SIGNIFICANT FIGURES
 
+#Specific to 2023, change dates and redo the join with dateTime####
+databaseImport<-databaseImport%>%mutate(Date=case_when(
+                              MULakeNumber=="276"&Date==as.Date("2023-05-17")~as.Date("2023-05-18"),
+                              MULakeNumber=="46"&Date==as.Date("2023-05-23")~as.Date("2023-05-22"),
+                              MULakeNumber=="114"&Date==as.Date("2023-06-14")~as.Date("2023-06-15"),
+                              .default=Date
+                              ))%>%
+              dplyr::select(-dateTime)%>%
+              left_join(.,dateTime,by=c("MULakeNumber","Date"))
+
+
+databaseImport%>%dplyr::select(parameterType,unit)%>%distinct(.)%>%print(n=Inf)
 #Database DNR####
 #Remove anything outside of May to September
-#Remove chloride
+#Remove chloride, parameterType=="CL"
+#Remove -	"121-2023-08-10" “30-2023-08-15" 
