@@ -580,11 +580,61 @@ databaseImport<-
             left_join(.,filterMaster%>%rename(endDepth_m_2=endDepth_m)%>%mutate(MULakeNumber=ifelse((MULakeNumber=="FB"|MULakeNumber=="Field Blank"),"401",MULakeNumber)),by=c("MULakeNumber","Date","endDepth_char"))%>% #join in the correct endDepth_m from the filter master sheet. Have to rename it to avoid generating an endDepth_m.x column, also #Replace all field blank references with 401 (field blank equivelent MULakeNumber)
             mutate(endDepth_m=ifelse(!is.na(endDepth_m_2),endDepth_m_2,endDepth_m))%>% #if the endDepth_m_2 from the filter master has a value, replace endDepth_m with that value
             mutate(endDepth_m=as.numeric(endDepth_m))%>% #make endDepth_m a numeric column now, no NAs introduced by coercion should pop up
-            dplyr::select(-endDepth_m_2) #Get rid of the duplicate endDepth_m_2 column
-             
-
-#STOPPED HERE################################################
-#STILL NEED SIGNIFICANT FIGURES
+            dplyr::select(-endDepth_m_2)%>% #Get rid of the duplicate endDepth_m_2 column
+            #This converts to ug/L if needed and also rounds based on the correct number of reporting decimals, the format and nsmall is for display after rounding, these need to match each other, 
+            #Warning: this converts the parameterValue into characters
+            mutate(parameterValue=case_when(  
+                                parameterType=="DO"&unit=="mg/L"~format(round(parameterValue,digits=2),nsmall=2),
+                                parameterType=="Temp"&unit=="C"~format(round(parameterValue,digits=3),nsmall=3), 
+                                parameterType=="pH"&unit=="unitless"~format(round(parameterValue,digits=2),nsmall=2), 
+                                parameterType=="ANA_tox"&unit=="ug/L"~format(round(parameterValue,digits=3),nsmall=3),
+                                parameterType=="CYL_tox"&unit=="ug/L"~format(round(parameterValue,digits=3),nsmall=3),
+                                parameterType=="MIC_tox"&unit=="ug/L"~format(round(parameterValue,digits=3),nsmall=3),
+                                parameterType=="SAX_tox"&unit=="ug/L"~format(round(parameterValue,digits=3),nsmall=3),
+                                parameterType=="Acid_fluor"&unit=="RFU"~format(round(parameterValue,digits=2),nsmall=2),
+                                parameterType=="Tot_fluor"&unit=="RFU"~format(round(parameterValue,digits=2),nsmall=2),
+                                parameterType=="CHL_A_COR"&unit=="mg/L"~format(round(parameterValue*1000,digits=2),nsmall=2), #Convert to ug/L
+                                parameterType=="CHL_A_lab"&unit=="mg CHL_A/L"~format(round(parameterValue*1000,digits=2),nsmall=2), #Convert to ug/L
+                                parameterType=="PHEO"&unit=="mg PHEO/L"~format(round(parameterValue*1000,digits=2),nsmall=2), #Convert to ug/L
+                                parameterType=="NH4"&unit=="mg NH4-N/L"~format(round(parameterValue*1000,digits=0),nsmall=0), #Convert to ug/L
+                                parameterType=="NO3"&unit=="mg NO3-N/L"~format(round(parameterValue*1000,digits=0),nsmall=0), #Convert to ug/L
+                                parameterType=="TDN"&unit=="mg N/L"~format(round(parameterValue*1000,digits=1),nsmall=1), #Convert to ug/L
+                                parameterType=="TN"&unit=="mg N/L"~format(round(parameterValue*1000,digits=1),nsmall=1), #Convert to ug/L
+                                parameterType=="TP"&unit=="mg PO4-P/L"~format(round(parameterValue*1000,digits=1),nsmall=1), #Convert to ug/L
+                                parameterType=="TSS"&unit=="mg/L"~format(round(parameterValue,digits=1),nsmall=1),
+                                parameterType=="PIM"&unit=="mg/L"~format(round(parameterValue,digits=1),nsmall=1),
+                                parameterType=="POM"&unit=="mg/L"~format(round(parameterValue,digits=1),nsmall=1),
+                                parameterType=="SECCHI"&unit=="m"~format(round(parameterValue,digits=2),nsmall=2),
+                                TRUE~as.character(parameterValue)
+                                ))%>%
+            mutate(unit=case_when(  #This changes the unit column if the the numbers were converted
+                                parameterType=="DO"&unit=="mg/L"~unit,
+                                parameterType=="Temp"&unit=="C"~unit, 
+                                parameterType=="pH"&unit=="unitless"~unit, 
+                                parameterType=="ANA_tox"&unit=="ug/L"~unit,
+                                parameterType=="CYL_tox"&unit=="ug/L"~unit,
+                                parameterType=="MIC_tox"&unit=="ug/L"~unit,
+                                parameterType=="SAX_tox"&unit=="ug/L"~unit,
+                                parameterType=="Acid_fluor"&unit=="RFU"~unit,
+                                parameterType=="Tot_fluor"&unit=="RFU"~unit,
+                                parameterType=="CHL_A_COR"&unit=="mg/L"~"ug/L", #Convert to ug/L
+                                parameterType=="CHL_A_lab"&unit=="mg CHL_A/L"~"ug/L", #Convert to ug/L
+                                parameterType=="PHEO"&unit=="mg PHEO/L"~"ug PHEO/L", #Convert to ug/L
+                                parameterType=="NH4"&unit=="mg NH4-N/L"~"ug/L", #Convert to ug/L
+                                parameterType=="NO3"&unit=="mg NO3-N/L"~"ug/L", #Convert to ug/L
+                                parameterType=="TDN"&unit=="mg N/L"~"ug/L", #Convert to ug/L
+                                parameterType=="TN"&unit=="mg N/L"~"ug/L", #Convert to ug/L
+                                parameterType=="TP"&unit=="mg PO4-P/L"~"ug/L", #Convert to ug/L
+                                parameterType=="TSS"&unit=="mg/L"~unit,
+                                parameterType=="PIM"&unit=="mg/L"~unit,
+                                parameterType=="POM"&unit=="mg/L"~unit,
+                                parameterType=="SECCHI"&unit=="m"~unit,
+                                .default=unit
+                                ))
+     
+#Gives all the current parameterType and units unique to the dataset
+#databaseImport%>%dplyr::select(parameterType,unit)%>%distinct(.)%>%print(n=Inf)
+           
 
 #Specific to 2023, change dates and redo the join with dateTime####
 databaseImport<-databaseImport%>%mutate(Date=case_when(
@@ -597,8 +647,25 @@ databaseImport<-databaseImport%>%mutate(Date=case_when(
               left_join(.,dateTime,by=c("MULakeNumber","Date"))
 
 
-databaseImport%>%dplyr::select(parameterType,unit)%>%distinct(.)%>%print(n=Inf)
+
+
+
 #Database DNR####
-#Remove anything outside of May to September
-#Remove chloride, parameterType=="CL"
-#Remove -	"121-2023-08-10" “30-2023-08-15" 
+databaseDNR<-databaseImport%>%
+    #remove specific rows for isothermal
+    filter(!(MULakeNumber=="440"&Date==as.Date("2023-04-27")))%>%
+    filter(!(MULakeNumber=="165"&Date==as.Date("2023-05-31")))%>%
+    filter(!(MULakeNumber=="46"&Date==as.Date("2023-06-12")))%>%
+    filter(!(MULakeNumber=="163"&Date==as.Date("2023-06-13")))%>%
+    filter(!(MULakeNumber=="121"&Date==as.Date("2023-07-19")))%>%
+    filter(!(MULakeNumber=="121"&Date==as.Date("2023-08-10")))%>%
+    filter(!(MULakeNumber=="30"&Date==as.Date("2023-09-22")))%>%
+    filter(!(MULakeNumber=="30"&Date==as.Date("2023-08-15")))%>%
+    #Only keep May to September
+    filter(month(Date)>=5&month(Date)<=9)%>%
+    #Remove chloride samples
+    filter(!(parameterType=="CL"))
+ #Export database for DNR####
+write_csv(databaseDNR,file=paste0("06_Outputs/",year,"_MissouriReservoirsForDNR.csv"))
+
+  
