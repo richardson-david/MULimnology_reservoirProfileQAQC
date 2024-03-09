@@ -7,13 +7,14 @@ if (!require(maps)) {install.packages("maps")}
 if (!require(ggmap)) {install.packages("ggmap")}
 if (!require(ggspatial)) {install.packages("ggspatial")}
 if (!require(ggrepel)) {install.packages("ggrepel")}
-
+if (!require(patchwork)) {install.packages("patchwork")}
 
 library(maps)
 library(ggmap)
 library(tidyverse)
 library(ggspatial) #For the scale bar and compass on the map
 library(ggrepel) #For fancy non-overlapping labels
+library(patchwork) #for multipanel plots
 
 #establish the year here###
 year<-2023
@@ -115,12 +116,13 @@ ggsave(gg.MapMULakeNUmber,file="06_Outputs/SLAPReport-Figure1-2023.jpg",width=pl
 #Set some parameters globally for all maps####
 endDepth<-"EPI" #can be EPI or SURF here
 pointSize<-2.25 #size of points on the graph
+GeoLineWidth<-0.2 #sets the line width of the state and counties on the map
 
 #Map TP with fill=trophicState based on EPI####
 gg.MapTP<-ggplot()+
   #geom_polygon(data=state,aes(x=long,y=lat,group=group),fill='white',color='dark grey')+
-  geom_polygon(data=state%>%filter(region=="missouri"),aes(x=long,y=lat),color='black',fill="light grey")+
-  geom_polygon(data=county%>%filter(region=="missouri"),aes(x=long,y=lat,group=subregion),color='black',fill="white")+
+  geom_polygon(data=state%>%filter(region=="missouri"),aes(x=long,y=lat),color='black',fill="light grey",linewidth=GeoLineWidth)+
+  geom_polygon(data=county%>%filter(region=="missouri"),aes(x=long,y=lat,group=subregion),color='black',fill="white",linewidth=GeoLineWidth)+
   geom_point(data=waterChemDF_trophic%>%filter(parameterType=="TP"&endDepth_char==endDepth),aes(x=samplingSiteLongitude,y=samplingSiteLatitude,fill=trophicState_factor),shape=21,size=pointSize)+
   scale_fill_manual(values = c("white", rgb(180,198,239,maxColorValue = 255), rgb(71,123,200,maxColorValue = 255),rgb(45,69,123,maxColorValue = 255)))+
   annotation_scale(location = "bl", width_hint = 0.5) + 
@@ -143,8 +145,8 @@ ggsave(gg.MapTP,file="06_Outputs/SLAPReport-Figure2-TP-2023.jpg",width=plot.widt
 #Map TN with fill=trophicState based on EPI####
 gg.MapTN<-ggplot()+
   #geom_polygon(data=state,aes(x=long,y=lat,group=group),fill='white',color='dark grey')+
-  geom_polygon(data=state%>%filter(region=="missouri"),aes(x=long,y=lat),color='black',fill="light grey")+
-  geom_polygon(data=county%>%filter(region=="missouri"),aes(x=long,y=lat,group=subregion),color='black',fill="white")+
+  geom_polygon(data=state%>%filter(region=="missouri"),aes(x=long,y=lat),color='black',fill="light grey",linewidth=GeoLineWidth)+
+  geom_polygon(data=county%>%filter(region=="missouri"),aes(x=long,y=lat,group=subregion),color='black',fill="white",linewidth=GeoLineWidth)+
   geom_point(data=waterChemDF_trophic%>%filter(parameterType=="TN"&endDepth_char==endDepth),aes(x=samplingSiteLongitude,y=samplingSiteLatitude,fill=trophicState_factor),shape=21,size=pointSize)+
   scale_fill_manual(values = c("white", rgb(193,226,179,maxColorValue = 255), rgb(81,131,52,maxColorValue = 255),rgb(55,90,34,maxColorValue = 255)))+
   annotation_scale(location = "bl", width_hint = 0.5) + 
@@ -166,8 +168,8 @@ ggsave(gg.MapTN,file="06_Outputs/SLAPReport-Figure2-TN-2023.jpg",width=plot.widt
 #Map corrected chlorophyll-a with fill=trophicState based on EPI####
 gg.MapChlAcorr<-ggplot()+
   #geom_polygon(data=state,aes(x=long,y=lat,group=group),fill='white',color='dark grey')+
-  geom_polygon(data=state%>%filter(region=="missouri"),aes(x=long,y=lat),color='black',fill="light grey")+
-  geom_polygon(data=county%>%filter(region=="missouri"),aes(x=long,y=lat,group=subregion),color='black',fill="white")+
+  geom_polygon(data=state%>%filter(region=="missouri"),aes(x=long,y=lat),color='black',fill="light grey",linewidth=GeoLineWidth)+
+  geom_polygon(data=county%>%filter(region=="missouri"),aes(x=long,y=lat,group=subregion),color='black',fill="white",linewidth=GeoLineWidth)+
   geom_point(data=waterChemDF_trophic%>%filter(parameterType=="CHL_A_COR"&endDepth_char==endDepth),aes(x=samplingSiteLongitude,y=samplingSiteLatitude,fill=trophicState_factor),shape=21,size=pointSize)+
   scale_fill_manual(values = c("white", rgb(255,253,9,maxColorValue = 255), rgb(237,154,15,maxColorValue = 255),rgb(244,3,0,maxColorValue = 255)))+
   annotation_scale(location = "bl", width_hint = 0.5) + 
@@ -189,8 +191,8 @@ ggsave(gg.MapChlAcorr,file="06_Outputs/SLAPReport-Figure2-ChlAcorr-2023.jpg",wid
 #Map secchi with fill=trophicState based on ACTUAL####
 gg.MapSecchi<-ggplot()+
   #geom_polygon(data=state,aes(x=long,y=lat,group=group),fill='white',color='dark grey')+
-  geom_polygon(data=state%>%filter(region=="missouri"),aes(x=long,y=lat),color='black',fill="light grey")+
-  geom_polygon(data=county%>%filter(region=="missouri"),aes(x=long,y=lat,group=subregion),color='black',fill="white")+
+  geom_polygon(data=state%>%filter(region=="missouri"),aes(x=long,y=lat),color='black',fill="light grey",linewidth=GeoLineWidth)+
+  geom_polygon(data=county%>%filter(region=="missouri"),aes(x=long,y=lat,group=subregion),color='black',fill="white",linewidth=GeoLineWidth)+
   geom_point(data=waterChemDF_trophic%>%filter(parameterType=="SECCHI"),aes(x=samplingSiteLongitude,y=samplingSiteLatitude,fill=trophicState_factor),shape=21,size=pointSize)+
   scale_fill_manual(values = c("white", rgb(218,189,241,maxColorValue = 255), rgb(168,101,216,maxColorValue = 255),rgb(114,46,171,maxColorValue = 255)))+
   annotation_scale(location = "bl", width_hint = 0.5) + 
@@ -211,4 +213,70 @@ ggsave(gg.MapSecchi,file="06_Outputs/SLAPReport-Figure2-Secchi-2023.jpg",width=p
 
 ###################################################STOPPED HERE###############################
 #Merge together in 1 four panel frame with A, B, C, D labels in upper left and no x/y labels where appropriate
+MapFigureList<-list(gg.MapTN+
+                            xlab("")+
+                            theme(axis.text.x=element_blank(),
+                                  #axis.ticks.x=element_blank(),
+                                  legend.text=element_text(size=7),
+                                  legend.title=element_text(size=8),
+                                  legend.background = element_rect(fill = 'transparent',color=NA), #Remove legend background
+                                  legend.key = element_rect(colour = "transparent", fill = 'transparent'), #Remove legend fill around the circles
+                                  legend.spacing.y = unit(5, 'pt'), #Squish the legend closer together
+                                  legend.key.height=unit(11,"pt"),
+                                  legend.key.width=unit(5,"pt")
+                                )+
+                            annotate("text",x=-96,y=40.5,label="A",hjust=0.8,vjust=0.1),
+                          gg.MapTP+
+                            xlab("")+
+                            ylab("")+
+                            theme(axis.text.x=element_blank(),
+                                  axis.text.y=element_blank(),
+                                  #axis.ticks.x=element_blank(),
+                                  legend.text=element_text(size=7),
+                                  legend.title=element_text(size=8),
+                                  legend.background = element_rect(fill = 'transparent',color=NA), #Remove legend background
+                                  legend.key = element_rect(colour = "transparent", fill = 'transparent'), #Remove legend fill around the circles
+                                  legend.spacing.y = unit(5, 'pt'), #Squish the legend closer together
+                                  legend.key.height=unit(11,"pt"),
+                                  legend.key.width=unit(5,"pt")
+                            )+
+                            annotate("text",x=-96,y=40.5,label="B",hjust=0.8,vjust=0.1),
+                          gg.MapChlAcorr+
+                            #xlab("")+
+                            #ylab("")+
+                            theme( #axis.text.x=element_blank(),
+                                  #axis.text.y=element_blank(),
+                                  #axis.ticks.x=element_blank(),
+                                  legend.text=element_text(size=7),
+                                  legend.title=element_text(size=8),
+                                  legend.background = element_rect(fill = 'transparent',color=NA), #Remove legend background
+                                  legend.key = element_rect(colour = "transparent", fill = 'transparent'), #Remove legend fill around the circles
+                                  legend.spacing.y = unit(5, 'pt'), #Squish the legend closer together
+                                  legend.key.height=unit(11,"pt"),
+                                  legend.key.width=unit(5,"pt")
+                            )+
+                            annotate("text",x=-96,y=40.5,label="C",hjust=0.8,vjust=0.1),
+                          gg.MapSecchi+
+                            #xlab("")+
+                            ylab("")+
+                            theme(#axis.text.x=element_blank(),
+                              axis.text.y=element_blank(),
+                              #axis.ticks.x=element_blank(),
+                              legend.text=element_text(size=7),
+                              legend.title=element_text(size=8),
+                              legend.background = element_rect(fill = 'transparent',color=NA), #Remove legend background
+                              legend.key = element_rect(colour = "transparent", fill = 'transparent'), #Remove legend fill around the circles
+                              legend.spacing.y = unit(5, 'pt'), #Squish the legend closer together
+                              legend.key.height=unit(11,"pt"),
+                              legend.key.width=unit(5,"pt")
+                            )+
+                            annotate("text",x=-96,y=40.5,label="D",hjust=0.8,vjust=0.1)
+                )
+
+
+#Put the plots on a 2x2 matrix####
+(gg.fig2<-wrap_plots(MapFigureList,ncol=2,nrow=2)&theme(plot.margin = unit(c(3,3,3,3),"pt")))
+
+#Export the plot as a jpg####
+ggsave(gg.fig2,file="06_Outputs/SLAPReport-Figure2-2023.jpg",width=plot.width*1.3,height=plot.height.new*1.3,units="in")
 
