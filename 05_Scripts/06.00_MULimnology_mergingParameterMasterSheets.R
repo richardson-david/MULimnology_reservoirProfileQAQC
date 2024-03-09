@@ -560,6 +560,7 @@ databaseImport<-
                     pH_merge,
                     CL_merge
                     )%>%
+            mutate(MULakeNumber=ifelse(!(is.na(as.numeric(MULakeNumber))),as.character(as.numeric(MULakeNumber)),MULakeNumber))%>% #This will make sure that 003 and 3 are both 3 for MULake number but also avoids converting Field Dupes, and other types of sites
             left_join(.,latlong_best)%>% #add in the latitudes and longitudes      
             arrange(Date,parameterType)%>% #order by date, parameteType to match the 2022 import file
             left_join(.,dateTime,by=c("MULakeNumber","Date"))%>%
@@ -665,7 +666,9 @@ databaseDNR<-databaseImport%>%
     filter(month(Date)>=5&month(Date)<=9)%>%
     #Remove chloride samples
     filter(!(parameterType=="CL"))
+
  #Export database for DNR####
 write_csv(databaseDNR,file=paste0("06_Outputs/",year,"_MissouriReservoirsForDNR.csv"))
 
-  
+
+
