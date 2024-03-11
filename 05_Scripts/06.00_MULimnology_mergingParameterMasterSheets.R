@@ -13,6 +13,9 @@ library(readxl) #read in excel files, need to load readxl explicity because it i
 year<-2023
 dir<-paste0("08_ParameterMasterSheets/",year,"_ParameterMasterSheets")
 
+#Read in the functions####
+source("05_Scripts/00_MULimnology_reservoirProfileQAQC_Functions.R")
+
 
 #Read in master parameter sheets####
 ###############################
@@ -37,7 +40,27 @@ dateTime<-secchiMaster%>%dplyr::select(MULakeNumber,date,dateTime)%>%
           rename(Date=date)%>%
           mutate(MULakeNumber=as.character(MULakeNumber))%>%
           distinct(.) #keep only the unique values for merging
-          
+
+#Create a latlon dataframe for all the possible Field duplicate files
+dateTime_FD<-dateTime%>%
+  mutate(MULakeNumber=paste0(MULakeNumber," FD"))          
+
+#Create a waterBody name column####
+waterBody_df<-secchiMaster%>%dplyr::select(MULakeNumber,LakeName)%>%
+  mutate(MULakeNumber=as.character(MULakeNumber))%>%
+  rename(waterBody=LakeName)%>%
+  distinct(.) #keep only the unique values for merging
+
+#############STOPPED HERE - NEED SELECTION FOR WATERBODY NAMES#####
+unique(waterBody_df$MULakeNumber)
+waterBody_df%>%group_by(MULakeNumber)%>%filter(n()>1)%>%arrange(MULakeNumber)%>%print(n=Inf)
+######################################################
+
+#Matching waterbody df for field duplicates####
+waterBody_df_FD<-waterBody_df%>%
+  mutate(MULakeNumber=paste0(MULakeNumber," FD"))
+  
+
 
 #Secchi: create a subdata frame with the long format that will be merged####   
 secchi_merge<-secchiMaster%>%
@@ -46,7 +69,7 @@ secchi_merge<-secchiMaster%>%
                      Date=date,
                      beginDepth=0,
                      endDepth_char="ACTUAL",
-                     endDepth_m="ACTUAL",
+                     endDepth_m=NA,
                      parameterType="SECCHI",
                      unit="m",
                      parameterValue=secchiDepth_m,
@@ -534,6 +557,11 @@ latlong_best<-left_join(handheld2023_LatLong,latlongMetadata,by="MULakeNumber")%
   dplyr::select(MULakeNumber,samplingSiteLatitude,samplingSiteLongitude)%>%
   mutate(MULakeNumber=ifelse(nchar(MULakeNumber)==3,as.character(as.numeric(MULakeNumber)),MULakeNumber)) #Make sure to convert 003 back to 3 here for merge
 
+#Create a latlon dataframe for all the possible Field duplicate files
+latlong_best_FD<-latlong_best%>%
+                  mutate(MULakeNumber=paste0(MULakeNumber," FD"))
+
+
 ######################STACK ALL THE MERGE FILES IN LONG FORM###########################
 #row_bind all the merge files:
 databaseImport<-
@@ -561,9 +589,7 @@ databaseImport<-
                     CL_merge
                     )%>%
             mutate(MULakeNumber=ifelse(!(is.na(as.numeric(MULakeNumber))),as.character(as.numeric(MULakeNumber)),MULakeNumber))%>% #This will make sure that 003 and 3 are both 3 for MULake number but also avoids converting Field Dupes, and other types of sites
-            left_join(.,latlong_best)%>% #add in the latitudes and longitudes      
             arrange(Date,parameterType)%>% #order by date, parameteType to match the 2022 import file
-            left_join(.,dateTime,by=c("MULakeNumber","Date"))%>%
             mutate(endDepth_char=case_when( #Fix up all the endDepth_char
                     endDepth_char=="Epi"~"EPI",
                     endDepth_char=="SURF'"~"SURF",
@@ -575,12 +601,16 @@ databaseImport<-
                             endDepth_char=="SURF"&parameterType=="pH"~as.character(0.5),
                             endDepth_char=="SURF"&parameterType=="Temp"~as.character(0.5),
                             endDepth_char=="SURF"~as.character(0),
-                            endDepth_char=="ACTUAL"~NA,
                             .default=endDepth_m
                             ))%>%
+            mutate(MULakeNumber=ifelse(substrRight(MULakeNumber,2)=="FD"&substrFromRight(MULakeNumber,3)!=" ",paste0(substr(MULakeNumber,1,3)," ",substrRight(MULakeNumber,2)),MULakeNumber))%>% #Check to see if the MULakeNumber field dupes have a space and add one if not
+            left_join(.,bind_rows(latlong_best,latlong_best_FD),by=c("MULakeNumber"))%>% #add in the latitudes and longitudes, including for field dupes
+            mutate(MULakeNumber=ifelse((MULakeNumber=="FB"|MULakeNumber=="Field Blank"),"401",MULakeNumber))%>% #rename all FB or FIeld blanks as 401
+            left_join(.,bind_rows(dateTime,dateTime_FD),by=c("MULakeNumber","Date"))%>% #Add in the dateTime from the secchi
+            left_join(.,bind_rows(waterBody_df,waterBody_df_FD),by=c("MULakeNumber"))%>% #Add in the waterBody name from the secchi
             left_join(.,filterMaster%>%rename(endDepth_m_2=endDepth_m)%>%mutate(MULakeNumber=ifelse((MULakeNumber=="FB"|MULakeNumber=="Field Blank"),"401",MULakeNumber)),by=c("MULakeNumber","Date","endDepth_char"))%>% #join in the correct endDepth_m from the filter master sheet. Have to rename it to avoid generating an endDepth_m.x column, also #Replace all field blank references with 401 (field blank equivelent MULakeNumber)
-            mutate(endDepth_m=ifelse(!is.na(endDepth_m_2),endDepth_m_2,endDepth_m))%>% #if the endDepth_m_2 from the filter master has a value, replace endDepth_m with that value
-            mutate(endDepth_m=as.numeric(endDepth_m))%>% #make endDepth_m a numeric column now, no NAs introduced by coercion should pop up
+            mutate(endDepth_m=ifelse(is.na(endDepth_m_2),endDepth_m,endDepth_m_2))%>% #if the endDepth_m_2 from the filter master has a value, replace endDepth_m with that value
+            mutate(endDepth_m=format(round(as.numeric(endDepth_m),digits=2),nsmall=2))%>% #make endDepth_m a numeric column now, no NAs introduced by coercion should pop up
             dplyr::select(-endDepth_m_2)%>% #Get rid of the duplicate endDepth_m_2 column
             #This converts to ug/L if needed and also rounds based on the correct number of reporting decimals, the format and nsmall is for display after rounding, these need to match each other, 
             #Warning: this converts the parameterValue into characters
@@ -631,19 +661,30 @@ databaseImport<-
                                 parameterType=="POM"&unit=="mg/L"~unit,
                                 parameterType=="SECCHI"&unit=="m"~unit,
                                 .default=unit
-                                ))
-     
+                                ))%>%
+              #Create sample QAQC type column that is either Field blank, Field duplicate, or Sample
+              mutate(sampleQAQCType=case_when(MULakeNumber=="401"~"Field blank", 
+                                              substrRight(MULakeNumber,2)=="FD"~"Field duplicate",
+                                              .default="Sample"))
+
 #Gives all the current parameterType and units unique to the dataset
 #databaseImport%>%dplyr::select(parameterType,unit)%>%distinct(.)%>%print(n=Inf)
-           
-
+  
 #Specific to 2023, change dates and redo the join with dateTime####
-databaseImport<-databaseImport%>%mutate(Date=case_when(
+databaseImport2<-databaseImport%>%mutate(Date=case_when(
                               MULakeNumber=="276"&Date==as.Date("2023-05-17")~as.Date("2023-05-18"),
                               MULakeNumber=="46"&Date==as.Date("2023-05-23")~as.Date("2023-05-22"),
                               MULakeNumber=="114"&Date==as.Date("2023-06-14")~as.Date("2023-06-15"),
                               .default=Date
                               ))%>%
+                              mutate(endDepth_m=case_when(
+                                MULakeNumber=="276"&Date==as.Date("2023-05-18")&endDepth_char=="EPI"~"2.04", #adjustment from MULake lab
+                                MULakeNumber=="14"&Date==as.Date("2023-06-15")&endDepth_char=="EPI"~"1.80", #adjustment from MULake lab, check if this lake number is correct
+                                MULakeNumber=="197 FD"&Date==as.Date("2023-06-26")&endDepth_char=="EPI"~"0.98", 
+                                MULakeNumber=="211 FD"&Date==as.Date("2023-07-31")&endDepth_char=="EPI"~"3.31",
+                                .default=endDepth_m
+                              ))%>%
+                              mutate(MULakeNumber=ifelse(MULakeNumber=="197FD","197 FD",MULakeNumber))%>%
               dplyr::select(-dateTime)%>%
               left_join(.,dateTime,by=c("MULakeNumber","Date"))
 
@@ -652,7 +693,7 @@ databaseImport<-databaseImport%>%mutate(Date=case_when(
 
 
 #Database DNR####
-databaseDNR<-databaseImport%>%
+databaseDNR<-databaseImport2%>%
     #remove specific rows for isothermal
     filter(!(MULakeNumber=="440"&Date==as.Date("2023-04-27")))%>%
     filter(!(MULakeNumber=="165"&Date==as.Date("2023-05-31")))%>%
@@ -662,13 +703,24 @@ databaseDNR<-databaseImport%>%
     filter(!(MULakeNumber=="121"&Date==as.Date("2023-08-10")))%>%
     filter(!(MULakeNumber=="30"&Date==as.Date("2023-09-22")))%>%
     filter(!(MULakeNumber=="30"&Date==as.Date("2023-08-15")))%>%
+    filter(!(MULakeNumber=="446-01-00"&Date==as.Date("2023-09-19")))%>%
     #Only keep May to September
     filter(month(Date)>=5&month(Date)<=9)%>%
     #Remove chloride samples
     filter(!(parameterType=="CL"))
 
  #Export database for DNR####
-write_csv(databaseDNR,file=paste0("06_Outputs/",year,"_MissouriReservoirsForDNR.csv"))
+write_csv(databaseDNR,file=paste0("06_Outputs/",year,"_MissouriReservoirsForDNR_v1.csv"))
 
 
 
+
+unique(databaseImport2$MULakeNumber)
+
+databaseDNR%>%filter(MULakeNumber=="46"&Date==as.Date("2023-05-22"))%>%print(n=Inf)
+databaseImport%>%filter(MULakeNumber=="FB"&Date==as.Date("2023-07-10"))%>%print(n=Inf)
+databaseImport%>%filter(MULakeNumber=="211 FD")%>%print(n=Inf)
+filterMaster%>%filter(MULakeNumber=="211"&Date==as.Date("2023-07-31"))%>%dplyr::select(endDepth_m)%>%pull()
+
+
+databaseImport2%>%filter(MULakeNumber=="197 FD"|MULakeNumber=="197FD")%>%print(n=Inf)

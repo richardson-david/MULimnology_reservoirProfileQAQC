@@ -15,7 +15,6 @@ library(rLakeAnalyzer) #for heatmaps and for water saturation
 library(purrr)
 library(insol)
 
-
 #FUNCTION: qaqc_bounds####
 #for qaqc to create NAs based on being outside the bounds from a data table####
 qaqc_bounds<-function(variable,qaqc_table){
@@ -498,7 +497,13 @@ EO_dailyMean_single<-function(date,latitude=38.377955,longitude=-92.411306,eleva
     
 } #end of the function
 
+#Function that pulls the right n characters of a string####
+substrRight <- function(x, n){
+  substr(x, nchar(x)-n+1, nchar(x))
+}
 
-
-
+#Function that pulls the nth character from a string####
+substrFromRight <- function(x, n){
+  substr(x, nchar(x)-n+1, nchar(x)-n+1)
+}
 

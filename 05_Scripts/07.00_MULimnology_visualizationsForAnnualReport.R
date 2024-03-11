@@ -114,7 +114,7 @@ gg.MapMULakeNUmber<-ggplot()+
 ggsave(gg.MapMULakeNUmber,file="06_Outputs/SLAPReport-Figure1-2023.jpg",width=plot.width,height=plot.height.new,units="in")
 
 #Set some parameters globally for all maps####
-endDepth<-"EPI" #can be EPI or SURF here
+endDepth<-"SURF" #can be EPI or SURF here
 pointSize<-2.25 #size of points on the graph
 GeoLineWidth<-0.2 #sets the line width of the state and counties on the map
 
