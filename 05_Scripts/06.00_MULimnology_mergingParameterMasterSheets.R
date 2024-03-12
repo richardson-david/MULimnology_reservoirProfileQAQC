@@ -54,13 +54,24 @@ ecoRegionMaster<-read_excel(paste0(dir,"/SLAP 2023 Ecoregion Table.xlsx"),sheet=
   rename(MULakeNumber=`MU#`,
          waterBody=`Reservoir Name`, #rename some columns
          )%>%
+  mutate(waterBody=ifelse(substr(waterBody,1,1)=="*",substr(waterBody,2,nchar(waterBody)),waterBody))%>% #remove a "*" at the beginning if it exists
   dplyr::select(MULakeNumber,waterBody)
+
 
 #Create a waterBody name column####
 waterBody_df<-ecoRegionMaster%>%
   mutate(MULakeNumber=as.character(MULakeNumber))%>%
-  distinct(.) #keep only the unique values for merging
-
+  distinct(.)%>% #keep only the unique values for merging
+  mutate(waterBody=case_when(
+                  MULakeNumber=="3"~"Bowling Green (East)",
+                  MULakeNumber=="454"~"Cedar Hill (Lake 1)",
+                  MULakeNumber=="186"~"Carl DiSalvo",
+                  MULakeNumber=="454"~"Cedar Hill (Lake 1)",
+                  MULakeNumber=="179"~"Nodaway County",
+                  .default=waterBody
+         ))%>%
+    mutate(samplingSite=paste0(waterBody," 1"))%>% #Add in sampling site for the dam, it is always the name with " 1" 
+  add_row(MULakeNumber="401",waterBody="Field Blank",samplingSite="Field Blank")
 #Matching waterbody df for field duplicates####
 waterBody_df_FD<-waterBody_df%>%
   mutate(MULakeNumber=paste0(MULakeNumber," FD"))
@@ -684,7 +695,7 @@ databaseImport2<-databaseImport%>%mutate(Date=case_when(
                               ))%>%
                               mutate(endDepth_m=case_when(
                                 MULakeNumber=="276"&Date==as.Date("2023-05-18")&endDepth_char=="EPI"~"2.04", #adjustment from MULake lab
-                                MULakeNumber=="14"&Date==as.Date("2023-06-15")&endDepth_char=="EPI"~"1.80", #adjustment from MULake lab, check if this lake number is correct
+                                MULakeNumber=="114"&Date==as.Date("2023-06-15")&endDepth_char=="EPI"~"1.80", #adjustment from MULake lab, check if this lake number is correct
                                 MULakeNumber=="197 FD"&Date==as.Date("2023-06-26")&endDepth_char=="EPI"~"0.98", 
                                 MULakeNumber=="211 FD"&Date==as.Date("2023-07-31")&endDepth_char=="EPI"~"3.31",
                                 .default=endDepth_m
@@ -701,23 +712,24 @@ databaseImport2<-databaseImport%>%mutate(Date=case_when(
 databaseDNR<-databaseImport2%>%
     #remove specific rows for isothermal
     filter(!(MULakeNumber=="440"&Date==as.Date("2023-04-27")))%>%
-    filter(!(MULakeNumber=="165"&Date==as.Date("2023-05-31")))%>%
     filter(!(MULakeNumber=="46"&Date==as.Date("2023-06-12")))%>%
     filter(!(MULakeNumber=="163"&Date==as.Date("2023-06-13")))%>%
     filter(!(MULakeNumber=="121"&Date==as.Date("2023-07-19")))%>%
     filter(!(MULakeNumber=="121"&Date==as.Date("2023-08-10")))%>%
-    filter(!(MULakeNumber=="30"&Date==as.Date("2023-09-22")))%>%
     filter(!(MULakeNumber=="30"&Date==as.Date("2023-08-15")))%>%
     filter(!(MULakeNumber=="446-01-00"&Date==as.Date("2023-09-19")))%>%
     #Only keep May to September
     filter(month(Date)>=5&month(Date)<=9)%>%
-    #Remove chloride samples
-    filter(!(parameterType=="CL"))
+    
+    filter(!(parameterType=="CL"))%>% #Remove chloride samples
+    filter(!(parameterType=="Tot_fluor"))%>% #Remove fluorometer RFU samples
+    filter(!(parameterType=="Acid_fluor")) #Remove fluorometer acidied RFU samples
+
 
  #Export database for DNR####
 write_csv(databaseDNR,file=paste0("06_Outputs/",year,"_MissouriReservoirsForDNR_v1.csv"))
 
-
+databaseDNR%>%filter(MULakeNumber=="114"&Date==as.Date("2023-06-15"))
 
 #RANDOM CODE TO HELP WITH MERGING AND IDing specific cases####
 #unique(databaseImport2$MULakeNumber)

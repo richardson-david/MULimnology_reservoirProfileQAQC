@@ -19,7 +19,7 @@ library(patchwork) #for multipanel plots
 #establish the year here###
 year<-2023
 #Read in the 2023 database here####
-waterChemDF<-read_csv(paste0("06_Outputs/",year,"_MissouriReservoirsForDNR.csv"))
+waterChemDF<-read_csv(paste0("06_Outputs/",year,"_MissouriReservoirsForDNR_v1.csv"))
 
 #Data munging the data frame####
 waterChemDF_summary<-waterChemDF%>%
@@ -111,7 +111,7 @@ gg.MapMULakeNUmber<-ggplot()+
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
 #Export the plot as a jpg####
-ggsave(gg.MapMULakeNUmber,file="06_Outputs/SLAPReport-Figure1-2023.jpg",width=plot.width,height=plot.height.new,units="in")
+ggsave(gg.MapMULakeNUmber,file=paste0("09_Figures/",year,"_DNRreport/","SLAPReport-Figure1-",year,".jpg"),width=plot.width,height=plot.height.new,units="in",dpi=300)
 
 #Set some parameters globally for all maps####
 endDepth<-"SURF" #can be EPI or SURF here
@@ -139,7 +139,7 @@ gg.MapTP<-ggplot()+
         legend.position=c(0.87,0.83))
 
 #Export the plot as a jpg####
-ggsave(gg.MapTP,file="06_Outputs/SLAPReport-Figure2-TP-2023.jpg",width=plot.width,height=plot.height.new,units="in")
+ggsave(gg.MapTP,file=paste0("09_Figures/",year,"_DNRreport/","SLAPReport-Figure2-TP-",year,".jpg"),width=plot.width,height=plot.height.new,units="in")
 
 
 #Map TN with fill=trophicState based on EPI####
@@ -163,7 +163,7 @@ gg.MapTN<-ggplot()+
         legend.position=c(0.87,0.83))
 
 #Export the plot as a jpg####
-ggsave(gg.MapTN,file="06_Outputs/SLAPReport-Figure2-TN-2023.jpg",width=plot.width,height=plot.height.new,units="in")
+ggsave(gg.MapTN,file=paste0("09_Figures/",year,"_DNRreport/","SLAPReport-Figure2-TN-",year,".jpg"),width=plot.width,height=plot.height.new,units="in")
 
 #Map corrected chlorophyll-a with fill=trophicState based on EPI####
 gg.MapChlAcorr<-ggplot()+
@@ -186,7 +186,7 @@ gg.MapChlAcorr<-ggplot()+
         legend.position=c(0.87,0.83))
 
 #Export the plot as a jpg####
-ggsave(gg.MapChlAcorr,file="06_Outputs/SLAPReport-Figure2-ChlAcorr-2023.jpg",width=plot.width,height=plot.height.new,units="in")
+ggsave(gg.MapChlAcorr,file=paste0("09_Figures/",year,"_DNRreport/","SLAPReport-Figure2-ChlAcorr-",year,".jpg"),width=plot.width,height=plot.height.new,units="in")
 
 #Map secchi with fill=trophicState based on ACTUAL####
 gg.MapSecchi<-ggplot()+
@@ -209,7 +209,7 @@ gg.MapSecchi<-ggplot()+
         legend.position=c(0.87,0.83))
 
 #Export the plot as a jpg####
-ggsave(gg.MapSecchi,file="06_Outputs/SLAPReport-Figure2-Secchi-2023.jpg",width=plot.width,height=plot.height.new,units="in")
+ggsave(gg.MapSecchi,file=paste0("09_Figures/",year,"_DNRreport/","SLAPReport-Figure2-Secchi-",year,".jpg"),width=plot.width,height=plot.height.new,units="in")
 
 ###################################################STOPPED HERE###############################
 #Merge together in 1 four panel frame with A, B, C, D labels in upper left and no x/y labels where appropriate
@@ -278,5 +278,5 @@ MapFigureList<-list(gg.MapTN+
 (gg.fig2<-wrap_plots(MapFigureList,ncol=2,nrow=2)&theme(plot.margin = unit(c(3,3,3,3),"pt")))
 
 #Export the plot as a jpg####
-ggsave(gg.fig2,file="06_Outputs/SLAPReport-Figure2-2023.jpg",width=plot.width*1.3,height=plot.height.new*1.3,units="in")
+ggsave(gg.fig2,file=paste0("09_Figures/",year,"_DNRreport/","SLAPReport-Figure2-",year,".jpg"),width=plot.width*1.3,height=plot.height.new*1.3,units="in",dpi=300)
 
