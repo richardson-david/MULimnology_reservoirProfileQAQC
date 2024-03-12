@@ -45,16 +45,21 @@ dateTime<-secchiMaster%>%dplyr::select(MULakeNumber,date,dateTime)%>%
 dateTime_FD<-dateTime%>%
   mutate(MULakeNumber=paste0(MULakeNumber," FD"))          
 
-#Create a waterBody name column####
-waterBody_df<-secchiMaster%>%dplyr::select(MULakeNumber,LakeName)%>%
-  mutate(MULakeNumber=as.character(MULakeNumber))%>%
-  rename(waterBody=LakeName)%>%
-  distinct(.) #keep only the unique values for merging
 
-#############STOPPED HERE - NEED SELECTION FOR WATERBODY NAMES#####
-unique(waterBody_df$MULakeNumber)
-waterBody_df%>%group_by(MULakeNumber)%>%filter(n()>1)%>%arrange(MULakeNumber)%>%print(n=Inf)
-######################################################
+#Read in ecoregion sheets####
+###############################
+#*Read in Sheet1 sheet####
+#Gives file name#
+ecoRegionMaster<-read_excel(paste0(dir,"/SLAP 2023 Ecoregion Table.xlsx"),sheet="Sheet1")%>%
+  rename(MULakeNumber=`MU#`,
+         waterBody=`Reservoir Name`, #rename some columns
+         )%>%
+  dplyr::select(MULakeNumber,waterBody)
+
+#Create a waterBody name column####
+waterBody_df<-ecoRegionMaster%>%
+  mutate(MULakeNumber=as.character(MULakeNumber))%>%
+  distinct(.) #keep only the unique values for merging
 
 #Matching waterbody df for field duplicates####
 waterBody_df_FD<-waterBody_df%>%
@@ -589,7 +594,7 @@ databaseImport<-
                     CL_merge
                     )%>%
             mutate(MULakeNumber=ifelse(!(is.na(as.numeric(MULakeNumber))),as.character(as.numeric(MULakeNumber)),MULakeNumber))%>% #This will make sure that 003 and 3 are both 3 for MULake number but also avoids converting Field Dupes, and other types of sites
-            arrange(Date,parameterType)%>% #order by date, parameteType to match the 2022 import file
+            arrange(Date,MULakeNumber,parameterType)%>% #order by date, parameteType to match the 2022 import file
             mutate(endDepth_char=case_when( #Fix up all the endDepth_char
                     endDepth_char=="Epi"~"EPI",
                     endDepth_char=="SURF'"~"SURF",
@@ -714,13 +719,10 @@ write_csv(databaseDNR,file=paste0("06_Outputs/",year,"_MissouriReservoirsForDNR_
 
 
 
-
-unique(databaseImport2$MULakeNumber)
-
-databaseDNR%>%filter(MULakeNumber=="46"&Date==as.Date("2023-05-22"))%>%print(n=Inf)
-databaseImport%>%filter(MULakeNumber=="FB"&Date==as.Date("2023-07-10"))%>%print(n=Inf)
-databaseImport%>%filter(MULakeNumber=="211 FD")%>%print(n=Inf)
-filterMaster%>%filter(MULakeNumber=="211"&Date==as.Date("2023-07-31"))%>%dplyr::select(endDepth_m)%>%pull()
-
-
-databaseImport2%>%filter(MULakeNumber=="197 FD"|MULakeNumber=="197FD")%>%print(n=Inf)
+#RANDOM CODE TO HELP WITH MERGING AND IDing specific cases####
+#unique(databaseImport2$MULakeNumber)
+#databaseDNR%>%filter(MULakeNumber=="46"&Date==as.Date("2023-05-22"))%>%print(n=Inf)
+#databaseImport%>%filter(MULakeNumber=="FB"&Date==as.Date("2023-07-10"))%>%print(n=Inf)
+#databaseImport%>%filter(MULakeNumber=="211 FD")%>%print(n=Inf)
+#filterMaster%>%filter(MULakeNumber=="211"&Date==as.Date("2023-07-31"))%>%dplyr::select(endDepth_m)%>%pull()
+#databaseImport2%>%filter(MULakeNumber=="197 FD"|MULakeNumber=="197FD")%>%print(n=Inf)
