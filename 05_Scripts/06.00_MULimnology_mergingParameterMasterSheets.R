@@ -35,6 +35,22 @@ secchiMaster<-read_excel(paste0(dir,"/2023 SLAP Secchi depth masterfile 01-11-20
          dateTime=ymd(date)+hms(time))%>% #put a dateTime together
   dplyr::select(-hour,-minute,-second) #get rid of the extraneous hour, minute, second
 
+#Secchi: create a subdata frame with the long format that will be merged####   
+secchi_merge<-secchiMaster%>%
+  mutate(
+    MULakeNumber=as.character(MULakeNumber),
+    Date=date,
+    beginDepth=0,
+    endDepth_char="ACTUAL",
+    endDepth_m="0",
+    parameterType="SECCHI",
+    unit="m",
+    parameterValue=secchiDepth_m,
+    parameterValueQCCodeID=NA
+  )%>%
+  dplyr::select(MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,parameterType,unit,parameterValue,parameterValueQCCodeID)
+
+
 #Create a secchi dateTime to match with the MULakeNumber and Date columns####
 dateTime<-secchiMaster%>%dplyr::select(MULakeNumber,date,dateTime)%>%
           rename(Date=date)%>%
@@ -78,22 +94,6 @@ waterBody_df_FD<-waterBody_df%>%
   
 
 
-#Secchi: create a subdata frame with the long format that will be merged####   
-secchi_merge<-secchiMaster%>%
-              mutate(
-                     MULakeNumber=as.character(MULakeNumber),
-                     Date=date,
-                     beginDepth=0,
-                     endDepth_char="ACTUAL",
-                     endDepth_m=NA,
-                     parameterType="SECCHI",
-                     unit="m",
-                     parameterValue=secchiDepth_m,
-                     parameterValueQCCodeID=NA
-                     )%>%
-  dplyr::select(MULakeNumber,Date,beginDepth,endDepth_char,endDepth_m,parameterType,unit,parameterValue,parameterValueQCCodeID)
-
-#**This dateTime has the sampling time, can create separate file and merge in later####
 
 ###############################
 #*Read in chlorophyll sheet####
@@ -729,9 +729,9 @@ databaseDNR<-databaseImport2%>%
  #Export database for DNR####
 write_csv(databaseDNR,file=paste0("06_Outputs/",year,"_MissouriReservoirsForDNR_v1.csv"))
 
-databaseDNR%>%filter(MULakeNumber=="114"&Date==as.Date("2023-06-15"))
 
 #RANDOM CODE TO HELP WITH MERGING AND IDing specific cases####
+#databaseDNR%>%filter(MULakeNumber=="114"&Date==as.Date("2023-06-15"))
 #unique(databaseImport2$MULakeNumber)
 #databaseDNR%>%filter(MULakeNumber=="46"&Date==as.Date("2023-05-22"))%>%print(n=Inf)
 #databaseImport%>%filter(MULakeNumber=="FB"&Date==as.Date("2023-07-10"))%>%print(n=Inf)
