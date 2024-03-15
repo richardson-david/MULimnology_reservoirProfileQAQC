@@ -15,6 +15,7 @@ library(tidyverse)
 library(ggspatial) #For the scale bar and compass on the map
 library(ggrepel) #For fancy non-overlapping labels
 library(patchwork) #for multipanel plots
+library(readxl) #read in excel files, need to load readxl explicity because it is not a core tidyverse package
 
 #establish the year here###
 year<-2023
@@ -25,7 +26,7 @@ waterChemDF<-read_csv(paste0("06_Outputs/",year,"_MissouriReservoirsForDNR_v1.cs
 waterChemDF_summary<-waterChemDF%>%
   filter(!(MULakeNumber=="401"))%>% #remove 401 (field blanks)
   filter(nchar(MULakeNumber)<=3)%>% #remove all field dupes and other sites
-  group_by(MULakeNumber,Date,parameterType,endDepth_char,unit)%>%
+  group_by(MULakeNumber,Date,parameterType,endDepth_char,unit,waterBody)%>%
   summarize(parameterValue=mean(parameterValue,na.rm=TRUE),  
             endDepth_m=mean(endDepth_m,na.rm=TRUE),
             samplingSiteLatitude=mean(samplingSiteLatitude,na.rm=TRUE),
@@ -279,4 +280,28 @@ MapFigureList<-list(gg.MapTN+
 
 #Export the plot as a jpg####
 ggsave(gg.fig2,file=paste0("09_Figures/",year,"_DNRreport/","SLAPReport-Figure2-",year,".jpg"),width=plot.width*1.3,height=plot.height.new*1.3,units="in",dpi=300)
+
+
+
+
+#Read in historical data from 5 lakes to be highlighted in the report####
+# Jamesport Community #228, King #163, Macon #49, Gopher #169, and Winnebago #120#
+FiveHistoricalLakes_surf<-read_excel(paste0("08_ParameterMasterSheets/",year,"_ParameterMasterSheets/SLAP 5 lakes -exported 23 Feb 2024.xlsx"),sheet="DNR Output Data")%>%
+                     mutate(Date=ymd(beginDateTime),
+                            endDepth_char="SURF",
+                            MULakeNumber=as.character(MULakeNumber))%>%
+                    filter(beginDepth==0&endDepth==0)%>% #Only pull the surface samples
+                    rename(endDepth_m=endDepth
+                           )%>%
+                    dplyr::select(MULakeNumber,waterBody,Date,parameterType,endDepth_char,unit,parameterValue,endDepth_m,samplingSiteLatitude,samplingSiteLongitude)
+
+################STOPPED HERE - NEED TO MAKE SURE THAT THE UNITS FROM THE PAST DATA MATCH CURRENT#####
+
+#Merge the historical data with the 2023 data####
+FiveHistoricalLakes_surf_merged<-bind_rows(FiveHistoricalLakes_surf,waterChemDF_summary)
+
+ggplot(data=FiveHistoricalLakes_surf_merged%>%filter(MULakeNumber=="228"),aes(x=Date,y=parameterValue))+geom_point()+facet_wrap(~parameterType,scales="free_y")
+
+names(FiveHistoricalLakes_surf)
+names(waterChemDF_summary)
 
