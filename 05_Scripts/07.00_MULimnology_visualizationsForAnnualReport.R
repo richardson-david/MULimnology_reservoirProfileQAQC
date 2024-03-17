@@ -293,15 +293,57 @@ FiveHistoricalLakes_surf<-read_excel(paste0("08_ParameterMasterSheets/",year,"_P
                     filter(beginDepth==0&endDepth==0)%>% #Only pull the surface samples
                     rename(endDepth_m=endDepth
                            )%>%
-                    dplyr::select(MULakeNumber,waterBody,Date,parameterType,endDepth_char,unit,parameterValue,endDepth_m,samplingSiteLatitude,samplingSiteLongitude)
+                    dplyr::select(MULakeNumber,waterBody,Date,parameterType,endDepth_char,unit,parameterValue,endDepth_m,samplingSiteLatitude,samplingSiteLongitude)%>%
+                    #Convert units to match the data from this year####
+                    mutate(parameterValue=case_when(
+                                              parameterType=="CHL_A_COR"~parameterValue*1000,
+                                              parameterType=="CHL_A_lab"~parameterValue*1000,
+                                              parameterType=="NH4"~parameterValue*1000,
+                                              parameterType=="NO3"~parameterValue*1000,
+                                              parameterType=="PHEO"~parameterValue*1000,
+                                              parameterType=="TDN"~parameterValue*1000,
+                                              parameterType=="TN"~parameterValue*1000,
+                                              parameterType=="TP"~parameterValue*1000,
+                                              .default = parameterValue
+                                          ))%>%
+                    #Change the unit labels####
+                    mutate(unit=case_when(
+                      parameterType=="CHL_A_COR"~"ug/L",
+                      parameterType=="CHL_A_lab"~"ug/L",
+                      parameterType=="NH4"~"ug/L",
+                      parameterType=="NO3"~"ug/L",
+                      parameterType=="PHEO"~"ug PHEO/L",
+                      parameterType=="TDN"~"ug/L",
+                      parameterType=="TN"~"ug/L",
+                      parameterType=="TP"~"ug/L",
+                      parameterType=="SECCHI"~"m",
+                      parameterType=="PH_field"~"unitless",
+                      parameterType=="PH_lab"~"unitless",
+                      parameterType=="TEMP"~"C",
+                      .default = unit
+                    ))%>%
+                      #Change the parameter types####
+                    mutate(parameterType=case_when(
+                      parameterType=="PH_field"~"pH",
+                      parameterType=="TEMP"~"Temp", #This should probably be fixed in 2023 data
+                      .default = parameterType
+                    ))
 
 ################STOPPED HERE - NEED TO MAKE SURE THAT THE UNITS FROM THE PAST DATA MATCH CURRENT#####
 
 #Merge the historical data with the 2023 data####
-FiveHistoricalLakes_surf_merged<-bind_rows(FiveHistoricalLakes_surf,waterChemDF_summary)
+FiveHistoricalLakes_surf_merged<-bind_rows(FiveHistoricalLakes_surf,waterChemDF_summary%>%filter(MULakeNumber%in%unique(FiveHistoricalLakes_surf$MULakeNumber)))
 
-ggplot(data=FiveHistoricalLakes_surf_merged%>%filter(MULakeNumber=="228"),aes(x=Date,y=parameterValue))+geom_point()+facet_wrap(~parameterType,scales="free_y")
+#Check the units for each to make sure they are synced####
+FiveHistoricalLakes_surf%>%dplyr::select(parameterType,unit)%>%distinct(.)%>%arrange(parameterType)%>%print(n=Inf)
+waterChemDF_summary%>%ungroup()%>%dplyr::select(parameterType,unit)%>%distinct(.)%>%arrange(parameterType)%>%print(n=Inf)
 
-names(FiveHistoricalLakes_surf)
-names(waterChemDF_summary)
+#Find the list of historical lakes to generate figures for####
+unique(FiveHistoricalLakes_surf$MULakeNumber)
 
+#Plot all the different variables over time for a specific lake
+ggplot(data=FiveHistoricalLakes_surf_merged%>%filter(MULakeNumber=="49"),aes(x=Date,y=parameterValue))+geom_point()+facet_wrap(~parameterType,scales="free_y")
+
+#STOPPED HERE####
+#Look at TN, TP, CHL_A_COR, SECCHI for each of the 5####
+#Maybe take annual averages and add error bars - then do Mann-Kendall/Sens slopes to see if they are changing over time####
