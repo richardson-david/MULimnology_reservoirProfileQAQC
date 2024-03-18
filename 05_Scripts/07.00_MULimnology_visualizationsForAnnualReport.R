@@ -17,6 +17,9 @@ library(ggrepel) #For fancy non-overlapping labels
 library(patchwork) #for multipanel plots
 library(readxl) #read in excel files, need to load readxl explicity because it is not a core tidyverse package
 
+#Read in the functions####
+source("05_Scripts/00_MULimnology_reservoirProfileQAQC_Functions.R")
+
 #establish the year here###
 year<-2023
 #Read in the 2023 database here####
@@ -329,8 +332,6 @@ FiveHistoricalLakes_surf<-read_excel(paste0("08_ParameterMasterSheets/",year,"_P
                       .default = parameterType
                     ))
 
-################STOPPED HERE - NEED TO MAKE SURE THAT THE UNITS FROM THE PAST DATA MATCH CURRENT#####
-
 #Merge the historical data with the 2023 data####
 FiveHistoricalLakes_surf_merged<-bind_rows(FiveHistoricalLakes_surf,waterChemDF_summary%>%filter(MULakeNumber%in%unique(FiveHistoricalLakes_surf$MULakeNumber)))
 
@@ -338,12 +339,153 @@ FiveHistoricalLakes_surf_merged<-bind_rows(FiveHistoricalLakes_surf,waterChemDF_
 FiveHistoricalLakes_surf%>%dplyr::select(parameterType,unit)%>%distinct(.)%>%arrange(parameterType)%>%print(n=Inf)
 waterChemDF_summary%>%ungroup()%>%dplyr::select(parameterType,unit)%>%distinct(.)%>%arrange(parameterType)%>%print(n=Inf)
 
+
+
 #Find the list of historical lakes to generate figures for####
 unique(FiveHistoricalLakes_surf$MULakeNumber)
 
 #Plot all the different variables over time for a specific lake
 ggplot(data=FiveHistoricalLakes_surf_merged%>%filter(MULakeNumber=="49"),aes(x=Date,y=parameterValue))+geom_point()+facet_wrap(~parameterType,scales="free_y")
 
+
+#Take the annual average and SE of that average####
+FiveHistoricalLakes_merged_annual<-
+    FiveHistoricalLakes_surf_merged%>%
+    ungroup()%>%
+    mutate(year=year(Date))%>%
+    group_by(year,MULakeNumber,waterBody,parameterType,unit)%>%
+    dplyr::summarise(parameterValue_mean=mean(parameterValue,na.rm=TRUE),
+              parameterValue_sderr=sderr(parameterValue),
+              .groups="keep")
+
+#Plot all the different variables over time for a specific lake
+ggplot(data=FiveHistoricalLakes_merged_annual%>%filter(MULakeNumber=="49"),aes(x=year,y=parameterValue_mean))+geom_point()+geom_errorbar(aes(ymin = parameterValue_mean-parameterValue_sderr, ymax = parameterValue_mean+parameterValue_sderr))+facet_wrap(~parameterType,scales="free_y")
+
+#Find the sen slopes for these variables: CHL_A_COR, PIM, POM, SECCHI, TN, TP, TSS
+#group by MULakeNumber, parameterType, unit
+FiveHistoricalLakes_merged_annual%>%
+  filter(parameterType%in%c("CHL_A_COR", "PIM", "POM", "SECCHI", "TN", "TP", "TSS"))%>% #pull out these 7 variables of interest
+  ungroup()%>%
+  group_by(MULakeNumber,parameterType,unit)%>%
+  summarize(sensSlope_slope=MTCC.sensSlope(year,parameterValue_mean)$coefficients["Year"],
+            sensSlope_intercept=MTCC.sensSlope(year,parameterValue_mean)$coefficients["Intercept"],
+            sensSlope_pval=MTCC.sensSlope(year,parameterValue_mean)$pval)%>%
+  mutate(significance=ifelse(sensSlope_pval<0.05,"*",""))%>%print(n=Inf)
+
+
+#for each lake - do this set of 4 figures: TP, TN, CHl, Secchi
+# Jamesport Community #228, King #163, Macon #49, Gopher #169, and Winnebago #120#
+#can do it on a loop or just run each one here
+lake.id<-"169" #specify the lake
+
+#TN specific graphs####
+labels_TN<-tibble(x=rep(-Inf,4),y.line=c(350,550,1200,NA),y.label=c((350/2),450,(550+1200)/2,1250),y.label.text=c("0","M","E","HE"))
+y.max_TN<-max(1255,max(FiveHistoricalLakes_merged_annual%>%filter(MULakeNumber==lake.id&parameterType=="TN")%>%mutate(upper=parameterValue_mean+parameterValue_sderr)%>%dplyr::select(upper)%>%ungroup()%>%pull(),na.rm=TRUE),na.rm=TRUE)
+(gg.TN.lake<-ggplot(data=FiveHistoricalLakes_merged_annual%>%filter(MULakeNumber==lake.id&parameterType=="TN"),aes(x=year,y=parameterValue_mean))+
+    geom_hline(yintercept=labels_TN$y.line,linetype=2,color="grey")+
+    geom_text(data=labels_TN,aes(x=x,y=y.label,label=y.label.text),hjust=-0.2,color="grey")+
+    geom_errorbar(aes(ymin = parameterValue_mean-parameterValue_sderr, ymax = parameterValue_mean+parameterValue_sderr))+
+    geom_point(size=2,shape=21,fill="light grey")+
+    theme_bw()+
+    xlab("Year")+
+    ylab(bquote(TN~(mu*g*'/'*L)))+
+    scale_y_continuous(limits=c(0,y.max_TN)))
+
+#TP specific graphs####
+labels_TP<-tibble(x=rep(-Inf,4),y.line=c(10,25,100,NA),y.label=c((10/2),(10+25)/2,(25+100)/2,120),y.label.text=c("0","M","E","HE"))
+y.max_TP<-max(125,max(FiveHistoricalLakes_merged_annual%>%filter(MULakeNumber==lake.id&parameterType=="TP")%>%mutate(upper=parameterValue_mean+parameterValue_sderr)%>%dplyr::select(upper)%>%ungroup()%>%pull(),na.rm=TRUE),na.rm=TRUE)
+(gg.TP.lake<-ggplot(data=FiveHistoricalLakes_merged_annual%>%filter(MULakeNumber==lake.id&parameterType=="TP"),aes(x=year,y=parameterValue_mean))+
+    geom_hline(yintercept=labels_TP$y.line,linetype=2,color="grey")+
+    geom_text(data=labels_TP,aes(x=x,y=y.label,label=y.label.text),hjust=-0.2,color="grey")+
+    geom_errorbar(aes(ymin = parameterValue_mean-parameterValue_sderr, ymax = parameterValue_mean+parameterValue_sderr))+
+    geom_point(size=2,shape=21,fill="light grey")+
+    theme_bw()+
+    xlab("Year")+
+    ylab(bquote(TP~(mu*g*'/'*L)))+
+    scale_y_continuous(limits=c(0,y.max_TP)))
+
+#CHL_A_COR specific graphs####
+labels_CHL_A_COR<-tibble(x=rep(-Inf,4),y.line=c(3,9,40,NA),y.label=c((3/2),(3+9)/2,(9+40)/2,43),y.label.text=c("0","M","E","HE"))
+y.max_CHL_A_COR<-max(45,max(FiveHistoricalLakes_merged_annual%>%filter(MULakeNumber==lake.id&parameterType=="CHL_A_COR")%>%mutate(upper=parameterValue_mean+parameterValue_sderr)%>%dplyr::select(upper)%>%ungroup()%>%pull(),na.rm=TRUE),na.rm=TRUE)
+(gg.CHL_A_COR.lake<-ggplot(data=FiveHistoricalLakes_merged_annual%>%filter(MULakeNumber==lake.id&parameterType=="CHL_A_COR"),aes(x=year,y=parameterValue_mean))+
+    geom_hline(yintercept=labels_CHL_A_COR$y.line,linetype=2,color="grey")+
+    geom_text(data=labels_CHL_A_COR,aes(x=x,y=y.label,label=y.label.text),hjust=-0.2,color="grey")+
+    geom_errorbar(aes(ymin = parameterValue_mean-parameterValue_sderr, ymax = parameterValue_mean+parameterValue_sderr))+
+    geom_point(size=2,shape=21,fill="light grey")+
+    theme_bw()+
+
+    xlab("Year")+
+    ylab(bquote(Chl~italic(a)~(mu*g*'/'*L)))+
+    scale_y_continuous(limits=c(0,y.max_CHL_A_COR)))
+
+#SECCHI specific graphs####
+labels_SECCHI<-tibble(x=rep(-Inf,4),y.line=c(0.45,1.3,2.6,NA),y.label=c((0.45/2),(0.45+1.3)/2,(1.3+2.6)/2,3),y.label.text=c("HE","E","M","O"))
+y.max_SECCHI<-max(3.2,max(FiveHistoricalLakes_merged_annual%>%filter(MULakeNumber==lake.id&parameterType=="SECCHI")%>%mutate(upper=parameterValue_mean+parameterValue_sderr)%>%dplyr::select(upper)%>%ungroup()%>%pull(),na.rm=TRUE),na.rm=TRUE)
+(gg.SECCHI.lake<-ggplot(data=FiveHistoricalLakes_merged_annual%>%filter(MULakeNumber==lake.id&parameterType=="SECCHI"),aes(x=year,y=parameterValue_mean))+
+    geom_hline(yintercept=labels_SECCHI$y.line,linetype=2,color="grey")+ #Lines for indicating trophic state
+    geom_text(data=labels_SECCHI,aes(x=x,y=y.label,label=y.label.text),hjust=-0.2,color="grey")+ #labels for trophic state
+    geom_errorbar(aes(ymin = parameterValue_mean-parameterValue_sderr, ymax = parameterValue_mean+parameterValue_sderr))+
+    geom_point(size=2,shape=21,fill="light grey")+
+    theme_bw()+
+    xlab("Year")+
+    ylab(bquote(Secchi~(m)))+
+    #scale_y_continuous()+
+    scale_y_reverse(limits=c(y.max_SECCHI,-0.2))
+)
+
+#Find the absolute max and min for the years####
+year.range<-FiveHistoricalLakes_merged_annual%>%filter(MULakeNumber==lake.id)%>%ungroup()%>%summarize(min.year=min(year,na.rm=TRUE)-1,max.year=max(year,na.rm=TRUE)+1)%>%slice(1)%>%as.numeric()
+
+###################################################STOPPED HERE###############################
+#Merge together in 1 four panel frame with A, B, C, D labels in upper left and no x/y labels where appropriate
+IndLakeFigureList<-list(gg.TN.lake+
+                      xlab("")+
+                      theme(axis.text.x=element_blank(),
+                      panel.grid.major = element_blank(), panel.grid.minor = element_blank()
+                      )+
+                      scale_x_continuous(limits=year.range)+
+                      annotate("text",x=Inf,y=Inf,label="A",hjust=1.2,vjust=1.2),
+                    gg.TP.lake+
+                      xlab("")+
+                      #ylab("")+
+                      theme(axis.text.x=element_blank(),
+                            #axis.text.y=element_blank(),
+                            #axis.ticks.x=element_blank(),
+                            panel.grid.major = element_blank(), panel.grid.minor = element_blank()
+                            )+
+                      scale_x_continuous(limits=year.range)+
+                      annotate("text",x=Inf,y=Inf,label="B",hjust=1.2,vjust=1.2),
+                    gg.CHL_A_COR.lake+
+                      #xlab("")+
+                      #ylab("")+
+                      theme( #axis.text.x=element_blank(),
+                        #axis.text.y=element_blank(),
+                        #axis.ticks.x=element_blank(),
+                        panel.grid.major = element_blank(), panel.grid.minor = element_blank()
+                          )+
+                      scale_x_continuous(limits=year.range)+
+                      annotate("text",x=Inf,y=Inf,label="C",hjust=1.2,vjust=1.2),
+                    gg.SECCHI.lake+
+                      #xlab("")+
+                      #ylab("")+
+                      theme(#axis.text.x=element_blank(),
+                        #axis.text.y=element_blank(),
+                        #axis.ticks.x=element_blank(),
+                        panel.grid.major = element_blank(), panel.grid.minor = element_blank()
+                        )+
+                      scale_x_continuous(limits=year.range)+
+                      annotate("text",x=Inf,y=-Inf,label="D",hjust=1.2,vjust=1.2)
+)
+
+
+#Put the plots on a 2x2 matrix####
+(gg.fig3.lake<-wrap_plots(IndLakeFigureList,ncol=2,nrow=2)&theme(plot.margin = unit(c(3,3,3,3),"pt")))
+
+#Export the plot as a jpg####
+ggsave(gg.fig3.lake,file=paste0("09_Figures/",year,"_DNRreport/","SLAPReport-Figure3-",year,"-MULakeNumber-",lake.id,".jpg"),width=plot.width*1.3,height=plot.height.new*1.3,units="in",dpi=300)
+
+
+#There are some 
 #STOPPED HERE####
 #Look at TN, TP, CHL_A_COR, SECCHI for each of the 5####
 #Maybe take annual averages and add error bars - then do Mann-Kendall/Sens slopes to see if they are changing over time####

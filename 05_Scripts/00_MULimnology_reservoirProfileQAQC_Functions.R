@@ -507,3 +507,75 @@ substrFromRight <- function(x, n){
   substr(x, nchar(x)-n+1, nchar(x)-n+1)
 }
 
+#####Function: Standard Error####
+#Standard error
+#Calculates the standard error
+#returns SE
+sderr <- function(x) {
+  sd(x, na.rm = TRUE) / sqrt(length(na.omit(x)))
+}
+####End of standard error#
+
+#Function: slope differences####
+#Calculates all pairwise slope differnces
+#Used in Theil sen slope function: MTCC.sensSlope
+slope.differences <-
+  function(i, xx, yy, n) {
+    (yy[1:(n - i)] - yy[(i + 1):n]) / (xx[1:(n - i)] - xx[(i + 1):n])
+  }
+
+#Function: Theil Sen's slope (non-parametric slope)####
+#Can deal with NAs in the data frame
+#Includes output of p-value, slope and intercept
+#based on a combination of zyp:zyp.sen and trend:sens.slope
+#Implentation:
+#MTCC.sensSlope(testDF.na$Year,testDF.na$Response)
+MTCC.sensSlope <- function (x, y)
+{
+  #Figure out the length of the data
+  n <- length(x)
+  #Get all the pairwise slopes
+  slopes <- unlist(lapply(1:(n - 1), slope.differences, x, y, n))
+  #Figure out which ones are finite
+  sni <- which(is.finite(slopes))
+  #Get the median slope of only the finite ones
+  slope <- median(slopes[sni])
+  #Calculate all the possible intercepts
+  intercepts <- y - slope * x
+  #Get the median intercept - this is different from zyp.sen because it has na.rm=T
+  intercept <- median(intercepts, na.rm = TRUE)
+  #Make the y variables into a table
+  table <- table(y)
+  names(table) <- NULL
+  #Adjust table values?
+  tadjs <- sum(table * (table - 1) * (2 * table + 5))
+  #Not sure what varS signifies
+  varS <- (n * (n - 1) * (2 * n + 5) - tadjs) / 18
+  #Find some boundaries for significance?
+  C <- qnorm(1 - (1 - 0.95) / 2) * sqrt(varS)
+  rank.up <- round(((n - 1) + C) / 2 + 1)
+  rank.lo <- round(((n - 1) - C) / 2)
+  rank.d <- sort(slopes[sni])
+  lo <- rank.d[rank.lo]
+  up <- rank.d[rank.up]
+  #mkScore
+  S <- 0
+  for (j in 1:n) {
+    S <- S + sum(sign(y[j] - y[1:j]), na.rm = TRUE)
+  }
+  
+  sg <- sign(S)
+  z <- sg * (abs(S) - 1) / sqrt(varS)
+  pval <- 2 * min(0.5, pnorm(abs(z), lower.tail = FALSE))
+  
+  #Compile a list for export
+  res <- list(
+    coefficients = c(intercept, slope),
+    residuals = (y - (slope * x + intercept)),
+    pval = pval,
+    z_stat = z,
+    n = n
+  )
+  names(res$coefficients) = c("Intercept", "Year")
+  return(res)
+}
