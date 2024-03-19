@@ -485,7 +485,3 @@ IndLakeFigureList<-list(gg.TN.lake+
 ggsave(gg.fig3.lake,file=paste0("09_Figures/",year,"_DNRreport/","SLAPReport-Figure3-",year,"-MULakeNumber-",lake.id,".jpg"),width=plot.width*1.3,height=plot.height.new*1.3,units="in",dpi=300)
 
 
-#There are some 
-#STOPPED HERE####
-#Look at TN, TP, CHL_A_COR, SECCHI for each of the 5####
-#Maybe take annual averages and add error bars - then do Mann-Kendall/Sens slopes to see if they are changing over time####
