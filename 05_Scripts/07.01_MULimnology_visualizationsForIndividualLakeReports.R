@@ -100,21 +100,30 @@ slopes<-privateLakes_merged_annual%>%
   group_by(MULakeNumber,parameterType,unit)%>%
   summarize(sensSlope_slope=MTCC.sensSlope(year,parameterValue_mean)$coefficients["Year"],
             sensSlope_intercept=MTCC.sensSlope(year,parameterValue_mean)$coefficients["Intercept"],
-            sensSlope_pval=MTCC.sensSlope(year,parameterValue_mean)$pval)%>%
+            sensSlope_pval=MTCC.sensSlope(year,parameterValue_mean)$pval,
+            sensSlope_df=n()-2)%>%
   mutate(significance=ifelse(sensSlope_pval<0.05,"*",""))%>%print(n=Inf)
 
+#Export the table for the Sens Slope stats####
+write_csv(slopes,file=paste0("06_Outputs/",year,"_MissouriIndividualReports_slopes.csv"))
 
 #Join back in the slopes by MULakeNumber, parameterType, unit####
 privateLakes_merged_annual_slopes<-left_join(privateLakes_merged_annual,slopes,by=c("MULakeNumber","parameterType","unit"))%>%
   mutate(parameterValue_mean_fit=ifelse(significance=="*",year*sensSlope_slope+sensSlope_intercept,NA))
 
 #for each lake - do this set of 4 figures: TP, TN, CHl, Secchi
-#"18"  "21"  "85"  "45"  "11"  "112" "14"  "120"
-#can do it on a loop or just run each one here
-lake.id<-"18" #specify the lake
+#Specify the lakes for the individual reports here###
+#Might have to go further up in the future to subset the lakes from the overall dataframe####
+individual.lakes<-c("18",  "21",  "85",  "45",  "11",  "112", "14",  "120")
+
+#Loop through each of these individual lakes and create the two figures for them####
+for(lake.index in 1:length(individual.lakes)){
+
+  lake.id<-individual.lakes[lake.index] #specify the lake
+  
 #Desired plot width in inches
 plot.width<-6
-plot.height<-6
+plot.height<-4.75
 
 #TN specific graphs####
 labels_TN<-tibble(x=rep(-Inf,4),y.line=c(350,550,1200,NA),y.label=c((350/2),450,(550+1200)/2,1250),y.label.text=c("0","M","E","HE"))
@@ -174,10 +183,48 @@ y.max_SECCHI<-max(3.2,max(privateLakes_merged_annual_slopes%>%filter(MULakeNumbe
     scale_y_reverse(limits=c(y.max_SECCHI,-0.2))
 )
 
+#TSS specific graphs####
+y.max_TSS<-max(privateLakes_merged_annual_slopes%>%filter(MULakeNumber==lake.id&parameterType=="TSS")%>%mutate(upper=parameterValue_mean+parameterValue_sderr)%>%dplyr::select(upper)%>%ungroup()%>%pull(),na.rm=TRUE)
+(gg.TSS.lake<-ggplot(data=privateLakes_merged_annual_slopes%>%filter(MULakeNumber==lake.id&parameterType=="TSS"),aes(x=year,y=parameterValue_mean))+
+    #geom_hline(yintercept=labels_TN$y.line,linetype=2,color="grey")+
+    #geom_text(data=labels_TN,aes(x=x,y=y.label,label=y.label.text),hjust=-0.2,color="grey")+
+    geom_errorbar(aes(ymin = parameterValue_mean-parameterValue_sderr, ymax = parameterValue_mean+parameterValue_sderr))+
+    geom_point(size=2,shape=21,fill="light grey")+
+    geom_line(aes(x=year,y=parameterValue_mean_fit),color="blue")+
+    theme_bw()+
+    xlab("Year")+
+    ylab(bquote(TSS~(mg*'/'*L)))+
+    scale_y_continuous(limits=c(0,y.max_TSS)))
+
+#PIM specific graphs####
+y.max_PIM<-max(privateLakes_merged_annual_slopes%>%filter(MULakeNumber==lake.id&parameterType=="PIM")%>%mutate(upper=parameterValue_mean+parameterValue_sderr)%>%dplyr::select(upper)%>%ungroup()%>%pull(),na.rm=TRUE)
+(gg.PIM.lake<-ggplot(data=privateLakes_merged_annual_slopes%>%filter(MULakeNumber==lake.id&parameterType=="PIM"),aes(x=year,y=parameterValue_mean))+
+    #geom_hline(yintercept=labels_TN$y.line,linetype=2,color="grey")+
+    #geom_text(data=labels_TN,aes(x=x,y=y.label,label=y.label.text),hjust=-0.2,color="grey")+
+    geom_errorbar(aes(ymin = parameterValue_mean-parameterValue_sderr, ymax = parameterValue_mean+parameterValue_sderr))+
+    geom_point(size=2,shape=21,fill="light grey")+
+    geom_line(aes(x=year,y=parameterValue_mean_fit),color="blue")+
+    theme_bw()+
+    xlab("Year")+
+    ylab(bquote(PIM~(mg*'/'*L)))+
+    scale_y_continuous(limits=c(0,y.max_PIM)))
+
+#POM specific graphs####
+y.max_POM<-max(privateLakes_merged_annual_slopes%>%filter(MULakeNumber==lake.id&parameterType=="POM")%>%mutate(upper=parameterValue_mean+parameterValue_sderr)%>%dplyr::select(upper)%>%ungroup()%>%pull(),na.rm=TRUE)
+(gg.POM.lake<-ggplot(data=privateLakes_merged_annual_slopes%>%filter(MULakeNumber==lake.id&parameterType=="POM"),aes(x=year,y=parameterValue_mean))+
+    #geom_hline(yintercept=labels_TN$y.line,linetype=2,color="grey")+
+    #geom_text(data=labels_TN,aes(x=x,y=y.label,label=y.label.text),hjust=-0.2,color="grey")+
+    geom_errorbar(aes(ymin = parameterValue_mean-parameterValue_sderr, ymax = parameterValue_mean+parameterValue_sderr))+
+    geom_point(size=2,shape=21,fill="light grey")+
+    geom_line(aes(x=year,y=parameterValue_mean_fit),color="blue")+
+    theme_bw()+
+    xlab("Year")+
+    ylab(bquote(POM~(mg*'/'*L)))+
+    scale_y_continuous(limits=c(0,y.max_POM)))
+
 #Find the absolute max and min for the years####
 year.range<-privateLakes_merged_annual%>%filter(MULakeNumber==lake.id)%>%ungroup()%>%summarize(min.year=min(year,na.rm=TRUE)-1,max.year=max(year,na.rm=TRUE)+1)%>%slice(1)%>%as.numeric()
 
-###################################################STOPPED HERE###############################
 #Merge together in 1 four panel frame with A, B, C, D labels in upper left and no x/y labels where appropriate
 IndLakeFigureList<-list(gg.TN.lake+
                           xlab("")+
@@ -218,14 +265,42 @@ IndLakeFigureList<-list(gg.TN.lake+
                           annotate("text",x=Inf,y=-Inf,label="D",hjust=1.2,vjust=1.2)
 )
 
-
 #Put the plots on a 2x2 matrix####
 (gg.trophic.Individuallake<-wrap_plots(IndLakeFigureList,ncol=2,nrow=2)&theme(plot.margin = unit(c(3,3,3,3),"pt")))
 
 #Export the plot as a jpg####
 ggsave(gg.trophic.Individuallake,file=paste0("09_Figures/",year,"_IndividualLakeReports/","SLAPReport-Figure3-",year,"-MULakeNumber-",lake.id,".jpg"),width=plot.width,height=plot.height,units="in",dpi=300)
 
-####STOPPED HERE#####
-#Loop across all the lakes
-#Generate a similar figure with TSS, POM, PIM stacked 3 high within loop####
+
+#Merge together in 1 four panel frame with A, B, C, D labels in upper left and no x/y labels where appropriate
+IndLakeFigureList.TSS<-list(gg.TSS.lake+
+                          xlab("")+
+                          theme(axis.text.x=element_blank(),
+                                panel.grid.major = element_blank(), panel.grid.minor = element_blank()
+                          )+
+                          scale_x_continuous(limits=year.range)+
+                          annotate("text",x=Inf,y=Inf,label="A",hjust=1.2,vjust=1.2),
+                        gg.PIM.lake+
+                          xlab("")+
+                          theme(axis.text.x=element_blank(),
+                                panel.grid.major = element_blank(), panel.grid.minor = element_blank()
+                          )+
+                          scale_x_continuous(limits=year.range)+
+                          annotate("text",x=Inf,y=Inf,label="B",hjust=1.2,vjust=1.2),
+                        gg.POM.lake+
+                          #xlab("")+
+                          theme(#axis.text.x=element_blank(),
+                                panel.grid.major = element_blank(), panel.grid.minor = element_blank()
+                          )+
+                          scale_x_continuous(limits=year.range)+
+                          annotate("text",x=Inf,y=Inf,label="C",hjust=1.2,vjust=1.2)
+)
+
+#Put the plots on a 3x1 matrix####
+(gg.trophic.Individuallake.TSS<-wrap_plots(IndLakeFigureList.TSS,ncol=1,nrow=3)&theme(plot.margin = unit(c(3,3,3,3),"pt")))
+
+#Export the plot as a jpg####
+ggsave(gg.trophic.Individuallake.TSS,file=paste0("09_Figures/",year,"_IndividualLakeReports/","SLAPReport-Figure4-",year,"-MULakeNumber-",lake.id,".jpg"),width=plot.width/2,height=plot.height*(3/2),units="in",dpi=300)
+
+} #end of loop
 
