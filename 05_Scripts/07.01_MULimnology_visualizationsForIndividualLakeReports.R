@@ -124,34 +124,35 @@ for(lake.index in 1:length(individual.lakes)){
 #Desired plot width in inches
 plot.width<-6
 plot.height<-4.75
+scale_to_mg<-(1/1000) #This scales everything to mg/L for TP and TN. Change labels and change this factor to 1 for ug/L
 
 #TN specific graphs####
 labels_TN<-tibble(x=rep(-Inf,4),y.line=c(350,550,1200,NA),y.label=c((350/2),450,(550+1200)/2,1250),y.label.text=c("0","M","E","HE"))
 y.max_TN<-max(1255,max(privateLakes_merged_annual_slopes%>%filter(MULakeNumber==lake.id&parameterType=="TN")%>%mutate(upper=parameterValue_mean+parameterValue_sderr)%>%dplyr::select(upper)%>%ungroup()%>%pull(),na.rm=TRUE),na.rm=TRUE)
-(gg.TN.lake<-ggplot(data=privateLakes_merged_annual_slopes%>%filter(MULakeNumber==lake.id&parameterType=="TN"),aes(x=year,y=parameterValue_mean))+
-    geom_hline(yintercept=labels_TN$y.line,linetype=2,color="grey")+
-    geom_text(data=labels_TN,aes(x=x,y=y.label,label=y.label.text),hjust=-0.2,color="grey")+
-    geom_errorbar(aes(ymin = parameterValue_mean-parameterValue_sderr, ymax = parameterValue_mean+parameterValue_sderr))+
+(gg.TN.lake<-ggplot(data=privateLakes_merged_annual_slopes%>%filter(MULakeNumber==lake.id&parameterType=="TN"),aes(x=year,y=parameterValue_mean*scale_to_mg))+
+    geom_hline(yintercept=labels_TN$y.line*scale_to_mg,linetype=2,color="grey")+
+    geom_text(data=labels_TN,aes(x=x,y=y.label*scale_to_mg,label=y.label.text),hjust=-0.2,color="grey")+
+    geom_errorbar(aes(ymin = (parameterValue_mean-parameterValue_sderr)*scale_to_mg, ymax = (parameterValue_mean+parameterValue_sderr)*scale_to_mg))+
     geom_point(size=2,shape=21,fill="light grey")+
-    geom_line(aes(x=year,y=parameterValue_mean_fit),color="blue")+
+    geom_line(aes(x=year,y=parameterValue_mean_fit*scale_to_mg),color="blue")+
     theme_bw()+
     xlab("Year")+
-    ylab(bquote(TN~(mu*g*'/'*L)))+
-    scale_y_continuous(limits=c(0,y.max_TN)))
+    ylab(bquote(TN~(mg*'/'*L)))+
+    scale_y_continuous(limits=c(0,y.max_TN*scale_to_mg)))
 
 #TP specific graphs####
 labels_TP<-tibble(x=rep(-Inf,4),y.line=c(10,25,100,NA),y.label=c((10/2),(10+25)/2,(25+100)/2,120),y.label.text=c("0","M","E","HE"))
 y.max_TP<-max(125,max(privateLakes_merged_annual_slopes%>%filter(MULakeNumber==lake.id&parameterType=="TP")%>%mutate(upper=parameterValue_mean+parameterValue_sderr)%>%dplyr::select(upper)%>%ungroup()%>%pull(),na.rm=TRUE),na.rm=TRUE)
-(gg.TP.lake<-ggplot(data=privateLakes_merged_annual_slopes%>%filter(MULakeNumber==lake.id&parameterType=="TP"),aes(x=year,y=parameterValue_mean))+
-    geom_hline(yintercept=labels_TP$y.line,linetype=2,color="grey")+
-    geom_text(data=labels_TP,aes(x=x,y=y.label,label=y.label.text),hjust=-0.2,color="grey")+
-    geom_errorbar(aes(ymin = parameterValue_mean-parameterValue_sderr, ymax = parameterValue_mean+parameterValue_sderr))+
+(gg.TP.lake<-ggplot(data=privateLakes_merged_annual_slopes%>%filter(MULakeNumber==lake.id&parameterType=="TP"),aes(x=year,y=parameterValue_mean*scale_to_mg))+
+    geom_hline(yintercept=labels_TP$y.line*scale_to_mg,linetype=2,color="grey")+
+    geom_text(data=labels_TP,aes(x=x,y=y.label*scale_to_mg,label=y.label.text),hjust=-0.2,color="grey")+
+    geom_errorbar(aes(ymin = (parameterValue_mean-parameterValue_sderr)*scale_to_mg, ymax = (parameterValue_mean+parameterValue_sderr)*scale_to_mg))+
     geom_point(size=2,shape=21,fill="light grey")+
-    geom_line(aes(x=year,y=parameterValue_mean_fit),color="blue")+
+    geom_line(aes(x=year,y=parameterValue_mean_fit*scale_to_mg),color="blue")+
     theme_bw()+
     xlab("Year")+
-    ylab(bquote(TP~(mu*g*'/'*L)))+
-    scale_y_continuous(limits=c(0,y.max_TP)))
+    ylab(bquote(TP~(mg*'/'*L)))+
+    scale_y_continuous(limits=c(0,y.max_TP*scale_to_mg)))
 
 #CHL_A_COR specific graphs####
 labels_CHL_A_COR<-tibble(x=rep(-Inf,4),y.line=c(3,9,40,NA),y.label=c((3/2),(3+9)/2,(9+40)/2,43),y.label.text=c("0","M","E","HE"))
