@@ -711,12 +711,12 @@ databaseImport2<-databaseImport%>%mutate(Date=case_when(
 #Database DNR####
 databaseDNR<-databaseImport2%>%
     #remove specific rows for isothermal
-    filter(!(MULakeNumber=="440"&Date==as.Date("2023-04-27")))%>%
-    filter(!(MULakeNumber=="46"&Date==as.Date("2023-06-12")))%>%
-    filter(!(MULakeNumber=="163"&Date==as.Date("2023-06-13")))%>%
-    filter(!(MULakeNumber=="121"&Date==as.Date("2023-07-19")))%>%
-    filter(!(MULakeNumber=="121"&Date==as.Date("2023-08-10")))%>%
-    filter(!(MULakeNumber=="30"&Date==as.Date("2023-08-15")))%>%
+    #filter(!(MULakeNumber=="440"&Date==as.Date("2023-04-27")))%>%
+    #filter(!(MULakeNumber=="46"&Date==as.Date("2023-06-12")))%>%
+    #filter(!(MULakeNumber=="163"&Date==as.Date("2023-06-13")))%>%
+    #filter(!(MULakeNumber=="121"&Date==as.Date("2023-07-19")))%>%
+    #filter(!(MULakeNumber=="121"&Date==as.Date("2023-08-10")))%>%
+    #filter(!(MULakeNumber=="30"&Date==as.Date("2023-08-15")))%>%
     filter(!(MULakeNumber=="446-01-00"&Date==as.Date("2023-09-19")))%>%
     #Only keep May to September
     filter(month(Date)>=5&month(Date)<=9)%>%
@@ -727,7 +727,7 @@ databaseDNR<-databaseImport2%>%
 
 
  #Export database for DNR####
-write_csv(databaseDNR,file=paste0("06_Outputs/",year,"_MissouriReservoirsForDNR_v1.csv"))
+write_csv(databaseDNR,file=paste0("06_Outputs/",year,"_MissouriReservoirsForDNR_v2.csv"))
 
 
 #RANDOM CODE TO HELP WITH MERGING AND IDing specific cases####
