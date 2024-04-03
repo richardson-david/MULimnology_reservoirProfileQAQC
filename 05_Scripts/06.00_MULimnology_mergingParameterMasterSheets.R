@@ -717,9 +717,11 @@ databaseDNR<-databaseImport2%>%
     #filter(!(MULakeNumber=="121"&Date==as.Date("2023-07-19")))%>%
     #filter(!(MULakeNumber=="121"&Date==as.Date("2023-08-10")))%>%
     #filter(!(MULakeNumber=="30"&Date==as.Date("2023-08-15")))%>%
-    filter(!(MULakeNumber=="446-01-00"&Date==as.Date("2023-09-19")))%>%
-    #Only keep May to September
-    filter(month(Date)>=5&month(Date)<=9)%>%
+    filter(!(MULakeNumber=="446-01-00"&Date==as.Date("2023-09-19")))%>% #Remove these non-sampled sites
+    filter(!(MULakeNumber=="446-01-00"&Date==as.Date("2023-04-16")))%>%
+    filter(!(MULakeNumber=="438"&Date==as.Date("2023-04-11")))%>%
+    #Only keep April to September
+    filter(month(Date)>=4&month(Date)<=9)%>%
     
     filter(!(parameterType=="CL"))%>% #Remove chloride samples
     filter(!(parameterType=="Tot_fluor"))%>% #Remove fluorometer RFU samples
